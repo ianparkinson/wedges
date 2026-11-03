@@ -1,0 +1,58 @@
+/*
+ * Design tokens: the only place colours, spacing and type sizes are defined.
+ * Components use these custom properties from their own CSS Modules.
+ */
+:root {
+  --color-bg: #f6f1e7;
+  --color-surface: #fffdf8;
+  --color-text: #2b2118;
+  --color-text-muted: #6b5d4f;
+  --color-accent: #8a4b1f;
+  --color-focus: #1f5fbf;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-cuneiform: 'Noto Sans Cuneiform', 'Segoe UI Historic', serif;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 2rem;
+  --text-glyph: 4rem;
+
+  --radius: 8px;
+  --content-width: 40rem;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1d1814;
+    --color-surface: #28211b;
+    --color-text: #efe6da;
+    --color-text-muted: #b3a493;
+    --color-accent: #e0a070;
+    --color-focus: #7fb0ff;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.5;
+}

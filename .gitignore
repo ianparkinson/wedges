@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+# Local Claude Code settings
+.claude/settings.local.json
+
+# Editor / OS clutter
+.DS_Store
+*.swp
+.vscode/
+.idea/

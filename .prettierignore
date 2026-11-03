@@ -1,0 +1,9 @@
+dist
+coverage
+playwright-report
+test-results
+package-lock.json
+
+# Markdown is left as written: Prettier pads tables, which makes every
+# table edit a whole-table diff.
+*.md
