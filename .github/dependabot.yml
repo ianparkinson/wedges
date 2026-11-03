@@ -4,6 +4,13 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # typescript-eslint supports TypeScript <6.1; lift this when it supports 7.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+      # Matches the Node version in .nvmrc; bump both together.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
     groups:
       # These must move together: @axe-core/playwright shares playwright-core.
       playwright:
