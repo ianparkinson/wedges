@@ -85,4 +85,4 @@ Write for an experienced software engineer who is new to this project and to cun
 
 ## Data and licences
 
-Code and templates are MIT. The Oracc Sign List data is CC0. Templates are traced over Noto Sans Cuneiform (SIL Open Font License). Check a font's licence before using it as a tracing reference; see [prior-art.md](docs/prior-art.md).
+Code and skeletons are MIT. The Oracc Sign List data is CC0. Skeletons are traced over Noto Sans Cuneiform (SIL Open Font License). Check a font's licence before using it as a tracing reference; see [prior-art.md](docs/prior-art.md).

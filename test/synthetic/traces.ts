@@ -1,5 +1,5 @@
 /**
- * Synthetic finger traces: turns template strokes into noisy point lists, as
+ * Synthetic finger traces: turns skeleton strokes into noisy point lists, as
  * a person might draw them, for tests.
  */
 import type { Point } from "@/core/geometry"
@@ -7,7 +7,7 @@ import type { Stroke } from "@/core/strokes"
 
 import type { Random } from "./random"
 
-/** Where a sign on the 0–10 template grid lands on the pad. */
+/** Where a sign on the 0–10 skeleton grid lands on the pad. */
 export interface Placement {
   /** Pixels per grid unit. */
   readonly scale: number
@@ -29,7 +29,7 @@ const LEG_STEPS = 12
 const LEG_JITTER = 1
 
 /**
- * A noisy trace of one template stroke. `noise` jitters the stroke's key
+ * A noisy trace of one skeleton stroke. `noise` jitters the stroke's key
  * points, in grid units (a sign is 10 across).
  */
 export function synthesizeTrace(
