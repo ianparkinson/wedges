@@ -80,7 +80,7 @@ Write for an experienced software engineer who is new to this project and to cun
 - `docs/`: how the algorithms work, beside the code they describe (each `src/core` module's header comment links to its section), and [prior art](docs/prior-art.md): related projects, data sources and licences.
 - `docs/decisions/`: decision records.
 - `e2e/`: Playwright specs.
-- `test/`: test setup, and later the golden fixtures and benchmark.
+- `test/`: test setup, and tests that use seeded synthetic drawings from `synthetic/`.
 - `.github/workflows/`: `ci.yml` (every PR and push to `main`) and `deploy.yml` (deploys `main` to GitHub Pages after CI passes).
 
 ## Data and licences
