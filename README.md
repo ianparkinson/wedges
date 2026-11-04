@@ -21,6 +21,7 @@ See [AGENTS.md](AGENTS.md) for how the code is organised and the rules for contr
 
 ## Documentation
 
+- [Stroke recognition](docs/stroke-recognition.md): how a touch trace becomes a wedge or a Winkelhaken.
 - [Prior art](docs/prior-art.md): related projects, data sources and licences.
 - [Decision records](docs/decisions/): why things are the way they are.
 
