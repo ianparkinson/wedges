@@ -8,7 +8,7 @@ Draw a sign one wedge at a time and pick it from the top three candidates, build
 
 ## Development
 
-You need Node.js 22 or later.
+You need Node.js 26 or later (see `.nvmrc`).
 
 ```bash
 npm install
