@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    ignore:
+      # typescript-eslint supports TypeScript <6.1; lift this when it supports 7.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      # Matches the Node version in .nvmrc; bump both together.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+    groups:
+      # These must move together: @axe-core/playwright shares playwright-core.
+      playwright:
+        patterns: ["@playwright/test", "playwright-core"]
+      # Minor and patch updates of everything else in one weekly PR.
+      minor-and-patch:
+        update-types: [minor, patch]
+        exclude-patterns: ["@playwright/test", "playwright-core"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

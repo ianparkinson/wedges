@@ -1,0 +1,32 @@
+.page {
+  max-width: var(--content-width);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.glyph {
+  margin: 0;
+  font-family: var(--font-cuneiform);
+  font-size: var(--text-glyph);
+  line-height: 1.2;
+  color: var(--color-accent);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-xl);
+}
+
+.lede {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.status {
+  margin: 0;
+  color: var(--color-text-muted);
+}

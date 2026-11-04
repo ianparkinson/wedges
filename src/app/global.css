@@ -1,0 +1,11 @@
+/*
+ * Site-wide base styles, applied after modern-normalize and tokens.css.
+ */
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.5;
+}
