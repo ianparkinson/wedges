@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ianparkinson.github.io/wedges/schemas/skeletons.schema.json",
+  "title": "Sign skeletons",
+  "description": "Skeletons that drawings are matched against, for one script style or font. See docs/skeleton-format.md.",
+  "type": "object",
+  "required": ["version", "style", "skeletons"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "style": {
+      "description": "The script style or font the file follows.",
+      "enum": ["noto"]
+    },
+    "comments": {
+      "description": "Notes on the file: who or what made it, and when.",
+      "type": "string"
+    },
+    "skeletons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["char", "spec"],
+        "additionalProperties": false,
+        "properties": {
+          "char": {
+            "description": "The Unicode character, a single code point.",
+            "type": "string",
+            "pattern": "^[\\u{12000}-\\u{1254F}]$"
+          },
+          "spec": {
+            "description": "The strokes, in spec notation.",
+            "type": "string",
+            "minLength": 1
+          },
+          "comments": {
+            "description": "Notes on this entry, for people editing the file.",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

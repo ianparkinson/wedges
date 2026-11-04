@@ -22,12 +22,13 @@ See [AGENTS.md](AGENTS.md) for how the code is organised and the rules for contr
 ## Documentation
 
 - [Stroke recognition](docs/stroke-recognition.md): how a touch trace becomes a wedge or a Winkelhaken.
+- [Skeleton format](docs/skeleton-format.md): the spec notation for sign skeletons, and the skeleton files.
 - [Prior art](docs/prior-art.md): related projects, data sources and licences.
 - [Decision records](docs/decisions/): why things are the way they are.
 
 ## Credits and licence
 
-Wedges is released under the [MIT licence](LICENSE), code and templates alike.
+Wedges is released under the [MIT licence](LICENSE), code and skeletons alike.
 
 - Sign names, values and ids come from the [Oracc Sign List](https://oracc.museum.upenn.edu/osl/), released under CC0.
-- The sign templates were traced over [Noto Sans Cuneiform](https://fonts.google.com/noto/specimen/Noto+Sans+Cuneiform), which is licensed under the SIL Open Font License 1.1.
+- The sign skeletons were traced over [Noto Sans Cuneiform](https://fonts.google.com/noto/specimen/Noto+Sans+Cuneiform), which is licensed under the SIL Open Font License 1.1.

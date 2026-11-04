@@ -23,13 +23,13 @@ Plenty of nearby work exists: ways of describing a sign's wedges in text, search
 ### Gottstein system
 
 - **What it is:** Norbert Gottstein (2012) describes each sign by how many wedges of each type it has. It was designed to help beginners find a sign by its appearance rather than its position in a sign list. It covers mainly Middle and Neo-Assyrian signs ([CDLN 2015:17](https://cdli.earth/articles/cdln/2015-17)).
-- **Relevance:** useful as a pre-filter or a cross-check on templates. It can't be a template itself, since it records no positions. We didn't find a machine-readable list of codes.
+- **Relevance:** useful as a pre-filter or a cross-check on skeletons. It can't be a skeleton itself, since it records no positions. We didn't find a machine-readable list of codes.
 
 ### PaleoCodage (verified)
 
 - **What it is:** a text notation by Timo Homburg, modelled on the Manuel de Codage used for Egyptian hieroglyphs ([DH2019 abstract](https://dh-abstracts.library.virginia.edu/works/9865); _Digital Scholarship in the Humanities_ 2021, DOI 10.1093/llc/fqab038). It encodes wedge types and how wedges relate to each other: beside, beneath, crossing, rotated, smaller.
 - **Data:** [github.com/situx/PaleoCodage](https://github.com/situx/PaleoCodage) (GPL-3.0, last updated October 2022) contains `js/paleocodes.js`, which encodes 380 signs. Each has its codepoint, transliteration, Borger number and a PaleoCode string such as `a-b-w-a:a`. `js/paleocodage.js` draws those codes.
-- **Relevance:** the only dataset we found that describes how a sign's wedges are laid out, covering about a third of Unicode. It could generate starting templates without tracing, but they would be rough, because the notation records relations, not exact positions. Using its data or code would probably require this project to be released under the GPL too.
+- **Relevance:** the only dataset we found that describes how a sign's wedges are laid out, covering about a third of Unicode. It could generate starting skeletons without tracing, but they would be rough, because the notation records relations, not exact positions. Using its data or code would probably require this project to be released under the GPL too.
 
 ### Recursive encoding
 
@@ -60,13 +60,13 @@ A mature research area, but a different problem: finding and identifying signs i
 
 - **Oracc Sign List (OSL)**: [oracc.museum.upenn.edu/osl](https://oracc.museum.upenn.edu/osl/), with the source at [github.com/oracc/osl](https://github.com/oracc/osl) (`00lib/osl.asl`). It's public domain (CC0) and covers 1,225 of the 1,234 Unicode cuneiform characters. Each sign has a name, values (readings), Unicode mapping, numbers in other sign lists (MZL, ABZL, HZL…), and links to eBL and Wikidata. Wedges uses it for sign names, values and links.
 - **ORACC and CDLI corpora**: transliterated texts, the obvious source for sign frequency counts if ranking ever weights candidates by how common they are. Neither gives counts per Unicode character directly; you'd map readings to signs through OSL. Frequencies also vary a lot by period, language and genre.
-- **Fonts**: Noto Sans Cuneiform (SIL Open Font License) was used as the tracing reference for the sign templates. Its signs are drawn as single merged outlines, not separate wedges, so templates can't be pulled out of it automatically. Fonts in other styles, such as the Neo-Assyrian Assurbanipal font, could serve as references for variant templates.
+- **Fonts**: Noto Sans Cuneiform (SIL Open Font License) was used as the tracing reference for the sign skeletons. Its signs are drawn as single merged outlines, not separate wedges, so skeletons can't be pulled out of it automatically. Fonts in other styles, such as the Neo-Assyrian Assurbanipal font, could serve as references for variant skeletons.
 
 ## How this project relates to it
 
 - **No code or data reused from other projects.** CuneiPainter's source was read only to describe it here, after the matcher had been written. Nothing from CuneiPainter or PaleoCodage is used, so their GPL licences don't apply.
 - **Data the project is built on:**
-  - the templates were traced over Noto Sans Cuneiform glyphs (SIL Open Font License)
+  - the skeletons were traced over Noto Sans Cuneiform glyphs (SIL Open Font License)
   - sign names and values come from the Oracc Sign List (CC0)
   - character names come from the Unicode Character Database
 - **Ideas with precedents, credited in the README:**
@@ -78,10 +78,10 @@ A mature research area, but a different problem: finding and identifying signs i
   - the drawing conventions (wedges from the head, a Winkelhaken as a single angle)
   - a stroke classifier that tolerates flicks
   - pairing that also allows extra and missing strokes and reversed wedges
-  - templates traced over a reference font, covering all of Unicode
+  - skeletons traced over a reference font, covering all of Unicode
 
 ## What this means for a production version
 
 - **The gap is real:** existing systems either count wedge types (CuneiPainter, Gottstein), need a written description (QbX), or work on photos. Matching drawn wedge geometry is what sets this project apart.
 - **Licensing:** OSL is CC0 and safe to bundle. CuneiPainter and PaleoCodage are GPL-3.0, so reusing their data or code commits the project to the GPL.
-- **Script styles:** reference fonts and sign lists follow particular periods. Users trained in Neo-Assyrian will draw some signs quite differently from the Noto glyphs. A production database needs several samples for those signs, which the template format allows.
+- **Script styles:** reference fonts and sign lists follow particular periods. Users trained in Neo-Assyrian will draw some signs quite differently from the Noto glyphs. A production database needs several samples for those signs, which the skeleton format allows.

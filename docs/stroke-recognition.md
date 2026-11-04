@@ -1,6 +1,6 @@
 # Stroke recognition
 
-How a single touch trace becomes a cuneiform stroke: either a **wedge** or a **Winkelhaken**. This is the first stage of recognition. The second stage matches a set of strokes against sign templates. The implementation is `classifyTrace()` in [`src/core/strokes.ts`](../src/core/strokes.ts).
+How a single touch trace becomes a cuneiform stroke: either a **wedge** or a **Winkelhaken**. This is the first stage of recognition. The second stage matches a set of strokes against sign skeletons. The implementation is `classifyTrace()` in [`src/core/strokes.ts`](../src/core/strokes.ts).
 
 ## How users draw
 
@@ -69,7 +69,7 @@ This is the most important tolerance for touchscreens. Without it, a straight we
 
 Measure the angle at the corner between the two legs. If it's within `winkelhakenAngles`, the stroke is a **Winkelhaken** with vertex at the corner. Otherwise it's a **curved wedge** from first point to last. Below 15° the legs nearly overlap: a back-and-forth scribble, not a deliberate angle. Above 135° it's a bowed line rather than an angle.
 
-Opening direction isn't checked: a `>` is still a Winkelhaken. Matching compares opening direction against the template, so signs whose Winkelhaken open another way (AK, for example) still work.
+Opening direction isn't checked: a `>` is still a Winkelhaken. Matching compares opening direction against the skeleton, so signs whose Winkelhaken open another way (AK, for example) still work.
 
 ## Tests
 
@@ -79,7 +79,7 @@ Opening direction isn't checked: a `>` is still a Winkelhaken. Matching compares
 ## Known limitations and ideas
 
 - **Thresholds are untuned:** they were set by eye. Labelled real drawings could be used to tune them, and the matching weights, systematically.
-- **Curves can't be drawn:** a few signs contain curved shapes rather than wedges, such as KAM₄ (a semicircle), ŠAR₂ (a circle) and the variant forms of ONE THIRD and TWO THIRDS. They have no stroke type to match them, so they have no template. Supporting them would need a third stroke type (an arc, or a closed loop) in both recognition and matching.
+- **Curves can't be drawn:** a few signs contain curved shapes rather than wedges, such as KAM₄ (a semicircle), ŠAR₂ (a circle) and the variant forms of ONE THIRD and TWO THIRDS. They have no stroke type to match them, so they have no skeleton. Supporting them would need a third stroke type (an arc, or a closed loop) in both recognition and matching.
 - **Only one corner:** a stroke with two corners (a Z shape) becomes either a Winkelhaken or a wedge. Cuneiform has no strokes like that, but treating them as errors and asking the user to redraw might be clearer than guessing.
 - **Size and length are ignored:** a deliberately short wedge (in many signs, small wedges differ from long ones) is still just a wedge. Matching compares lengths only relative to the whole sign, and only lightly.
 - **Taps are ignored:** a quick tap could be offered as a shortcut for a small Winkelhaken, a common component.
