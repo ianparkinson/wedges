@@ -30,8 +30,30 @@ jobs:
       # Type checks, lint, format, unit, component and data tests.
       - run: npm run check
 
+      # The browsers' system packages come from a slow apt mirror, so their
+      # .deb files are cached alongside the browsers.
+      - name: Read the Playwright version
+        id: playwright
+        run: |
+          echo "version=$(jq -r '.packages["node_modules/@playwright/test"].version' package-lock.json)" >> "$GITHUB_OUTPUT"
+          echo "image=$ImageOS" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers and system packages
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cache/ms-playwright
+            ~/apt-archives
+          key: playwright-${{ steps.playwright.outputs.image }}-${{ runner.arch }}-${{ steps.playwright.outputs.version }}
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium webkit
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium webkit
+      - name: Install the browsers' system packages
+        run: |
+          mkdir -p ~/apt-archives
+          sudo find ~/apt-archives -maxdepth 1 -name '*.deb' -exec cp -t /var/cache/apt/archives {} +
+          npx playwright install-deps chromium webkit
+          find /var/cache/apt/archives -maxdepth 1 -name '*.deb' -exec cp -t ~/apt-archives {} +
       - name: E2E tests
         run: npm run e2e
       - name: Upload Playwright report

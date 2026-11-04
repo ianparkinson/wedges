@@ -11,6 +11,7 @@ Wedges is a static app. It needs HTTPS for the Clipboard API. GitHub Actions min
 
 - Host on **GitHub Pages**, deployed from `main` by `.github/workflows/deploy.yml` once CI has passed on that commit. The site lives under `/wedges/`, which is Vite's `base`.
 - Every pull request runs `.github/workflows/ci.yml`: `npm run check`, then Playwright e2e and accessibility tests on emulated Pixel 7 (Chromium) and iPhone 14 (WebKit).
+- CI caches the Playwright browsers and the `.deb` files of their system packages, keyed on the Playwright version and runner image. The runner's apt mirror can be slow enough to time the job out.
 - The accuracy benchmark and performance timings take minutes, so they **run by hand**, never in CI or on a schedule. The PR template asks for the result when a PR touches matching or data.
 - Dependabot opens weekly update PRs, with CI as the gate.
 
