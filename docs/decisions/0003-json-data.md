@@ -10,8 +10,8 @@ The app needs two kinds of data: the sign skeletons the matcher compares drawing
 ## Decision
 
 - Skeletons live in `data/skeletons/`, one file per script style or font, starting with `noto.json`. Each entry is `{ char, spec }`, with optional `comments`; a file may have several entries for a sign.
-- Oracc Sign List data lives in `data/osl.json`, generated from `osl.asl` by `scripts/build-osl.ts`, including compound parts, variants and sequences. It is never edited by hand.
-- Both files have JSON Schemas in `data/schemas/`, and are validated in a unit test, not at runtime.
+- Oracc Sign List data comes from a copy of OSL's own source file, `data/osl.asl`, which is parsed at build time into names, values, compound parts, variants and sequences. Updating it means copying in a newer file, with no format of our own to maintain.
+- Skeleton files have a JSON Schema in `data/schemas/`, and are validated in a unit test, not at runtime.
 - Spec strings use a compact text notation with two ops, one per stroke shape.
 - The data loads lazily, after first paint.
 
