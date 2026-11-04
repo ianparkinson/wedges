@@ -111,6 +111,34 @@ A sign can have several samples. Its score is the best score over all of them, s
 
 Neither bound changes the results: the top `limit` are exactly those of a full ranking, as a unit test checks. The candidate list uses `limit = 3`.
 
+## Performance
+
+Cost per comparison is O(min(n, m)² · max(n, m)). A ranking does at most one comparison per sample: linear in database size, cubic in stroke counts.
+
+`npm run bench` times a ranking of the 832 skeletons, with `limit = 3`, in headless Chromium with the CPU throttled 4×, to stand in for a mid-range phone. Median of 10 synthetic drawings each, November 2026, with the hand-written solver that munkres replaced:
+
+| Strokes drawn | Time   |
+| ------------- | ------ |
+| 1             | 1.5 ms |
+| 5             | 10 ms  |
+| 10            | 21 ms  |
+| 20            | 43 ms  |
+| 30            | 64 ms  |
+
+The budget is 50 ms, so ranking runs on the main thread after each stroke, with no Web Worker; see [decision 0006](decisions/0006-ranking-on-main-thread.md). Large signs gain least from skipping, because many skeletons have similar stroke counts. In side-by-side runs, munkres gave times within noise of these overall, and solved 30 × 30 matrices about twice as fast.
+
+## Accuracy
+
+`npm run benchmark` draws every skeleton 40 times with noise: endpoints jittered by 0.6 grid units (6% of the sign's size), stroke order shuffled, and flicks on 30% of wedges. It reports how often the right sign comes first and in the top three, and fails below 95% and 98%. It runs by hand, before merging a change to matching or skeletons, and takes about two minutes on a desktop.
+
+| Skeletons | Right sign first | In top 3 |
+| --------- | ---------------- | -------- |
+| 832       | 96.2%            | 98.9%    |
+
+The commonest confusions are signs that look identical: DIŠ, ONE GEŠ₂ and OLD ASSYRIAN WORD DIVIDER are all a single vertical wedge, and numerals such as SIX DIŠ and SIX GEŠ₂ share a shape across counting systems. No drawing can separate those; the candidate list shows them side by side. Apart from those, most are within the DAG KISIM₅× family: 25 signs with the same large outer frame, differing only in the small sign written inside. That inner sign is a few strokes out of 20–30, all close together, so a wrong inner sign costs little against the whole. These can be built from their parts instead of drawn whole, by combining signs.
+
+These figures only show that the skeletons are distinct from each other. Real freehand drawings will score worse.
+
 ## Design decisions
 
 - **The approach has precedents.** Optimal pairing of parts is a standard way to compare shapes; Belongie et al. (2002), for example, match sample points on handwritten digits this way. For cuneiform, Bogacz et al. (2015) match characters taken from tablet scans by pairing their wedges. The matcher here was developed independently, but follows the same idea, applied to drawn strokes.

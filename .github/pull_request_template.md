@@ -10,7 +10,7 @@
 
 - [ ] `npm run check` passes locally
 - [ ] Docs updated if behaviour changed (AGENTS.md, docs/, README)
-- [ ] Fixtures regenerated in this PR if a behaviour change was intended
+- [ ] Any intended change in recognition or lookup behaviour described above
 - [ ] A decision record added in `docs/decisions/` if this changes a past decision
 
 ### If this touches `src/core/matcher` or `data/`

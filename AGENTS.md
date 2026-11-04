@@ -15,7 +15,7 @@ A mobile-first web app for entering cuneiform. You draw a sign one wedge at a ti
 5. **Tests sit beside the code:** `rank.ts` and `rank.test.ts`. A file with no test beside it should have a reason.
 6. **Small, named pieces:** one component or concept per file, files under about 300 lines, named constants instead of magic numbers.
 7. **Generated files say so in a header** and are rebuilt by a script, never edited by hand.
-8. **Don't change recognition behaviour by accident.** If a PR touches `src/core/matcher` or `data/`, run the accuracy benchmark by hand and put the result in the PR description. If a behaviour change is intended, regenerate the fixtures in the same PR.
+8. **Don't change recognition behaviour by accident.** If a PR touches `src/core/matcher` or `data/`, run the accuracy benchmark by hand and put the result in the PR description. If a behaviour change is intended, say what changed and why in the PR description.
 9. **Record decisions.** A choice that someone later might want to revisit gets a short file in `docs/decisions/`.
 
 ## Layers
@@ -47,6 +47,8 @@ Import our own code through the `@/` alias (`@/core/geometry`), or relatively wi
 | `npm run e2e`                     | Playwright tests on emulated Pixel 7 (Chromium) and iPhone 14 (WebKit), against the production build |
 | `npm run format`                  | rewrite files with Prettier                                                                          |
 | `npm run build`                   | production build into `dist/`                                                                        |
+| `npm run benchmark`               | accuracy benchmark: every skeleton drawn 40 times with noise (a few minutes)                         |
+| `npm run bench`                   | ranking time in headless Chromium with the CPU throttled 4×                                          |
 | `npm test` / `npm run test:watch` | Vitest only                                                                                          |
 
 The first time you run e2e tests, install the browsers with `npx playwright install chromium webkit`.
@@ -68,12 +70,12 @@ Write for an experienced software engineer who is new to this project and to cun
 
 ## Testing
 
-| Level                           | Tool                                                    | Runs                         |
-| ------------------------------- | ------------------------------------------------------- | ---------------------------- |
-| Unit (`src/core`)               | Vitest                                                  | every PR, in `npm run check` |
-| Component                       | Vitest and React Testing Library                        | every PR, in `npm run check` |
-| E2E and accessibility           | Playwright, axe-core                                    | every PR, in CI              |
-| Accuracy benchmark, performance | `npm run benchmark`, `npm run bench` (from milestone 2) | by hand, never in CI         |
+| Level                           | Tool                                 | Runs                         |
+| ------------------------------- | ------------------------------------ | ---------------------------- |
+| Unit (`src/core`)               | Vitest                               | every PR, in `npm run check` |
+| Component                       | Vitest and React Testing Library     | every PR, in `npm run check` |
+| E2E and accessibility           | Playwright, axe-core                 | every PR, in CI              |
+| Accuracy benchmark, performance | `npm run benchmark`, `npm run bench` | by hand, never in CI         |
 
 ## Where things are
 
@@ -81,6 +83,7 @@ Write for an experienced software engineer who is new to this project and to cun
 - `docs/decisions/`: decision records.
 - `e2e/`: Playwright specs.
 - `test/`: test setup, and tests that use seeded synthetic drawings from `synthetic/`.
+- `scripts/`: Node scripts, run with `tsx`.
 - `.github/workflows/`: `ci.yml` (every PR and push to `main`) and `deploy.yml` (deploys `main` to GitHub Pages after CI passes).
 
 ## Data and licences
