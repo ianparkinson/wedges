@@ -1,13 +1,13 @@
 # Stroke recognition
 
-How a single touch trace becomes a cuneiform stroke: either a **wedge** or a **Winkelhaken**. This is the first stage of recognition. The second stage matches a set of strokes against sign skeletons. The implementation is `classifyTrace()` in [`src/core/strokes.ts`](../src/core/strokes.ts).
+How a single touch trace becomes a cuneiform stroke: either a **wedge** or a **Winkelhaken**. This is the first stage of recognition. The second stage matches a set of strokes against sign skeletons, and is covered in [matching.md](matching.md). The implementation is `classifyTrace()` in [`src/core/strokes.ts`](../src/core/strokes.ts).
 
 ## How users draw
 
 The design rests on three conventions about how users draw:
 
 1. **One stroke per finger-down.** A stroke runs from pointer down to pointer up. Signs are built from several strokes, in any order.
-2. **A wedge is drawn from its head.** Where the finger lands is the wide, triangular end of the wedge (the impression of the stylus corner), and the stroke runs towards the tail. Direction therefore matters: a horizontal wedge drawn right-to-left is a different wedge, although matching only penalises reversal.
+2. **A wedge is drawn from its head.** Where the finger lands is the wide, triangular end of the wedge (the impression of the stylus corner), and the stroke runs towards the tail. Direction therefore matters: a horizontal wedge drawn right-to-left is a different wedge, although matching only penalises reversal (see [matching.md](matching.md)).
 3. **A Winkelhaken is drawn as an angle without lifting the finger,** like a `<`. The corner of the angle is the Winkelhaken's point. In practice users draw it from the top leg, round the vertex, out along the bottom leg, but recognition accepts either order and any orientation.
 
 These conventions keep each stroke unambiguous on its own, so recognition needs no knowledge of the sign being drawn.
