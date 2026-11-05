@@ -38,6 +38,16 @@ export function cleanValue(raw: string): string {
   return value.endsWith("?") ? value.slice(0, -1) : value
 }
 
+/**
+ * The full Unicode name, from "CUNEIFORM" on. Two OSL entries have stray
+ * words before it: "VARIANT B CUNEIFORM NUMERIC SIGN IMIN VARIANT B" is the
+ * character CUNEIFORM NUMERIC SIGN IMIN VARIANT B.
+ */
+function unicodeName(text: string): string {
+  const start = text.indexOf("CUNEIFORM")
+  return start > 0 ? text.slice(start) : text
+}
+
 export function parseAsl(text: string): AslEntry[] {
   const entries: AslEntry[] = []
   let sign: AslEntry | undefined
@@ -94,7 +104,7 @@ export function parseAsl(text: string): AslEntry[] {
     if (!current || skipping) continue
     if (tag === "@oid") current.oslId ??= rest
     else if (tag === "@ucun") current.chars ??= rest
-    else if (tag === "@uname") current.unicodeName ??= rest
+    else if (tag === "@uname") current.unicodeName ??= unicodeName(rest)
     else if (tag === "@v") current.values.push(cleanValue(rest))
     else if (tag === "@unote") {
       const code = DOUBLE_ENCODED.exec(rest)?.[1]
