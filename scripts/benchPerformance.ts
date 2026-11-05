@@ -1,6 +1,6 @@
 /**
  * Times ranking in headless Chromium, with the CPU throttled to stand in for a
- * phone: npm run bench [-- --throttle 4]. Run by hand alongside the benchmark.
+ * phone: npm run bench:performance [-- --throttle 4]. Run by hand, alongside the accuracy benchmark.
  */
 import { parseArgs } from "node:util"
 

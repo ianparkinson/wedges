@@ -4,7 +4,7 @@
  * sign comes first and in the top three. Run by hand before merging a change
  * to matching or skeletons:
  *
- *   npm run benchmark [-- --noise 0.6 --trials 40]
+ *   npm run bench:accuracy [-- --noise 0.6 --trials 40]
  *
  * Exits with an error below the accuracy floors.
  */

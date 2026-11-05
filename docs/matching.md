@@ -115,7 +115,7 @@ Neither bound changes the results: the top `limit` are exactly those of a full r
 
 Cost per comparison is O(min(n, m)² · max(n, m)). A ranking does at most one comparison per sample: linear in database size, cubic in stroke counts.
 
-`npm run bench` times a ranking of the 832 skeletons, with `limit = 3`, in headless Chromium with the CPU throttled 4×, to stand in for a mid-range phone. Median of 10 synthetic drawings each, November 2026:
+`npm run bench:performance` times a ranking of the 832 skeletons, with `limit = 3`, in headless Chromium with the CPU throttled 4×, to stand in for a mid-range phone. Median of 10 synthetic drawings each, November 2026:
 
 | Strokes drawn | Time  |
 | ------------- | ----- |
@@ -129,7 +129,7 @@ The budget is 50 ms, so ranking runs on the main thread after each stroke, with 
 
 ## Accuracy
 
-`npm run benchmark` draws every skeleton 40 times with noise: endpoints jittered by 0.6 grid units (6% of the sign's size), stroke order shuffled, and flicks on 30% of wedges. It reports how often the right sign comes first and in the top three, and fails below 95% and 98%. The Accuracy Benchmark workflow runs it, before and after, on each pull request that touches `src/core`, `data/` or the benchmark itself, and it takes a few minutes on a desktop.
+`npm run bench:accuracy` draws every skeleton 40 times with noise: endpoints jittered by 0.6 grid units (6% of the sign's size), stroke order shuffled, and flicks on 30% of wedges. It reports how often the right sign comes first and in the top three, and fails below 95% and 98%. The Accuracy Benchmark workflow runs it, before and after, on each pull request that touches `src/core`, `data/` or the benchmark itself, and it takes a few minutes on a desktop.
 
 | Skeletons | Right sign first | In top 3 |
 | --------- | ---------------- | -------- |

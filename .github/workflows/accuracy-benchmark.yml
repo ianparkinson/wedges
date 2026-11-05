@@ -8,7 +8,7 @@ on:
     paths:
       - "src/core/**"
       - "data/**"
-      - "scripts/benchmark.ts"
+      - "scripts/benchAccuracy.ts"
       - "scripts/osl/**"
       - "test/signDatabase.ts"
       - "test/synthetic/**"
@@ -46,7 +46,7 @@ jobs:
       - name: Accuracy benchmark
         # With shell: bash, the step fails when the benchmark does, despite tee.
         shell: bash
-        run: npm run --silent benchmark 2>&1 | tee benchmark.txt
+        run: npm run --silent bench:accuracy 2>&1 | tee benchmark.txt
       - name: Write summary
         if: always()
         run: |

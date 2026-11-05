@@ -1,5 +1,5 @@
 /**
- * Runs in the browser for scripts/bench.ts: times ranking synthetic drawings
+ * Runs in the browser for scripts/benchPerformance.ts: times ranking synthetic drawings
  * with a given number of strokes against every drawable sign.
  */
 import { osl } from "virtual:osl"
