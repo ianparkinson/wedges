@@ -14,7 +14,8 @@
     "scripts",
     "src/core",
     "test/synthetic",
-    "test/skeletonSigns.ts",
+    "test/signDatabase.ts",
+    "src/virtual.d.ts",
     "test/bench"
   ]
 }
