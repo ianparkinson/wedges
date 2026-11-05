@@ -1,8 +1,8 @@
 name: Accuracy Benchmark
 
 # The accuracy benchmark, on pull requests that could change recognition. It
-# runs on the PR's base and on the PR, side by side, and writes each result to
-# its job's summary for the PR template's before and after table.
+# runs on the PR's base and on the PR, side by side, writes each result to its
+# job's summary, and posts both as a comment on the PR.
 on:
   pull_request:
     paths:
@@ -56,3 +56,61 @@ jobs:
             cat benchmark.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: benchmark-${{ matrix.label }}
+          path: benchmark.txt
+          retention-days: 7
+
+  comment:
+    name: Comment with results
+    needs: benchmark
+    # Runs even when the benchmark fails its floors. A pull request from a
+    # fork gets a read-only token, so it has only the job summaries.
+    if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: benchmark-*
+      - name: Write comment
+        run: |
+          # The benchmark's first line reads "... top-1 96.2%, top-3 98.9% (161 s)".
+          result() {
+            sed -n "s/.*top-$2 \([0-9.]*%\).*/\1/p" "benchmark-$1/benchmark.txt" 2>/dev/null | head -1
+          }
+          output() {
+            cat "benchmark-$1/benchmark.txt" 2>/dev/null || echo "No output: the job failed before the benchmark ran."
+          }
+          {
+            echo "### Accuracy benchmark"
+            echo
+            echo "|        | top-1 | top-3 |"
+            echo "| ------ | ----- | ----- |"
+            echo "| before | $(result before 1) | $(result before 3) |"
+            echo "| after  | $(result after 1) | $(result after 3) |"
+            echo
+            echo "<details><summary>Full output</summary>"
+            echo
+            echo "Before (${{ github.event.pull_request.base.sha }}):"
+            echo '```'
+            output before
+            echo '```'
+            echo "After (${{ github.event.pull_request.head.sha }}):"
+            echo '```'
+            output after
+            echo '```'
+            echo "</details>"
+          } > comment.md
+      - name: Post or update comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # Edits this workflow's earlier comment, so each PR keeps just one.
+        run: >-
+          gh pr comment ${{ github.event.pull_request.number }}
+          --repo ${{ github.repository }}
+          --body-file comment.md --edit-last --create-if-none
