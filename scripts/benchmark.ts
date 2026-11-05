@@ -11,10 +11,8 @@
 import { parseArgs } from "node:util"
 
 import { rank } from "@/core/matcher/rank"
-import { SignDatabase } from "@/core/signs"
 
-import noto from "../data/skeletons/noto.json"
-import { skeletonSigns } from "../test/skeletonSigns"
+import { signDatabase, skeletonDrawings } from "../test/signDatabase"
 import { synthesizeDrawing } from "../test/synthetic/drawings"
 import { Random } from "../test/synthetic/random"
 import { loadOsl } from "./osl/loadOsl"
@@ -34,8 +32,8 @@ const { values } = parseArgs({
 const noise = Number(values.noise)
 const trials = Number(values.trials)
 
-const signs = skeletonSigns()
-const db = new SignDatabase([noto as typeof noto & { version: 1 }], loadOsl())
+const db = signDatabase(loadOsl())
+const skeletons = skeletonDrawings(db)
 const name = (char: string) => db.sign(char)?.name ?? char
 const random = new Random(SEED)
 const confusions = new Map<string, number>()
@@ -44,10 +42,10 @@ let top3 = 0
 let total = 0
 const started = performance.now()
 
-for (const sign of signs) {
+for (const { sign, strokes } of skeletons) {
   for (let trial = 0; trial < trials; trial++) {
-    const drawing = synthesizeDrawing(sign.strokes, noise, random)
-    const results = rank(drawing, signs, { limit: CANDIDATES })
+    const drawing = synthesizeDrawing(strokes, noise, random)
+    const results = rank(drawing, db.drawable, { limit: CANDIDATES })
     const position = results.findIndex((r) => r.sign === sign)
     total++
     if (position === 0) top1++
@@ -63,7 +61,7 @@ for (const sign of signs) {
 const percent = (k: number) => `${((100 * k) / total).toFixed(1)}%`
 const seconds = ((performance.now() - started) / 1000).toFixed(0)
 console.log(
-  `${signs.length} signs × ${trials} trials at noise ${noise}: ` +
+  `${skeletons.length} signs × ${trials} trials at noise ${noise}: ` +
     `top-1 ${percent(top1)}, top-3 ${percent(top3)} (${seconds} s)`,
 )
 console.log("Commonest confusions (drawn → ranked first):")

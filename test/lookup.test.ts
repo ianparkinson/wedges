@@ -2,6 +2,7 @@
  * Lookup on the real sign data: what a user types, and the sign or sequence
  * that should come first.
  */
+import { osl } from "virtual:osl"
 import { describe, expect, it } from "vitest"
 
 import { buildIndex, search } from "@/core/lookup"
@@ -45,7 +46,7 @@ const BEST_MATCHES: [query: string, chars: string, why: string][] = [
 ]
 
 describe("lookup on the real data", () => {
-  const index = buildIndex(signDatabase().lookupEntries)
+  const index = buildIndex(signDatabase(osl).lookupEntries)
 
   it.each(BEST_MATCHES)('"%s" finds %s first: %s', (query, chars) => {
     expect(search(index, query, 1)[0]?.entry.chars).toBe(chars)

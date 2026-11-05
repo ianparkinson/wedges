@@ -1,10 +1,12 @@
 /**
  * Runs in the browser for scripts/bench.ts: times ranking synthetic drawings
- * with a given number of strokes against every skeleton.
+ * with a given number of strokes against every drawable sign.
  */
+import { osl } from "virtual:osl"
+
 import { rank } from "@/core/matcher/rank"
 
-import { skeletonSigns } from "../skeletonSigns"
+import { signDatabase, skeletonDrawings } from "../signDatabase"
 import { synthesizeDrawing } from "../synthetic/drawings"
 import { Random } from "../synthetic/random"
 
@@ -14,20 +16,18 @@ const CANDIDATES = 3
 
 /** Median milliseconds per ranking, by number of strokes drawn. */
 export function timeRanking(strokeCounts: number[]): Record<number, number> {
-  const signs = skeletonSigns()
+  const db = signDatabase(osl)
+  const skeletons = skeletonDrawings(db)
   const random = new Random(1)
   const result: Record<number, number> = {}
   for (const count of strokeCounts) {
-    const pool = signs.filter((s) => s.strokes.length >= count)
+    const pool = skeletons.filter((s) => s.strokes.length >= count)
     const times: number[] = []
     for (let i = 0; i < DRAWINGS; i++) {
-      const sign = pool[Math.floor(random.next() * pool.length)]!
-      const drawing = synthesizeDrawing(sign.strokes, NOISE, random).slice(
-        0,
-        count,
-      )
+      const { strokes } = pool[Math.floor(random.next() * pool.length)]!
+      const drawing = synthesizeDrawing(strokes, NOISE, random).slice(0, count)
       const start = performance.now()
-      rank(drawing, signs, { limit: CANDIDATES })
+      rank(drawing, db.drawable, { limit: CANDIDATES })
       times.push(performance.now() - start)
     }
     times.sort((a, b) => a - b)

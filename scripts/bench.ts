@@ -7,6 +7,8 @@ import { parseArgs } from "node:util"
 import { chromium } from "playwright-core"
 import { build } from "vite"
 
+import { oslPlugin } from "./osl/vitePlugin.ts"
+
 const STROKE_COUNTS = [1, 5, 10, 20, 30]
 const BUDGET_MS = 50
 /** Rankings to run first, so the JIT has warmed up before timing. */
@@ -20,6 +22,7 @@ const throttle = Number(values.throttle)
 const output = await build({
   configFile: false,
   logLevel: "warn",
+  plugins: [oslPlugin()],
   resolve: {
     alias: { "@": new URL("../src", import.meta.url).pathname },
   },
