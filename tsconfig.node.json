@@ -5,12 +5,18 @@
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "lib": ["ES2023", "DOM"],
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": [
     "vite.config.ts",
     "playwright.config.ts",
     "eslint.config.js",
-    "e2e"
+    "e2e",
+    // The Vite plugin that builds the sign data, and what it imports.
+    "scripts/osl",
+    "src/core/types.ts"
   ]
 }

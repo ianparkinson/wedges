@@ -24,6 +24,7 @@ See [AGENTS.md](AGENTS.md) for how the code is organised and the rules for contr
 - [Stroke recognition](docs/stroke-recognition.md): how a touch trace becomes a wedge or a Winkelhaken.
 - [Matching](docs/matching.md): how strokes are matched against sign skeletons and ranked.
 - [Skeleton format](docs/skeleton-format.md): the spec notation for sign skeletons, and the skeleton files.
+- [Sign data](docs/sign-data.md): names, values, compounds, variants and sequences from the Oracc Sign List.
 - [Prior art](docs/prior-art.md): related projects, data sources and licences.
 - [Decision records](docs/decisions/): why things are the way they are.
 

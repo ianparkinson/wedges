@@ -49,6 +49,7 @@ Import our own code through the `@/` alias (`@/core/geometry`), or relatively wi
 | `npm run build`                   | production build into `dist/`                                                                        |
 | `npm run benchmark`               | accuracy benchmark: every skeleton drawn 40 times with noise (a few minutes)                         |
 | `npm run bench`                   | ranking time in headless Chromium with the CPU throttled 4×                                          |
+| `npm run osl-summary`             | count what the sign data built from `data/osl.asl` holds                                             |
 | `npm test` / `npm run test:watch` | Vitest only                                                                                          |
 
 The first time you run e2e tests, install the browsers with `npx playwright install chromium webkit`.
@@ -81,6 +82,7 @@ Write for an experienced software engineer who is new to this project and to cun
 
 - `docs/`: how the algorithms work, beside the code they describe (each `src/core` module's header comment links to its section), and [prior art](docs/prior-art.md): related projects, data sources and licences.
 - `docs/decisions/`: decision records.
+- `data/`: sign skeletons and their JSON Schema, and a copy of the Oracc Sign List's `osl.asl` ([skeleton-format.md](docs/skeleton-format.md), [sign-data.md](docs/sign-data.md)).
 - `e2e/`: Playwright specs.
 - `test/`: test setup, and tests that use seeded synthetic drawings from `synthetic/`.
 - `scripts/`: Node scripts, run with `tsx`.
