@@ -4,6 +4,7 @@ import { cleanValue, parseAsl } from "./parseAsl"
 
 const SAMPLE = `@sign AN
 @oid\to0000099
+@uname\tCUNEIFORM SIGN AN
 @ucun\t𒀭
 @v\tan
 @v\tdiŋir?
@@ -20,6 +21,7 @@ const SAMPLE = `@sign AN
 
 @sign- OLD
 @oid\to0000001
+@uname\tVARIANT B CUNEIFORM SIGN OLD
 @ucun\t𒀀
 @v\tgone
 @unote\tdouble-encoded as x12400
@@ -43,6 +45,14 @@ describe("parseAsl", () => {
   it("links a form to its sign", () => {
     expect(entries[1]?.sign).toBe(entries[0])
     expect(entries[1]).toMatchObject({ oslId: "o0000100", chars: "𒀭𒀭" })
+  })
+
+  it("reads Unicode names from CUNEIFORM on", () => {
+    expect(entries.map((e) => e.unicodeName)).toEqual([
+      "CUNEIFORM SIGN AN",
+      undefined,
+      "CUNEIFORM SIGN OLD",
+    ])
   })
 
   it("marks deprecated signs, and reads a double encoding", () => {

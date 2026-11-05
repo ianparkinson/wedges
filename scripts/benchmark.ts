@@ -11,10 +11,13 @@
 import { parseArgs } from "node:util"
 
 import { rank } from "@/core/matcher/rank"
+import { SignDatabase } from "@/core/signs"
 
+import noto from "../data/skeletons/noto.json"
 import { skeletonSigns } from "../test/skeletonSigns"
 import { synthesizeDrawing } from "../test/synthetic/drawings"
 import { Random } from "../test/synthetic/random"
+import { loadOsl } from "./osl/loadOsl"
 
 const TOP1_FLOOR = 0.95
 const TOP3_FLOOR = 0.98
@@ -32,6 +35,8 @@ const noise = Number(values.noise)
 const trials = Number(values.trials)
 
 const signs = skeletonSigns()
+const db = new SignDatabase([noto as typeof noto & { version: 1 }], loadOsl())
+const name = (char: string) => db.sign(char)?.name ?? char
 const random = new Random(SEED)
 const confusions = new Map<string, number>()
 let top1 = 0
@@ -47,7 +52,8 @@ for (const sign of signs) {
     total++
     if (position === 0) top1++
     else {
-      const key = `${sign.char} → ${results[0]?.sign.char ?? "nothing"}`
+      const top = results[0]?.sign.char
+      const key = `${name(sign.char)} → ${top ? name(top) : "nothing"}`
       confusions.set(key, (confusions.get(key) ?? 0) + 1)
     }
     if (position >= 0) top3++
