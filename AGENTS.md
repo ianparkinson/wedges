@@ -47,8 +47,8 @@ Import our own code through the `@/` alias (`@/core/geometry`), or relatively wi
 | `npm run e2e`                     | Playwright tests on emulated Pixel 7 (Chromium) and iPhone 14 (WebKit), against the production build |
 | `npm run format`                  | rewrite files with Prettier                                                                          |
 | `npm run build`                   | production build into `dist/`                                                                        |
-| `npm run benchmark`               | accuracy benchmark: every skeleton drawn 40 times with noise (a few minutes)                         |
-| `npm run bench`                   | ranking time in headless Chromium with the CPU throttled 4×                                          |
+| `npm run bench:accuracy`          | accuracy benchmark: every skeleton drawn 40 times with noise (a few minutes)                         |
+| `npm run bench:performance`       | ranking time in headless Chromium with the CPU throttled 4×                                          |
 | `npm run osl-summary`             | count what the sign data built from `data/osl.asl` holds                                             |
 | `npm test` / `npm run test:watch` | Vitest only                                                                                          |
 
@@ -76,8 +76,8 @@ Write for an experienced software engineer who is new to this project and to cun
 | Unit (`src/core`)     | Vitest                           | every PR, in `npm run check`                |
 | Component             | Vitest and React Testing Library | every PR, in `npm run check`                |
 | E2E and accessibility | Playwright, axe-core             | every PR, in CI                             |
-| Accuracy benchmark    | `npm run benchmark`              | in CI, on PRs that could change recognition |
-| Performance           | `npm run bench`                  | by hand, never in CI                        |
+| Accuracy benchmark    | `npm run bench:accuracy`         | in CI, on PRs that could change recognition |
+| Performance           | `npm run bench:performance`      | by hand, never in CI                        |
 
 ## Where things are
 

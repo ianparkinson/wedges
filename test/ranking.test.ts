@@ -1,7 +1,7 @@
 /**
  * Ranking on synthetic drawings: every skeleton, drawn cleanly but in random
  * stroke order, should be among the candidates shown. How often it comes
- * first under noise is the accuracy benchmark's job (npm run benchmark).
+ * first under noise is the accuracy benchmark's job (npm run bench:accuracy).
  */
 import { osl } from "virtual:osl"
 import { describe, expect, it } from "vitest"
