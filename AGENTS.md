@@ -15,7 +15,7 @@ A mobile-first web app for entering cuneiform. You draw a sign one wedge at a ti
 5. **Tests sit beside the code:** `rank.ts` and `rank.test.ts`. A file with no test beside it should have a reason.
 6. **Small, named pieces:** one component or concept per file, files under about 300 lines, named constants instead of magic numbers.
 7. **Generated files say so in a header** and are rebuilt by a script, never edited by hand.
-8. **Don't change recognition behaviour by accident.** If a PR touches `src/core/matcher` or `data/`, put the accuracy benchmark result in the PR description: the Accuracy Benchmark workflow runs it on the PR's base and on the PR, and writes each to its job's summary. If a behaviour change is intended, say what changed and why in the PR description.
+8. **Don't change recognition behaviour by accident.** When a PR touches `src/core` or `data/`, the Accuracy Benchmark workflow runs the accuracy benchmark on the PR's base and on the PR, and comments with both results; check them before merging. If a behaviour change is intended, say what changed and why in the PR description.
 9. **Record decisions.** A choice that someone later might want to revisit gets a short file in `docs/decisions/`.
 
 ## Layers
