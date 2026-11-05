@@ -1,0 +1,58 @@
+name: Accuracy Benchmark
+
+# The accuracy benchmark, on pull requests that could change recognition. It
+# runs on the PR's base and on the PR, side by side, and writes each result to
+# its job's summary for the PR template's before and after table.
+on:
+  pull_request:
+    paths:
+      - "src/core/**"
+      - "data/**"
+      - "scripts/benchmark.ts"
+      - "scripts/osl/**"
+      - "test/signDatabase.ts"
+      - "test/synthetic/**"
+      - ".github/workflows/accuracy-benchmark.yml"
+  # Lets anyone run it on any branch from the Actions tab.
+  workflow_dispatch:
+
+concurrency:
+  group: accuracy-benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    name: Accuracy benchmark (${{ matrix.label }})
+    # Standard runners are free for public repos; larger runners are not.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(github.event_name == 'pull_request' && '[{"label":"before","ref":"base"},{"label":"after","ref":"head"}]' || '[{"label":"after","ref":"head"}]') }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ matrix.ref == 'base' && github.event.pull_request.base.sha || '' }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+
+      - name: Accuracy benchmark
+        # With shell: bash, the step fails when the benchmark does, despite tee.
+        shell: bash
+        run: npm run --silent benchmark 2>&1 | tee benchmark.txt
+      - name: Write summary
+        if: always()
+        run: |
+          {
+            echo "### Accuracy benchmark, ${{ matrix.label }}"
+            echo '```'
+            cat benchmark.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

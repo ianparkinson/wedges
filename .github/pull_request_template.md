@@ -15,7 +15,7 @@
 
 ### If this touches `src/core/matcher` or `data/`
 
-Accuracy benchmark result (`npm run benchmark`), before and after:
+Accuracy benchmark result (`npm run benchmark`), before and after, from the Accuracy Benchmark workflow's job summaries:
 
 |        | top-1 | top-3 |
 | ------ | ----- | ----- |
