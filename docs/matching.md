@@ -84,7 +84,7 @@ The textbook construction is an (n + m)-wide square matrix, with an `unmatched` 
 
 ### The Hungarian algorithm
 
-Trying every pairing takes N! steps, impractical beyond about 10 strokes. The Hungarian algorithm (Kuhn 1955, Munkres 1957) finds the exact optimum in O(N³). Wedges uses the [munkres](https://github.com/havelessbemore/munkres) package (MIT, no dependencies), which accepts rectangular matrices of typed arrays. It keeps a number for each row and column such that every cost minus its row's and column's numbers is never negative, and grows a matching using only cells where that difference is 0: once every row is matched that way, nothing can be cheaper.
+Trying every pairing takes N! steps, impractical beyond about 10 strokes. The Hungarian algorithm (Kuhn 1955, Munkres 1957) finds the exact optimum in O(N³). Wedges uses the [munkres](https://github.com/havelessbemore/munkres) package (MIT, no dependencies), which accepts rectangular matrices. `match()` passes it plain arrays: it solves typed-array rows several times slower. It keeps a number for each row and column such that every cost minus its row's and column's numbers is never negative, and grows a matching using only cells where that difference is 0: once every row is matched that way, nothing can be cheaper.
 
 It replaced a hand-written solver in November 2026 with identical rankings. Solving alone, it was about 3 times slower on 3 × 3 matrices and about twice as fast on 30 × 30, which is where ranking is slowest.
 
@@ -115,17 +115,17 @@ Neither bound changes the results: the top `limit` are exactly those of a full r
 
 Cost per comparison is O(min(n, m)² · max(n, m)). A ranking does at most one comparison per sample: linear in database size, cubic in stroke counts.
 
-`npm run bench` times a ranking of the 832 skeletons, with `limit = 3`, in headless Chromium with the CPU throttled 4×, to stand in for a mid-range phone. Median of 10 synthetic drawings each, November 2026, with the hand-written solver that munkres replaced:
+`npm run bench` times a ranking of the 832 skeletons, with `limit = 3`, in headless Chromium with the CPU throttled 4×, to stand in for a mid-range phone. Median of 10 synthetic drawings each, November 2026:
 
-| Strokes drawn | Time   |
-| ------------- | ------ |
-| 1             | 1.5 ms |
-| 5             | 10 ms  |
-| 10            | 21 ms  |
-| 20            | 43 ms  |
-| 30            | 64 ms  |
+| Strokes drawn | Time  |
+| ------------- | ----- |
+| 1             | 1 ms  |
+| 5             | 5 ms  |
+| 10            | 20 ms |
+| 20            | 37 ms |
+| 30            | 53 ms |
 
-The budget is 50 ms, so ranking runs on the main thread after each stroke, with no Web Worker; see [decision 0006](decisions/0006-ranking-on-main-thread.md). Large signs gain least from skipping, because many skeletons have similar stroke counts. In side-by-side runs, munkres gave times within noise of these overall, and solved 30 × 30 matrices about twice as fast.
+The budget is 50 ms, so ranking runs on the main thread after each stroke, with no Web Worker; see [decision 0006](decisions/0006-ranking-on-main-thread.md). Large signs gain least from skipping, because many skeletons have similar stroke counts.
 
 ## Accuracy
 

@@ -51,10 +51,9 @@ export function match(
   // Capping a pair's cost at two unpaired strokes keeps the option of
   // leaving both unpaired.
   const cap = 2 * weights.unmatched
+  // Plain arrays: munkres solves typed-array rows several times slower.
   const costs = drawn.features.map((d) =>
-    Float64Array.from(skeleton.features, (s) =>
-      Math.min(pairCost(d, s, weights), cap),
-    ),
+    skeleton.features.map((s) => Math.min(pairCost(d, s, weights), cap)),
   )
   // rank() passes the worst score it is still keeping as the cutoff, so if
   // even the lower bound is above it, solving would be wasted work.
@@ -81,34 +80,44 @@ export function match(
  * is the larger of the bounds from the drawn strokes and from the skeleton
  * strokes; see {@link boundFromStrokes}.
  */
-function lowerBound(costs: readonly Float64Array[], unmatched: number): number {
-  const rows = costs.map((row) => Array.from(row))
-  const columns = Array.from(costs[0]!, (_, j) => costs.map((row) => row[j]!))
+function lowerBound(
+  costs: readonly (readonly number[])[],
+  unmatched: number,
+): number {
+  // Found in one pass, without copying the matrix: match() runs this for
+  // every sample that ranking doesn't skip.
+  const rowCheapest = new Float64Array(costs.length).fill(Infinity)
+  const columnCheapest = new Float64Array(costs[0]!.length).fill(Infinity)
+  costs.forEach((row, i) => {
+    row.forEach((cost, j) => {
+      rowCheapest[i] = Math.min(rowCheapest[i]!, cost)
+      columnCheapest[j] = Math.min(columnCheapest[j]!, cost)
+    })
+  })
   return Math.max(
-    boundFromStrokes(rows, columns.length, unmatched),
-    boundFromStrokes(columns, rows.length, unmatched),
+    boundFromStrokes(rowCheapest, columnCheapest.length, unmatched),
+    boundFromStrokes(columnCheapest, rowCheapest.length, unmatched),
   )
 }
 
 /**
  * A lower bound on the total cost from one list of strokes, given each
- * stroke's pair costs with the `otherCount` strokes of the other list. If
+ * stroke's cheapest pair with the `otherCount` strokes of the other list. If
  * this list is no longer than the other, each of its strokes is paired, so
  * pays at least its cheapest pair, and the other list's extra strokes pay
  * `unmatched` each. If it is longer, each stroke pays at least its cheapest
  * pair or `unmatched`, whichever is less.
  */
 function boundFromStrokes(
-  pairCosts: readonly (readonly number[])[],
+  cheapestPairs: Float64Array,
   otherCount: number,
   unmatched: number,
 ): number {
-  const allPaired = pairCosts.length <= otherCount
+  const allPaired = cheapestPairs.length <= otherCount
   let total = 0
-  for (const costs of pairCosts) {
-    const cheapest = Math.min(...costs)
+  for (const cheapest of cheapestPairs) {
     total += allPaired ? cheapest : Math.min(cheapest, unmatched)
   }
-  if (allPaired) total += (otherCount - pairCosts.length) * unmatched
+  if (allPaired) total += (otherCount - cheapestPairs.length) * unmatched
   return total
 }
