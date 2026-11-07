@@ -3,6 +3,7 @@
  * entries. Only the tags Wedges uses are kept.
  */
 
+/** One @sign or @form entry of osl.asl, with the tags Wedges uses. */
 export interface AslEntry {
   readonly kind: "sign" | "form"
   readonly name: string
@@ -48,6 +49,11 @@ function unicodeName(text: string): string {
   return start > 0 ? text.slice(start) : text
 }
 
+/**
+ * Parses the text of osl.asl into its sign and form entries, in file order.
+ * Deprecated forms (@form-) are skipped; deprecated signs (@sign-) are kept
+ * and marked.
+ */
 export function parseAsl(text: string): AslEntry[] {
   const entries: AslEntry[] = []
   let sign: AslEntry | undefined

@@ -60,7 +60,6 @@ Where we differ from the guide:
 - **File names** are camelCase (`pairCost.ts`), not snake_case. Component files are PascalCase, named after the component they export (`Link/Link.tsx`), as is usual in React projects.
 - **Imports** between folders of `src` use the `@/` alias (`@/core/geometry`), not long relative paths. Within a folder, import relatively.
 - **A `switch` over every member of a union needs no `default`**, so the compiler reports a case that a new member leaves unhandled.
-- **Doc comments only where they add something** (see Comments), rather than on every export.
 
 Beyond the guide:
 
@@ -84,7 +83,7 @@ Beyond the guide:
 
 Write for an experienced software engineer who is new to this project and to cuneiform.
 
-- Give exported functions, components and types a doc comment when their name and types don't say everything: units, coordinate frames, edge cases, or why they exist.
+- As the guide asks, give every export a doc comment. Say what the name and types don't: units, coordinate frames, edge cases, or why it exists.
 - Open a doc comment with what the function does, in plain words, even when the file's header says it too.
 - Use implementation comments sparingly, for code that is surprising or genuinely complex. Don't restate what the code says, or explain a standard idiom.
 - Describe the code as it is, not where it came from or how it changed: git keeps history.

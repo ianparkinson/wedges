@@ -20,6 +20,10 @@ const VARIANT_MODIFIER = /^([^|]+)@([gtsn])$/
 /** Maps each current sign's name to its character. */
 type CharOfName = ReadonlyMap<string, string>
 
+/**
+ * Builds the sign data from parsed osl.asl entries: one sign per cuneiform
+ * character, in code point order, and the sequences with readings of their own.
+ */
 export function buildOsl(entries: readonly AslEntry[]): OslData {
   const usable = byPreference(entries.filter(hasCuneiformPage))
   const signEntries = claimCharacters(

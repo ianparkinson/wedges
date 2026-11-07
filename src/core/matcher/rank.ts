@@ -10,12 +10,14 @@ export interface Rankable {
   readonly samples: readonly PreparedSample[]
 }
 
+/** One result of {@link rank}: a sign, how well it matched, and the sample that matched. */
 export interface Ranked<S extends Rankable> extends Match {
   readonly sign: S
   /** The sample that matched best. */
   readonly sample: PreparedSample
 }
 
+/** Options for {@link rank}. */
 export interface RankOptions<S extends Rankable> {
   /** How many results to return. Fewer means more signs can be skipped. */
   readonly limit?: number

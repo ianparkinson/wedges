@@ -13,6 +13,7 @@ export interface SkeletonFile {
   readonly skeletons: readonly SkeletonEntry[]
 }
 
+/** One skeleton: the strokes of a sign as one style or font draws it. */
 export interface SkeletonEntry {
   readonly char: string
   /** The strokes, in spec notation. */
@@ -26,11 +27,16 @@ export interface OslData {
   readonly sequences: readonly OslSequence[]
 }
 
+/**
+ * How the parts of a compound sign combine: × one inside another, & one above
+ * the other, % crossed, and . and + side by side.
+ */
 export type CompoundOperator = "×" | "&" | "%" | "." | "+"
 
 /** gunû, tenû, šeššig and nutillû. */
 export type VariantModifier = "g" | "t" | "s" | "n"
 
+/** A sign in the Oracc Sign List with a Unicode character of its own. */
 export interface OslSign {
   readonly char: string
   /** The OSL name, such as AN, LAGAR@g or |GA₂×AN|. */

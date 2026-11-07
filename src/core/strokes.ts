@@ -25,6 +25,7 @@ export interface Winkelhaken {
   readonly legB: Point
 }
 
+/** A recognised stroke: a wedge or a Winkelhaken. */
 export type Stroke = Wedge | Winkelhaken
 
 /** Thresholds for {@link classifyTrace}. Lengths are in the trace's own units, usually CSS pixels. */
@@ -41,6 +42,7 @@ export interface StrokeParams {
   readonly winkelhakenAngles: readonly [min: number, max: number]
 }
 
+/** The thresholds the app uses, set by eye. See docs/stroke-recognition.md. */
 export const defaultStrokeParams: StrokeParams = {
   minLength: 10,
   spacing: 3,

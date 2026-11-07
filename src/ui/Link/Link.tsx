@@ -3,6 +3,7 @@ import { Link as AriaLink } from "react-aria-components"
 
 import styles from "./Link.module.css"
 
+/** Props for {@link Link}. */
 export interface LinkProps {
   href: string
   children: ReactNode

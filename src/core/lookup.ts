@@ -32,6 +32,7 @@ export interface LookupIndex {
   readonly byChars: ReadonlyMap<string, LookupEntry>
 }
 
+/** One result of {@link search}: the entry found, and what about it matched. */
 export interface LookupResult {
   readonly entry: LookupEntry
   /** The name or value that matched; null when the query was the characters or a code point. */
@@ -51,6 +52,7 @@ export const Tier = {
   /** The key contains the query, which is at least three characters long. */
   Contains: 3,
 } as const
+/** One of the {@link Tier} values. */
 export type Tier = (typeof Tier)[keyof typeof Tier]
 
 const MIN_CONTAINS = 3
@@ -135,6 +137,7 @@ function keysFor(text: string, kind: Key["kind"]): Key[] {
   return [plain, { ...plain, folded: asNg }]
 }
 
+/** Builds the index {@link search} uses, with a key for each name and value. */
 export function buildIndex(entries: readonly LookupEntry[]): LookupIndex {
   return {
     entries: entries.map((entry) => ({

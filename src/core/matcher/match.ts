@@ -16,12 +16,14 @@ export interface PreparedSample {
   readonly wedges: number
 }
 
+/** Normalises a drawing or skeleton and reduces it to features, ready for {@link match}. */
 export function prepareSample(strokes: readonly Stroke[]): PreparedSample {
   const features = normalize(strokes).map(strokeFeature)
   const wedges = features.filter((f) => f.kind === "wedge").length
   return { features, wedges }
 }
 
+/** How well a drawing matches a sample, and which strokes were paired. */
 export interface Match {
   /** Total cost divided by the larger stroke count; lower is better. */
   readonly score: number

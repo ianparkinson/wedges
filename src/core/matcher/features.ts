@@ -8,6 +8,7 @@ import type { Stroke } from "../strokes"
 /** Keeps a zero-length wedge or leg out of a logarithm. */
 const MIN_LENGTH = 1e-3
 
+/** The features of a wedge. */
 export interface WedgeFeature {
   readonly kind: "wedge"
   /** The midpoint. */
@@ -18,6 +19,7 @@ export interface WedgeFeature {
   readonly logLength: number
 }
 
+/** The features of a Winkelhaken. */
 export interface WinkelhakenFeature {
   readonly kind: "winkelhaken"
   /** The vertex. */
@@ -28,8 +30,10 @@ export interface WinkelhakenFeature {
   readonly opening: number
 }
 
+/** The features of one stroke, of either kind. */
 export type StrokeFeature = WedgeFeature | WinkelhakenFeature
 
+/** Computes the features of one stroke, in the stroke's own coordinates. */
 export function strokeFeature(stroke: Stroke): StrokeFeature {
   switch (stroke.kind) {
     case "wedge": {
