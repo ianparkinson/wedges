@@ -73,7 +73,7 @@ Beyond the guide:
 
 - **Branch on a kind with `switch`**, or `if`/`else`, so each case reads as an alternative, not a fallback after an early return.
   - Genuine early returns, such as precondition validation, can of course precede the main flow without nesting the bulk of code in an `else`.
-- **Write code in paragraphs.** The guide allows blank lines within a function sparingly; we use them as a matter of course. Separate the steps of a function with a blank line, the way paragraphs separate the ideas in prose. An implementation comment introduces the paragraph below it, so give it a blank line above, unless it opens a block.
+- **Write code in paragraphs.** Separate the steps of a function with a blank line, the way paragraphs separate the ideas in prose. An implementation comment introduces the paragraph below it, so give it a blank line above, unless it opens a block.
 - **Break a function up** instead of nesting loops with `break` and `continue`, or when it runs through several stages: named helpers make the flow readable.
 - **Only what's needed now.** No functions the current work doesn't use, no defensive errors a user can't act on, no copies of `readonly` data.
 - **Prefer to avoid parameters passed just to build an error message**. Throw, and let the caller add context.
