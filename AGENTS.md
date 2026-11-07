@@ -83,7 +83,7 @@ Beyond the guide:
 
 Write for an experienced software engineer who is new to this project and to cuneiform.
 
-- As the guide asks, give every export a doc comment. Say what the name and types don't: units, coordinate frames, edge cases, or why it exists.
+- A doc comment says what the name and types don't: units, coordinate frames, edge cases, or why it exists.
 - Open a doc comment with what the function does, in plain words, even when the file's header says it too.
 - Use implementation comments sparingly, for code that is surprising or genuinely complex. Don't restate what the code says, or explain a standard idiom.
 - Describe the code as it is, not where it came from or how it changed: git keeps history.
