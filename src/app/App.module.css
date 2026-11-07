@@ -19,6 +19,13 @@
   box-sizing: border-box;
 }
 
+/* The suggestions sit with the text they are about, as close as its buttons. */
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
 .header {
   display: flex;
   align-items: center;
