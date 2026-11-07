@@ -48,7 +48,7 @@ describe("LookupSheet", () => {
     expect(screen.getByText("Nothing found.")).toBeVisible()
   })
 
-  it("appends a tapped result, and closes", async () => {
+  it("appends a tapped result, clears the search, and closes", async () => {
     const onAppend = vi.fn()
     const onClose = vi.fn()
     renderSheet(onAppend, onClose)
@@ -56,6 +56,7 @@ describe("LookupSheet", () => {
     await userEvent.click(results()[0]!)
     expect(onAppend).toHaveBeenCalledExactlyOnceWith(PA + TE + SI)
     expect(onClose).toHaveBeenCalledOnce()
+    expect(screen.getByRole("searchbox")).toHaveValue("")
   })
 
   it("opens a result's entry from its ⓘ, and goes back to the results", async () => {
@@ -70,7 +71,7 @@ describe("LookupSheet", () => {
     expect(screen.getByRole("searchbox")).toHaveValue("sza")
   })
 
-  it("appends all the signs of a sequence from its entry, and closes", async () => {
+  it("appends all the signs of a sequence from its entry, clears the search, and closes", async () => {
     const onAppend = vi.fn()
     const onClose = vi.fn()
     renderSheet(onAppend, onClose)
@@ -81,5 +82,6 @@ describe("LookupSheet", () => {
     await userEvent.click(screen.getByRole("button", { name: "Append all" }))
     expect(onAppend).toHaveBeenCalledExactlyOnceWith(PA + TE + SI)
     expect(onClose).toHaveBeenCalledOnce()
+    expect(screen.getByRole("searchbox")).toHaveValue("")
   })
 })

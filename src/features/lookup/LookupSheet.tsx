@@ -29,8 +29,8 @@ export interface LookupSheetProps {
 /**
  * Look up: search signs and sequences by name, value, code point or the
  * characters themselves. Tapping a result appends it, and its ⓘ opens its
- * entry, which can append it too. The query is kept while the sheet is closed, so it opens again
- * on the same results.
+ * entry, which can append it too. Appending clears the query. Closing
+ * without appending keeps it, so the sheet opens again on the same results.
  */
 export function LookupSheet({
   database,
@@ -60,6 +60,12 @@ export function LookupSheet({
     onClose()
   }
 
+  const append = (chars: string) => {
+    onAppend(chars)
+    setQuery("")
+    close()
+  }
+
   return (
     <Sheet
       isOpen={isOpen}
@@ -74,10 +80,7 @@ export function LookupSheet({
           <SignInfo
             entry={entry}
             database={database}
-            onAppend={() => {
-              onAppend(entryChars(entry))
-              close()
-            }}
+            onAppend={() => append(entryChars(entry))}
           />
         </div>
       ) : (
@@ -93,10 +96,7 @@ export function LookupSheet({
           ) : results.length > 0 ? (
             <ResultList
               results={results}
-              onAppend={(result) => {
-                onAppend(result.entry.chars)
-                close()
-              }}
+              onAppend={(result) => append(result.entry.chars)}
               onInfo={(result) =>
                 setEntry(findSignListEntry(database, result.entry))
               }
