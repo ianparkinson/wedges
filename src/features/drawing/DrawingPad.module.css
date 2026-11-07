@@ -1,0 +1,12 @@
+.pad {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  background: var(--color-clay);
+
+  /* The pad handles every touch itself: no scrolling or zooming. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}

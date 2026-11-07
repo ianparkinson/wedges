@@ -29,7 +29,8 @@
     "munkres": "^2.1.1",
     "react": "^19.3.1",
     "react-aria-components": "^1.22.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "usehooks-ts": "^3.1.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
