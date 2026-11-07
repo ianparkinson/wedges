@@ -27,10 +27,11 @@
   --text-md: 1rem;
   --text-lg: 1.25rem;
   --text-xl: 2rem;
-  --text-glyph: 4rem;
+  --text-glyph: 2.75rem;
 
   --radius: 8px;
   --touch-target: 44px;
+  --candidate-height: 6rem;
   --content-width: 40rem;
 
   color-scheme: light dark;
