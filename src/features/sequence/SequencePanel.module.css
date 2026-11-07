@@ -19,8 +19,14 @@
 .sign {
   padding: 0 var(--space-1);
   font-family: var(--font-cuneiform);
-  font-size: var(--text-xl);
+  font-size: var(--text-sign);
   line-height: 1.2;
+  /*
+   * The font's line box puts the middle of the line 0.45em above the
+   * baseline, but most signs reach from 0.11em below it to 0.74em above, so
+   * they'd sit low. This centres them.
+   */
+  translate: 0 -0.14em;
 }
 
 .item {
