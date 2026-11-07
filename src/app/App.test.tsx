@@ -74,6 +74,33 @@ describe("App", () => {
     expect(await screen.findByRole("option", { name: "AN" })).toBeVisible()
   })
 
+  it("appends a sign found with Look up to the text", async () => {
+    render(<App />)
+    await screen.findByText(/Draw a sign/)
+    await userEvent.click(screen.getByRole("button", { name: "Look up" }))
+    await userEvent.type(screen.getByRole("searchbox"), "sza")
+    const results = screen.getByRole("list", { name: "Results" })
+    await userEvent.click(within(results).getByRole("button", { name: "ŠA" }))
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+    expect(screen.getByRole("option", { name: "ŠA" })).toBeVisible()
+  })
+
+  it("shows a candidate's entry from its ⓘ, and appends it from there", async () => {
+    render(<App />)
+    await screen.findByText(/Draw a sign/)
+    const pad = screen.getByRole("img", { name: /Drawing pad/ })
+    drawAN(pad)
+
+    await userEvent.click(screen.getByRole("button", { name: "About AN" }))
+    expect(screen.getByRole("dialog", { name: "AN" })).toBeVisible()
+    await userEvent.click(screen.getByRole("button", { name: "Append" }))
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+    expect(screen.getByRole("option", { name: "AN" })).toBeVisible()
+    expect(pad).toHaveAccessibleName("Drawing pad, 0 strokes")
+  })
+
   it("links to the source repository", () => {
     render(<App />)
     expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(

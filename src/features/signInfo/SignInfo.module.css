@@ -1,0 +1,43 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.glyphs {
+  margin: 0;
+  font-family: var(--font-cuneiform);
+  font-size: var(--text-glyph);
+  line-height: 1.2;
+  text-align: center;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+}
+
+.facts dt {
+  color: var(--color-text-muted);
+}
+
+.facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.signs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sign {
+  font-family: var(--font-cuneiform);
+}
+
+.link {
+  margin: 0;
+}

@@ -22,6 +22,12 @@ export function oslUrl(entry: { readonly oslId: string }): string {
   return OSL_PAGE + entry.oslId
 }
 
+/** A character's Unicode code point, written as U+ and hexadecimal: 𒀭 is U+1202D. */
+export function codePoint(char: string): string {
+  const hex = (char.codePointAt(0) ?? 0).toString(16).toUpperCase()
+  return "U+" + hex.padStart(4, "0")
+}
+
 /** Every sign and sequence, found by character, with the samples drawings are ranked against. */
 export class SignDatabase {
   /** Every sign, in code point order. */

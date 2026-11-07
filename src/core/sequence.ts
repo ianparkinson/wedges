@@ -23,7 +23,6 @@ export interface SequenceState {
 
 /** An edit to a {@link SequenceState}. */
 export type SequenceAction =
-  /** Inserts each character of `chars` as an item of its own. */
   | { readonly kind: "insert"; readonly chars: string }
   | { readonly kind: "deleteBackward" }
   | { readonly kind: "clear" }
@@ -39,9 +38,8 @@ export const EMPTY_SEQUENCE: SequenceState = {
 /**
  * Applies an action to a sequence, returning the sequence after it. Inserting
  * puts the characters at the cursor, one item each, and moves the cursor past
- * them. Deleting backward
- * removes the item before the cursor, and does nothing at the start. A cursor
- * moved outside the sequence stops at its nearer end.
+ * them. Deleting backward removes the item before the cursor, and does nothing
+ * at the start. A cursor moved outside the sequence stops at its nearer end.
  */
 export function editSequence(
   sequence: SequenceState,

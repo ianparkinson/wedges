@@ -21,9 +21,12 @@ describe("CandidateList", () => {
         candidates={[AN, MAŠ, BAD]}
         isLoading={false}
         onPick={() => {}}
+        onInfo={() => {}}
       />,
     )
-    const items = within(screen.getByRole("list")).getAllByRole("button")
+    const items = within(screen.getByRole("list"))
+      .getAllByRole("button")
+      .filter((button) => !button.getAttribute("aria-label"))
     expect(items.map((item) => item.textContent)).toEqual([
       "𒀭AN",
       "𒈦MAŠ",
@@ -38,6 +41,7 @@ describe("CandidateList", () => {
         candidates={[AN, MAŠ, BAD]}
         isLoading={false}
         onPick={onPick}
+        onInfo={() => {}}
       />,
     )
     await userEvent.click(screen.getByRole("button", { name: "MAŠ" }))
@@ -51,22 +55,51 @@ describe("CandidateList", () => {
         candidates={[AN, MAŠ, BAD]}
         isLoading={false}
         onPick={onPick}
+        onInfo={() => {}}
       />,
     )
     await userEvent.click(screen.getByRole("button", { name: "Accept best" }))
     expect(onPick).toHaveBeenCalledExactlyOnceWith(AN)
   })
 
+  it("opens a candidate's entry with its ⓘ, without picking it", async () => {
+    const onPick = vi.fn()
+    const onInfo = vi.fn()
+    render(
+      <CandidateList
+        candidates={[AN, MAŠ, BAD]}
+        isLoading={false}
+        onPick={onPick}
+        onInfo={onInfo}
+      />,
+    )
+    await userEvent.click(screen.getByRole("button", { name: "About MAŠ" }))
+    expect(onInfo).toHaveBeenCalledExactlyOnceWith(MAŠ)
+    expect(onPick).not.toHaveBeenCalled()
+  })
+
   it("asks for a drawing when there are no candidates", () => {
     render(
-      <CandidateList candidates={[]} isLoading={false} onPick={() => {}} />,
+      <CandidateList
+        candidates={[]}
+        isLoading={false}
+        onPick={() => {}}
+        onInfo={() => {}}
+      />,
     )
     expect(screen.getByText(/Draw a sign/)).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Accept best" })).toBeDisabled()
   })
 
   it("says so while the signs are loading", () => {
-    render(<CandidateList candidates={[]} isLoading onPick={() => {}} />)
+    render(
+      <CandidateList
+        candidates={[]}
+        isLoading
+        onPick={() => {}}
+        onInfo={() => {}}
+      />,
+    )
     expect(screen.getByText("Loading signs…")).toBeInTheDocument()
   })
 })
