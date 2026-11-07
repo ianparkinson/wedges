@@ -67,8 +67,8 @@ The first time you run e2e tests, install the browsers with `npx playwright inst
 - **Names say what things are.** Avoid abbreviations except for common conventions such as `i`, `n`, `x` and `y`.
 - **Branch on a kind with `switch`**, or `if`/`else`, so each case reads as an alternative, not a fallback after an early return.
   - Genuine early returns, such as precondition validation, can of course precede the main flow without nesting the bulk of code in an `else`.
-- **Break a function up** instead of nesting loops with `break` and `continue`, or if runs through several stages: named helpers make the flow readable.
-- **Only what's needed now.** No functions the current work doesn't use, no defensive errors a user can't act on, no copies of `readonly` data
+- **Break a function up** instead of nesting loops with `break` and `continue`, or when it runs through several stages: named helpers make the flow readable.
+- **Only what's needed now.** No functions the current work doesn't use, no defensive errors a user can't act on, no copies of `readonly` data.
 - **Prefer to avoid parameters passed just to build an error message**. Throw, and let the caller add context.
 - **Reuse before writing.** Prefer a standard tool or package to bespoke code outside the problem domain, and look for an existing helper first.
 

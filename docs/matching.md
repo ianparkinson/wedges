@@ -128,7 +128,7 @@ Cost per comparison is O(min(n, m)² · max(n, m)). A ranking does at most one c
 The budget is 50 ms, so ranking runs on the main thread after each stroke, with no Web Worker; see [decision 0006](decisions/0006-ranking-on-main-thread.md). Large signs gain least from skipping, because many skeletons have similar stroke counts.
 
 > [!IMPORTANT]
-> **Ranking is a hot path.** Modifications `src/core/matcher` can cost speed, so run `npm run bench:performance` before and after one. munkres needs plain arrays: it is several times slower on typed-array rows.
+> **Ranking is a hot path.** Changes to `src/core/matcher` can cost speed, so run `npm run bench:performance` before and after. munkres needs plain arrays: it is several times slower on typed-array rows.
 
 ## Accuracy
 
