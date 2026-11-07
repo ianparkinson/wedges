@@ -13,6 +13,9 @@ import {
 const AN = "𒀭"
 const KA = "𒅗"
 const A = "𒀀"
+const PA = "𒉺"
+const TE = "𒋼"
+const SI = "𒋛"
 
 /** The sequence AN KA A, with the cursor at `cursor`. */
 function anKaA(cursor: number, cursorPlaced = false): SequenceState {
@@ -27,14 +30,24 @@ function edits(...actions: SequenceAction[]): SequenceState {
 describe("editSequence", () => {
   it("appends signs in the order they are inserted, with the cursor at the end", () => {
     expect(
-      edits({ kind: "insert", item: AN }, { kind: "insert", item: KA }),
+      edits({ kind: "insert", chars: AN }, { kind: "insert", chars: KA }),
     ).toEqual({ items: [AN, KA], cursor: 2, cursorPlaced: false })
   })
 
   it("inserts at the cursor, not at the end, and moves the cursor past the new item", () => {
-    expect(editSequence(anKaA(1, true), { kind: "insert", item: A })).toEqual({
+    expect(editSequence(anKaA(1, true), { kind: "insert", chars: A })).toEqual({
       items: [AN, A, KA, A],
       cursor: 2,
+      cursorPlaced: false,
+    })
+  })
+
+  it("inserts each character of a run as an item of its own", () => {
+    expect(
+      editSequence(anKaA(1), { kind: "insert", chars: PA + TE + SI }),
+    ).toEqual({
+      items: [AN, PA, TE, SI, KA, A],
+      cursor: 4,
       cursorPlaced: false,
     })
   })

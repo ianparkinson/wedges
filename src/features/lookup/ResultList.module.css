@@ -1,0 +1,51 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  position: relative;
+}
+
+/* Room on the right for the ⓘ, which sits over the card beside its button. */
+.item > :first-child {
+  width: 100%;
+  padding-inline-end: var(--touch-target);
+  text-align: start;
+}
+
+.info {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.result {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.glyphs {
+  flex: 0 0 auto;
+  min-width: 2.5rem;
+  font-family: var(--font-cuneiform);
+  font-size: var(--text-lg);
+}
+
+.text {
+  overflow-wrap: anywhere;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.match {
+  color: var(--color-text-muted);
+}

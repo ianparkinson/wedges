@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { oslUrl, shortUnicodeName, SignDatabase } from "./signs"
+import { codePoint, oslUrl, shortUnicodeName, SignDatabase } from "./signs"
 import type { OslData, SkeletonFile } from "./types"
 
 const osl: OslData = {
@@ -82,5 +82,15 @@ describe("oslUrl", () => {
     expect(oslUrl({ oslId: "o0000099" })).toBe(
       "https://oracc.museum.upenn.edu/osl/o0000099",
     )
+  })
+})
+
+describe("codePoint", () => {
+  it("writes a cuneiform character's code point in hexadecimal", () => {
+    expect(codePoint("𒀭")).toBe("U+1202D")
+  })
+
+  it("pads a short code point to four digits", () => {
+    expect(codePoint("A")).toBe("U+0041")
   })
 })

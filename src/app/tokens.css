@@ -13,6 +13,7 @@
   --color-clay: #e4d3b4;
   --color-impression: #5a3f28;
   --color-trace: #8a4b1f;
+  --color-overlay: rgb(0 0 0 / 0.3);
 
   --space-1: 4px;
   --space-2: 8px;
@@ -49,5 +50,6 @@
     --color-clay: #3a2f25;
     --color-impression: #e8d6bc;
     --color-trace: #e0a070;
+    --color-overlay: rgb(0 0 0 / 0.5);
   }
 }

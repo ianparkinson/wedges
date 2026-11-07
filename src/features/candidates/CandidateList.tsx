@@ -1,5 +1,7 @@
 import type { Sign } from "@/core/signs"
 import { Button } from "@/ui/Button/Button"
+import { IconButton } from "@/ui/IconButton/IconButton"
+import { InfoIcon } from "@/ui/InfoIcon/InfoIcon"
 
 import styles from "./CandidateList.module.css"
 
@@ -10,16 +12,19 @@ export interface CandidateListProps {
   /** True until the sign data has loaded. */
   isLoading: boolean
   onPick: (sign: Sign) => void
+  onInfo: (sign: Sign) => void
 }
 
 /**
  * The signs that best match the drawing, each with its glyph and name, the
  * best one largest. Tapping one picks it, and Accept best picks the best.
+ * The ⓘ in a candidate's corner opens its entry instead.
  */
 export function CandidateList({
   candidates,
   isLoading,
   onPick,
+  onInfo,
 }: CandidateListProps) {
   const [best] = candidates
   return (
@@ -34,6 +39,14 @@ export function CandidateList({
                 </span>
                 <span className={styles.name}>{sign.name}</span>
               </Button>
+              <span className={styles.info}>
+                <IconButton
+                  label={`About ${sign.name}`}
+                  onPress={() => onInfo(sign)}
+                >
+                  <InfoIcon />
+                </IconButton>
+              </span>
             </li>
           ))}
         </ul>
