@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 
 import { drag } from "../../test/drag"
+import { tapText } from "../../test/tapText"
 import { App } from "./App"
 
 /** Draws AN, 300 pixels across: a vertical wedge, a horizontal one and two diagonals. */
@@ -28,7 +29,7 @@ describe("App", () => {
     ).toBeInTheDocument()
   })
 
-  it("offers AN first when AN is drawn, and picking it clears the pad", async () => {
+  it("offers AN first when AN is drawn, and picking it adds it to the text and clears the pad", async () => {
     render(<App />)
     await screen.findByText(/Draw a sign/)
     const pad = screen.getByRole("img", { name: /Drawing pad/ })
@@ -40,10 +41,37 @@ describe("App", () => {
     )
 
     await userEvent.click(screen.getByRole("button", { name: "Accept best" }))
-    expect(
-      screen.getByRole("status", { name: "Picked signs" }),
-    ).toHaveTextContent("𒀭")
+    expect(screen.getByRole("option", { name: "AN" })).toBeVisible()
     expect(pad).toHaveAccessibleName("Drawing pad, 0 strokes")
+  })
+
+  it("inserts a picked sign at the cursor", async () => {
+    render(<App />)
+    await screen.findByText(/Draw a sign/)
+    const pad = screen.getByRole("img", { name: /Drawing pad/ })
+    const accept = screen.getByRole("button", { name: "Accept best" })
+    drawAN(pad)
+    await userEvent.click(accept)
+    drawAN(pad)
+    await userEvent.click(accept)
+    tapText(45)
+
+    drawAN(pad)
+    await userEvent.click(accept)
+    const signs = screen.getAllByRole("option")
+    expect(signs).toHaveLength(3)
+    expect(signs[1]).toHaveAttribute("aria-selected", "true")
+  })
+
+  it("keeps the text when the app is opened again", async () => {
+    const { unmount } = render(<App />)
+    await screen.findByText(/Draw a sign/)
+    drawAN(screen.getByRole("img", { name: /Drawing pad/ }))
+    await userEvent.click(screen.getByRole("button", { name: "Accept best" }))
+    unmount()
+
+    render(<App />)
+    expect(await screen.findByRole("option", { name: "AN" })).toBeVisible()
   })
 
   it("links to the source repository", () => {
