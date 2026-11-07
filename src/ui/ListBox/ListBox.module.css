@@ -17,6 +17,8 @@
   outline-offset: -2px;
 }
 
+/* Taps go to the list's parent, so these options needn't be touch-sized. */
 .untappable {
+  min-height: 0;
   pointer-events: none;
 }
