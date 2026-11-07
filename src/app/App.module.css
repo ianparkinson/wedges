@@ -1,11 +1,22 @@
 .page {
   max-width: var(--content-width);
-  min-height: 100dvh;
   margin: 0 auto;
-  padding: var(--space-4);
+  padding: 0 var(--space-4);
+}
+
+/*
+ * Everything needed to write fits on the screen, with the pad as tall as
+ * the height left over allows, up to its maximum. On a screen too short for
+ * the pad's smallest size, the page scrolls instead.
+ */
+.screen {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
+  height: 100dvh;
+  min-height: min-content;
+  padding: var(--space-3) 0;
+  box-sizing: border-box;
 }
 
 .header {
@@ -22,6 +33,7 @@
 
 .footer {
   margin: 0;
+  padding-bottom: var(--space-4);
   color: var(--color-text-muted);
   font-size: var(--text-sm);
 }

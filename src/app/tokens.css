@@ -33,6 +33,8 @@
   --radius: 8px;
   --touch-target: 44px;
   --candidate-height: 6rem;
+  --pad-min-size: 200px;
+  --pad-max-size: 480px;
   --content-width: 40rem;
 
   color-scheme: light dark;

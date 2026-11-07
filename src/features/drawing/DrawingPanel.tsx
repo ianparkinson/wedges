@@ -16,7 +16,9 @@ export interface DrawingPanelProps {
 
 /**
  * The drawing pad, with buttons to undo the last stroke or clear them all,
- * and any others given at the right-hand end of their row.
+ * and any others given at the right-hand end of their row. The pad fills the
+ * panel's width, and is as tall as the space allows, between its minimum and
+ * maximum sizes.
  */
 export function DrawingPanel({
   strokes,
@@ -26,10 +28,12 @@ export function DrawingPanel({
   const empty = strokes.length === 0
   return (
     <section className={styles.panel} aria-label="Draw a sign">
-      <DrawingPad
-        strokes={strokes}
-        onStroke={(stroke) => onStrokesChange([...strokes, stroke])}
-      />
+      <div className={styles.padArea}>
+        <DrawingPad
+          strokes={strokes}
+          onStroke={(stroke) => onStrokesChange([...strokes, stroke])}
+        />
+      </div>
       <div className={styles.actions}>
         <Button
           onPress={() => onStrokesChange(strokes.slice(0, -1))}
