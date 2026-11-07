@@ -99,3 +99,14 @@ test("a two-sign text is copied to the clipboard", async ({
   await expect(text.getByRole("status")).toHaveText("Copied")
   expect(await pasteClipboard(page)).toBe(AN + A)
 })
+
+test("the text keeps its height when the first sign is written", async ({
+  page,
+}) => {
+  const { text, write } = await openApp(page)
+  const signs = text.getByRole("listbox")
+  const empty = await signs.boundingBox()
+
+  await write(AN)
+  expect((await signs.boundingBox())?.height).toBe(empty?.height)
+})
