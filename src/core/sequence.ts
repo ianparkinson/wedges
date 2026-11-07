@@ -23,7 +23,8 @@ export interface SequenceState {
 
 /** An edit to a {@link SequenceState}. */
 export type SequenceAction =
-  | { readonly kind: "insert"; readonly item: string }
+  /** Inserts each character of `chars` as an item of its own. */
+  | { readonly kind: "insert"; readonly chars: string }
   | { readonly kind: "deleteBackward" }
   | { readonly kind: "clear" }
   | { readonly kind: "moveCursor"; readonly to: number }
@@ -37,7 +38,8 @@ export const EMPTY_SEQUENCE: SequenceState = {
 
 /**
  * Applies an action to a sequence, returning the sequence after it. Inserting
- * puts the item at the cursor and moves the cursor past it. Deleting backward
+ * puts the characters at the cursor, one item each, and moves the cursor past
+ * them. Deleting backward
  * removes the item before the cursor, and does nothing at the start. A cursor
  * moved outside the sequence stops at its nearer end.
  */
@@ -47,12 +49,17 @@ export function editSequence(
 ): SequenceState {
   const { items, cursor } = sequence
   switch (action.kind) {
-    case "insert":
+    case "insert": {
+      // Spreading a string splits it into whole characters. Cuneiform is
+      // outside the Basic Multilingual Plane, so each character is two
+      // UTF-16 units.
+      const inserted = [...action.chars]
       return {
-        items: items.toSpliced(cursor, 0, action.item),
-        cursor: cursor + 1,
+        items: items.toSpliced(cursor, 0, ...inserted),
+        cursor: cursor + inserted.length,
         cursorPlaced: false,
       }
+    }
     case "deleteBackward":
       return cursor === 0
         ? sequence
