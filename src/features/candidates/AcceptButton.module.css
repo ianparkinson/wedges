@@ -1,0 +1,15 @@
+.content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.glyph {
+  width: 2em;
+  overflow: hidden;
+  font-family: var(--font-cuneiform);
+  font-size: var(--text-lg);
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}

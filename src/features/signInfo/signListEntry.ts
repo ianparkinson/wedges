@@ -46,3 +46,13 @@ export function entryChars(entry: SignListEntry): string {
       return entry.sequence.chars
   }
 }
+
+/** The entry's values, in Oracc's order. */
+export function entryValues(entry: SignListEntry): readonly string[] {
+  switch (entry.kind) {
+    case "sign":
+      return entry.sign.values
+    case "sequence":
+      return entry.sequence.values
+  }
+}

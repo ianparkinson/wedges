@@ -48,20 +48,6 @@ describe("CandidateList", () => {
     expect(onPick).toHaveBeenCalledExactlyOnceWith(MAŠ)
   })
 
-  it("picks the best candidate with Accept best", async () => {
-    const onPick = vi.fn()
-    render(
-      <CandidateList
-        candidates={[AN, MAŠ, BAD]}
-        isLoading={false}
-        onPick={onPick}
-        onInfo={() => {}}
-      />,
-    )
-    await userEvent.click(screen.getByRole("button", { name: "Accept best" }))
-    expect(onPick).toHaveBeenCalledExactlyOnceWith(AN)
-  })
-
   it("opens a candidate's entry with its ⓘ, without picking it", async () => {
     const onPick = vi.fn()
     const onInfo = vi.fn()
@@ -88,7 +74,6 @@ describe("CandidateList", () => {
       />,
     )
     expect(screen.getByText(/Draw a sign/)).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Accept best" })).toBeDisabled()
   })
 
   it("says so while the signs are loading", () => {

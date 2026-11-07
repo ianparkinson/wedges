@@ -59,6 +59,10 @@ describe("SignDatabase", () => {
     ])
   })
 
+  it("knows how many signs the longest sequence has", () => {
+    expect(db.longestSequence).toBe(2)
+  })
+
   it("lets lookup find a sign by its Unicode name, when that differs", () => {
     const names = (char: string) =>
       db.lookupEntries.find((e) => e.chars === char)?.names

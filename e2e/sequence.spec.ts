@@ -14,7 +14,7 @@ async function openApp(page: Page) {
 
   const write = async (char: string) => {
     await drawSign(page, pad, char)
-    await page.getByRole("button", { name: "Accept best" }).click()
+    await page.getByRole("button", { name: "Accept" }).click()
   }
   return { text, signs: text.getByRole("option"), write }
 }

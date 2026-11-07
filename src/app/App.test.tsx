@@ -40,7 +40,7 @@ describe("App", () => {
       "AN",
     )
 
-    await userEvent.click(screen.getByRole("button", { name: "Accept best" }))
+    await userEvent.click(screen.getByRole("button", { name: "Accept" }))
     expect(screen.getByRole("option", { name: "AN" })).toBeVisible()
     expect(pad).toHaveAccessibleName("Drawing pad, 0 strokes")
   })
@@ -49,7 +49,7 @@ describe("App", () => {
     render(<App />)
     await screen.findByText(/Draw a sign/)
     const pad = screen.getByRole("img", { name: /Drawing pad/ })
-    const accept = screen.getByRole("button", { name: "Accept best" })
+    const accept = screen.getByRole("button", { name: "Accept" })
     drawAN(pad)
     await userEvent.click(accept)
     drawAN(pad)
@@ -67,7 +67,7 @@ describe("App", () => {
     const { unmount } = render(<App />)
     await screen.findByText(/Draw a sign/)
     drawAN(screen.getByRole("img", { name: /Drawing pad/ }))
-    await userEvent.click(screen.getByRole("button", { name: "Accept best" }))
+    await userEvent.click(screen.getByRole("button", { name: "Accept" }))
     unmount()
 
     render(<App />)
@@ -99,6 +99,22 @@ describe("App", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
     expect(screen.getByRole("option", { name: "AN" })).toBeVisible()
     expect(pad).toHaveAccessibleName("Drawing pad, 0 strokes")
+  })
+
+  it("offers the sign before the cursor as a suggestion, opening its entry without Append", async () => {
+    render(<App />)
+    await screen.findByText(/Draw a sign/)
+    drawAN(screen.getByRole("img", { name: /Drawing pad/ }))
+    await userEvent.click(screen.getByRole("button", { name: "Accept" }))
+
+    const suggestions = screen.getByRole("group", { name: "Suggestions" })
+    await userEvent.click(
+      within(suggestions).getByRole("button", { name: /^AN / }),
+    )
+    expect(screen.getByRole("dialog", { name: "AN" })).toBeVisible()
+    expect(
+      screen.queryByRole("button", { name: "Append" }),
+    ).not.toBeInTheDocument()
   })
 
   it("links to the source repository", () => {

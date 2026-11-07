@@ -1,0 +1,21 @@
+/*
+ * The component sets the fades' widths, to fade out an edge with more chips
+ * beyond it.
+ */
+.row {
+  --fade-start: 0px;
+  --fade-end: 0px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target);
+  overflow-x: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black var(--fade-start),
+    black calc(100% - var(--fade-end)),
+    transparent
+  );
+}

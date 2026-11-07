@@ -1,0 +1,47 @@
+.chip {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: center;
+  /* Chips share a row too narrow for them, down to this width each. */
+  min-width: 8rem;
+  max-width: 50%;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--touch-target) / 2);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.chip:only-child {
+  max-width: 100%;
+}
+
+.chip[data-pressed] {
+  background: var(--color-bg);
+}
+
+.chip[data-focus-visible] {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.detail {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}

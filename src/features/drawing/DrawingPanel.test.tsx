@@ -47,4 +47,13 @@ describe("DrawingPanel", () => {
     expect(screen.getByRole("button", { name: "Undo stroke" })).toBeDisabled()
     expect(screen.getByRole("button", { name: "Clear" })).toBeDisabled()
   })
+
+  it("shows the buttons it is given in its row", () => {
+    render(
+      <DrawingPanel strokes={[]} onStrokesChange={() => {}}>
+        <button type="button">Accept</button>
+      </DrawingPanel>,
+    )
+    expect(screen.getByRole("button", { name: "Accept" })).toBeVisible()
+  })
 })
