@@ -9,6 +9,10 @@
   --color-text-muted: #6b5d4f;
   --color-accent: #8a4b1f;
   --color-focus: #1f5fbf;
+  --color-border: #d8cbb8;
+  --color-clay: #e4d3b4;
+  --color-impression: #5a3f28;
+  --color-trace: #8a4b1f;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -26,6 +30,7 @@
   --text-glyph: 4rem;
 
   --radius: 8px;
+  --touch-target: 44px;
   --content-width: 40rem;
 
   color-scheme: light dark;
@@ -39,5 +44,9 @@
     --color-text-muted: #b3a493;
     --color-accent: #e0a070;
     --color-focus: #7fb0ff;
+    --color-border: #4a3e33;
+    --color-clay: #3a2f25;
+    --color-impression: #e8d6bc;
+    --color-trace: #e0a070;
   }
 }

@@ -17,6 +17,6 @@
     "e2e",
     // The Vite plugin that builds the sign data, and what it imports.
     "scripts/osl",
-    "src/core/types.ts"
+    "src/core"
   ]
 }

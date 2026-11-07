@@ -11,6 +11,13 @@ describe("App", () => {
     )
   })
 
+  it("opens on an empty drawing pad", () => {
+    render(<App />)
+    expect(
+      screen.getByRole("img", { name: "Drawing pad, 0 strokes" }),
+    ).toBeInTheDocument()
+  })
+
   it("links to the source repository", () => {
     render(<App />)
     expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
