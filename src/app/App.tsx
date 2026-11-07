@@ -71,30 +71,32 @@ export function App() {
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>Wedges</h1>
-        <Button onPress={() => setLookupOpen(true)}>Look up</Button>
-      </header>
-      <SequencePanel
-        sequence={sequence}
-        onAction={editSequence}
-        nameOf={(char) => database?.sign(char)?.name}
-      />
-      <SuggestionRow
-        suggestions={suggestions}
-        onOpen={(entry) => setShownEntry({ entry })}
-      />
-      <DrawingPanel strokes={strokes} onStrokesChange={setStrokes}>
-        <AcceptButton best={candidates[0]} onPick={pick} />
-      </DrawingPanel>
-      <CandidateList
-        candidates={candidates}
-        isLoading={!database}
-        onPick={pick}
-        onInfo={(sign) =>
-          setShownEntry({ entry: { kind: "sign", sign }, append: sign })
-        }
-      />
+      <div className={styles.screen}>
+        <header className={styles.header}>
+          <h1 className={styles.title}>Wedges</h1>
+          <Button onPress={() => setLookupOpen(true)}>Look up</Button>
+        </header>
+        <SequencePanel
+          sequence={sequence}
+          onAction={editSequence}
+          nameOf={(char) => database?.sign(char)?.name}
+        />
+        <SuggestionRow
+          suggestions={suggestions}
+          onOpen={(entry) => setShownEntry({ entry })}
+        />
+        <DrawingPanel strokes={strokes} onStrokesChange={setStrokes}>
+          <AcceptButton best={candidates[0]} onPick={pick} />
+        </DrawingPanel>
+        <CandidateList
+          candidates={candidates}
+          isLoading={!database}
+          onPick={pick}
+          onInfo={(sign) =>
+            setShownEntry({ entry: { kind: "sign", sign }, append: sign })
+          }
+        />
+      </div>
       <p className={styles.footer}>
         Wedges is being built. Follow along on{" "}
         <Link href={REPO_URL}>GitHub</Link>.

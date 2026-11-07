@@ -1,12 +1,29 @@
+/*
+ * The panel fills the height its parent gives it, but no more than the
+ * pad's maximum and the row of buttons below it need.
+ */
 .panel {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  max-height: calc(var(--pad-max-size) + var(--space-2) + var(--touch-target));
+}
+
+/* The pad fills the width and the height left over, within its limits. */
+.padArea {
+  flex: 1;
+  min-height: var(--pad-min-size);
+  max-height: var(--pad-max-size);
 }
 
 .actions {
   display: flex;
   gap: var(--space-2);
+}
+
+.actions > button {
+  white-space: nowrap;
 }
 
 .spacer {
