@@ -19,6 +19,7 @@
 }
 
 .button[data-disabled] {
+  border-color: var(--color-border);
   color: var(--color-text-muted);
   cursor: default;
 }
