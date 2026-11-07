@@ -11,3 +11,4 @@ One short file per decision that someone might later want to revisit: what was d
 | [0005](0005-hosting-ci.md)             | GitHub Pages hosting; accuracy benchmark in CI   | accepted |
 | [0006](0006-ranking-on-main-thread.md) | Rank on the main thread, without a Web Worker    | accepted |
 | [0007](0007-bundled-cuneiform-font.md) | Bundle Noto Sans Cuneiform                       | accepted |
+| [0008](0008-session-storage.md)        | Keep the text in session storage only            | accepted |
