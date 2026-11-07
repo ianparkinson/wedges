@@ -32,6 +32,7 @@ export function normalize(strokes: readonly Stroke[]): Stroke[] {
       y1 = Math.max(y1, p.y)
     }
   }
+
   const cx = (x0 + x1) / 2
   const cy = (y0 + y1) / 2
   const scale = Math.max(x1 - x0, y1 - y0, MIN_SCALE)
@@ -39,6 +40,7 @@ export function normalize(strokes: readonly Stroke[]): Stroke[] {
     x: (p.x - cx) / scale,
     y: (p.y - cy) / scale,
   })
+
   return strokes.map((s) =>
     s.kind === "wedge"
       ? { kind: "wedge", head: f(s.head), tail: f(s.tail) }

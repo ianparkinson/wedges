@@ -10,6 +10,7 @@ import { loadOsl, OSL_ASL } from "./loadOsl.ts"
 
 // Vite's convention for a module that isn't a file is a "virtual:" prefix.
 const ID = "virtual:osl"
+
 // The \0 prefix tells other plugins the module isn't a file.
 const RESOLVED_ID = "\0" + ID
 
@@ -22,6 +23,7 @@ export function oslPlugin(): Plugin {
     load(id) {
       if (id !== RESOLVED_ID) return undefined
       this.addWatchFile(fileURLToPath(OSL_ASL))
+
       // This is the source of the module the app imports. Browsers load a
       // large object faster from JSON.parse of a string than from a
       // JavaScript object literal, so the module holds the data as a string:

@@ -47,6 +47,7 @@ for (const { sign, strokes } of skeletons) {
     const drawing = synthesizeDrawing(strokes, noise, random)
     const results = rank(drawing, db.drawable, { limit: CANDIDATES })
     const position = results.findIndex((r) => r.sign === sign)
+
     total++
     if (position === 0) top1++
     else {

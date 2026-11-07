@@ -100,6 +100,7 @@ export function parseAsl(text: string): AslEntry[] {
         skipping = false
         continue
     }
+
     const current = form ?? sign
     if (!current || skipping) continue
     if (tag === "@oid") current.oslId ??= rest
@@ -111,5 +112,6 @@ export function parseAsl(text: string): AslEntry[] {
       if (code) current.duplicate = String.fromCodePoint(parseInt(code, 16))
     }
   }
+
   return entries
 }

@@ -49,6 +49,7 @@ function cases(): Case[] {
   })
   const placement = { scale: SCALE, offset: { x: 0, y: 0 } }
   const round = (n: number) => Math.round(n)
+
   const out: Omit<Case, "trace">[] = []
   for (let i = 0; i < CASES; i++) {
     if (i % 2 === 0) {
@@ -80,6 +81,7 @@ function cases(): Case[] {
       })
     }
   }
+
   return out.map((c) => ({
     ...c,
     trace: synthesizeTrace(c.stroke, placement, 0, random),

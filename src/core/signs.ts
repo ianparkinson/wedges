@@ -44,6 +44,7 @@ export class SignDatabase {
         samples.set(char, list)
       }
     }
+
     this.signs = osl.signs.map((sign) => ({
       ...sign,
       samples: samples.get(sign.char) ?? [],
@@ -52,6 +53,7 @@ export class SignDatabase {
     this.drawable = [...samples.keys()]
       .map((char) => this.byChar.get(char))
       .filter((sign) => sign !== undefined)
+
     this.sequences = osl.sequences
     this.sequenceByChars = new Map(this.sequences.map((s) => [s.chars, s]))
   }

@@ -69,6 +69,7 @@ export function classifyTrace(
 
   const points = smooth(resample(trace, params.spacing))
   const last = points.length - 1
+
   // A trace at least minLength long resamples to several points.
   const first = points[0]!
   const end = points[last]!
@@ -84,6 +85,7 @@ export function classifyTrace(
   const corner = points[bestCorner(points)]!
   const legA = distance(first, corner)
   const legB = distance(corner, end)
+
   // A much shorter leg is a flick at the start or end of a wedge: keep the longer leg.
   if (Math.min(legA, legB) < params.legRatio * Math.max(legA, legB)) {
     return legA > legB ? wedge(first, corner) : wedge(corner, end)
@@ -110,6 +112,7 @@ export function resample(points: readonly Point[], spacing: number): Point[] {
   const start = points[0]
   if (start === undefined || points.length < 2) return [...points]
   const out = [start]
+
   // Walk the path a segment at a time. `travelled` is the distance along the
   // path since the last point added. Whenever the current segment would take
   // it past `spacing`, add a point exactly `spacing` along, and carry on from
@@ -160,8 +163,10 @@ export function smooth(points: readonly Point[]): Point[] {
 /** The index of the interior point that best splits the path into two straight segments. */
 function bestCorner(points: readonly Point[]): number {
   const last = points.length - 1
+
   let best = 1
   let bestError = Infinity
+
   for (let k = 1; k < last; k++) {
     const error = Math.max(
       maxDeviation(points, 0, k),
@@ -172,6 +177,7 @@ function bestCorner(points: readonly Point[]): number {
       best = k
     }
   }
+
   return best
 }
 

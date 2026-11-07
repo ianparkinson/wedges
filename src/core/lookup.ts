@@ -241,6 +241,7 @@ export function search(
 
   const folded = fold(raw)
   if (!folded) return []
+
   const strict = foldStrict(raw)
   const strictStem = strict.replace(/\d+$/, "")
   const spelling = (k: Key, tier: Tier): 0 | 1 =>
@@ -263,6 +264,7 @@ export function search(
     }
     if (best) hits.push(best)
   }
+
   return hits
     .sort(compare)
     .slice(0, limit)
