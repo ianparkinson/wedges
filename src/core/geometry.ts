@@ -1,11 +1,16 @@
 /**
- * Points and distances shared by stroke recognition and matching.
+ * Points, distances and other geometry shared across the app.
  */
 
 /** A point in screen-like coordinates: x to the right, y downward. */
 export interface Point {
   readonly x: number
   readonly y: number
+}
+
+/** `value` moved into the range from `min` to `max`, if it lies outside. */
+export function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max)
 }
 
 /** Euclidean distance between two points. */
@@ -29,7 +34,7 @@ export function segmentDistance(p: Point, a: Point, b: Point): number {
   const lengthSquared = dx * dx + dy * dy
   if (lengthSquared === 0) return distance(p, a)
   let t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / lengthSquared
-  t = Math.max(0, Math.min(1, t))
+  t = clamp(t, 0, 1)
   return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy))
 }
 
@@ -45,5 +50,5 @@ export function angleAt(vertex: Point, a: Point, b: Point): number {
   const by = b.y - vertex.y
   const cos =
     (ax * bx + ay * by) / (Math.hypot(ax, ay) * Math.hypot(bx, by) || 1)
-  return Math.acos(Math.max(-1, Math.min(1, cos)))
+  return Math.acos(clamp(cos, -1, 1))
 }
