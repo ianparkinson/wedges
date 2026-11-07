@@ -1,11 +1,14 @@
 import {
+  sequenceText,
   showsCursor,
   type SequenceAction,
   type SequenceState,
 } from "@/core/sequence"
 import { Button } from "@/ui/Button/Button"
+import { ButtonBar } from "@/ui/ButtonBar/ButtonBar"
 import { ListBox, type ListBoxOption } from "@/ui/ListBox/ListBox"
 
+import { CopyButton } from "./CopyButton"
 import { nearestBoundary } from "./nearestBoundary"
 import styles from "./SequencePanel.module.css"
 
@@ -19,10 +22,10 @@ export interface SequencePanelProps {
 
 /**
  * The text being written, with a cursor after the selected sign, and buttons
- * to delete the sign before the cursor, or clear it all.
- * Tapping the text moves the cursor to the gap between signs nearest the tap;
- * with the keyboard, the arrow keys and Enter put it after a sign. The cursor
- * takes no width, so the signs stay put as it moves.
+ * to delete the sign before the cursor, clear it all, or copy
+ * it. Tapping the text moves the cursor to the gap between signs nearest the
+ * tap; with the keyboard, the arrow keys and Enter put it after a sign. The
+ * cursor takes no width, so the signs stay put as it moves.
  */
 export function SequencePanel({
   sequence,
@@ -68,7 +71,7 @@ export function SequencePanel({
           selectsOnTap={false}
         />
       </div>
-      <div className={styles.actions}>
+      <ButtonBar>
         <Button
           onPress={() => onAction({ kind: "deleteBackward" })}
           isDisabled={cursor === 0}
@@ -81,7 +84,8 @@ export function SequencePanel({
         >
           Clear text
         </Button>
-      </div>
+        <CopyButton text={sequenceText(sequence)} />
+      </ButtonBar>
     </section>
   )
 }

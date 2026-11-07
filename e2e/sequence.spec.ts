@@ -47,3 +47,43 @@ test("the text is edited at the cursor, and survives a reload", async ({
   await page.reload()
   await expect.poll(() => names(signs)).toEqual(["A"])
 })
+
+/**
+ * Reads the clipboard by pasting it into a new text box. WebKit lets a page
+ * read the clipboard only through a paste, not with `readText()`.
+ */
+async function pasteClipboard(page: Page): Promise<string> {
+  const box = await page.locator("body").evaluateHandle((body) => {
+    const textarea = document.createElement("textarea")
+    body.append(textarea)
+    return textarea
+  })
+  await box.focus()
+  await page.keyboard.press("ControlOrMeta+V")
+  return box.inputValue()
+}
+
+test("a two-sign text is copied to the clipboard", async ({
+  page,
+  context,
+  browserName,
+}) => {
+  // Headless Chromium refuses the clipboard unless allowed. WebKit has no
+  // such permissions, and allows it.
+  if (browserName === "chromium") {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"])
+  }
+  await page.goto("./")
+  const pad = page.getByRole("img", { name: /Drawing pad/ })
+  const text = page.getByRole("region", { name: "Text" })
+  await expect(page.getByText(/Draw a sign/)).toBeVisible()
+
+  await drawSign(page, pad, AN)
+  await page.getByRole("button", { name: "Accept best" }).click()
+  await drawSign(page, pad, A)
+  await page.getByRole("button", { name: "Accept best" }).click()
+  await text.getByRole("button", { name: "Copy" }).click()
+
+  await expect(text.getByRole("status")).toHaveText("Copied")
+  expect(await pasteClipboard(page)).toBe(AN + A)
+})
