@@ -76,15 +76,17 @@ export function App() {
           <h1 className={styles.title}>Wedges</h1>
           <Button onPress={() => setLookupOpen(true)}>Look up</Button>
         </header>
-        <SequencePanel
-          sequence={sequence}
-          onAction={editSequence}
-          nameOf={(char) => database?.sign(char)?.name}
-        />
-        <SuggestionRow
-          suggestions={suggestions}
-          onOpen={(entry) => setShownEntry({ entry })}
-        />
+        <div className={styles.text}>
+          <SuggestionRow
+            suggestions={suggestions}
+            onOpen={(entry) => setShownEntry({ entry })}
+          />
+          <SequencePanel
+            sequence={sequence}
+            onAction={editSequence}
+            nameOf={(char) => database?.sign(char)?.name}
+          />
+        </div>
         <DrawingPanel strokes={strokes} onStrokesChange={setStrokes}>
           <AcceptButton best={candidates[0]} onPick={pick} />
         </DrawingPanel>
