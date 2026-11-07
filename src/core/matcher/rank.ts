@@ -49,6 +49,7 @@ export function rank<S extends Rankable>(
   const results: Ranked<S>[] = []
   const topScores: number[] = []
   let cutoff = Infinity
+
   for (const { sign, bound } of queue) {
     // The queue is in order of bound, so no later sign can make the top
     // `limit` either.
@@ -56,12 +57,14 @@ export function rank<S extends Rankable>(
     const best = bestMatch(prepared, sign, weights, cutoff)
     if (best) {
       results.push(best)
+
       // Once there are `limit` results, a sign must beat the worst of them.
       insertSorted(topScores, best.score)
       if (topScores.length > limit) topScores.pop()
       if (topScores.length === limit) cutoff = topScores[limit - 1]!
     }
   }
+
   return results.sort((a, b) => a.score - b.score).slice(0, limit)
 }
 

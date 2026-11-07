@@ -48,6 +48,7 @@ function splitTopLevel(body: string): {
   const operators: CompoundOperator[] = []
   let depth = 0
   let start = 0
+
   for (let i = 0; i < body.length; i++) {
     const c = body[i]!
     if (c === "(") depth++
@@ -58,6 +59,7 @@ function splitTopLevel(body: string): {
       start = i + 1
     }
   }
+
   parts.push(body.slice(start))
   return { parts, operators }
 }

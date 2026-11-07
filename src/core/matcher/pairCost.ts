@@ -52,6 +52,7 @@ export function pairCost(
   const dx = f.position.x - g.position.x
   const dy = f.position.y - g.position.y
   const distance = Math.sqrt(dx * dx + dy * dy)
+
   if (f.kind === "wedge" && g.kind === "wedge") {
     const d = angleDifference(f.angle, g.angle)
     const angleCost = Math.min(
@@ -64,6 +65,7 @@ export function pairCost(
       weights.length * Math.abs(f.logLength - g.logLength)
     )
   }
+
   if (f.kind === "winkelhaken" && g.kind === "winkelhaken") {
     return (
       weights.position * distance +
@@ -72,5 +74,6 @@ export function pairCost(
         QUARTER_TURN
     )
   }
+
   return weights.kindMismatch + weights.position * distance
 }

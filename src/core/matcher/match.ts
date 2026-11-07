@@ -48,17 +48,21 @@ export function match(
   if (drawn.features.length === 0 || skeleton.features.length === 0) {
     return { score: weights.unmatched, pairs: [] }
   }
+
   // Capping a pair's cost at two unpaired strokes keeps the option of
   // leaving both unpaired.
   const cap = 2 * weights.unmatched
+
   // Plain arrays: munkres solves typed-array rows several times slower.
   const costs = drawn.features.map((d) =>
     skeleton.features.map((s) => Math.min(pairCost(d, s, weights), cap)),
   )
+
   // rank() passes the worst score it is still keeping as the cutoff, so if
   // even the lower bound is above it, solving would be wasted work.
   const bound = lowerBound(costs, weights.unmatched)
   if (bound / strokeCount - BOUND_TOLERANCE > cutoff) return null
+
   // The solver pairs every stroke of the shorter list, leaving the rest of
   // the longer one unpaired.
   const unpairedCount = Math.abs(
@@ -71,6 +75,7 @@ export function match(
     total += cost
     if (cost < cap) pairs.push([i, j])
   }
+
   return { score: total / strokeCount, pairs }
 }
 

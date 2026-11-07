@@ -29,14 +29,17 @@ function parseStroke(item: string): Stroke | null {
   for (let i = 0; i + 1 < numbers.length; i += 2) {
     points.push({ x: numbers[i]!, y: numbers[i + 1]! })
   }
+
   const valid =
     numbers.length % 2 === 0 && numbers.every((n) => Number.isFinite(n))
   const [p, q, r] = points
+
   if (valid && op === WEDGE_OP && points.length === 2 && p && q) {
     return { kind: "wedge", head: p, tail: q }
   }
   if (valid && op === WINKELHAKEN_OP && points.length === 3 && p && q && r) {
     return { kind: "winkelhaken", vertex: p, legA: q, legB: r }
   }
+
   return null
 }

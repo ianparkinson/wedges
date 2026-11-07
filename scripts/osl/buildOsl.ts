@@ -128,6 +128,7 @@ function toSign(
   return {
     char,
     name: entry.name,
+
     // A double-encoded sign's second character has a Unicode name of its own.
     ...(entry.unicodeName && char === entry.chars
       ? { unicodeName: entry.unicodeName }

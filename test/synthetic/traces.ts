@@ -43,11 +43,13 @@ export function synthesizeTrace(
     x: offset.x + p.x * scale + random.gauss() * noise * scale,
     y: offset.y + p.y * scale + random.gauss() * noise * scale,
   })
+
   switch (stroke.kind) {
     case "wedge": {
       const head = place(stroke.head)
       const tail = place(stroke.tail)
       const points = line(head, tail, WEDGE_STEPS, WEDGE_JITTER, random)
+
       if (random.next() < FLICK_CHANCE) {
         const end = points[points.length - 1]!
         const angle = random.next() * 2 * Math.PI
@@ -57,6 +59,7 @@ export function synthesizeTrace(
         }
         points.push(...line(end, flickEnd, FLICK_STEPS, FLICK_JITTER, random))
       }
+
       return points
     }
     case "winkelhaken": {
