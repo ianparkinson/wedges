@@ -60,13 +60,27 @@ The first time you run e2e tests, install the browsers with `npx playwright inst
 - Prettier with no semicolons, for code and Markdown alike. Imports are sorted by `@ianvs/prettier-plugin-sort-imports`: Node built-ins, packages, our own `@/` modules, relative imports, then CSS.
 - Styles live in a CSS Module beside each component. Colours, spacing and type sizes come from the custom properties in `src/app/tokens.css`; don't hard-code them in components. Site-wide base styles are in `src/app/global.css`, on top of `modern-normalize`.
 - Components are queried in tests by role and accessible name, as a user would find them.
+- Keep a diff to its change: no stray whitespace or newline edits in other files.
+
+## Code shape
+
+- **Names say what things are.** Avoid abbreviations except for common conventions such as `i`, `n`, `x` and `y`.
+- **Branch on a kind with `switch`**, or `if`/`else`, so each case reads as an alternative, not a fallback after an early return.
+  - Genuine early returns, such as precondition validation, can of course precede the main flow without nesting the bulk of code in an `else`.
+- **Break a function up** instead of nesting loops with `break` and `continue`, or when it runs through several stages: named helpers make the flow readable.
+- **Only what's needed now.** No functions the current work doesn't use, no defensive errors a user can't act on, no copies of `readonly` data.
+- **Prefer to avoid parameters passed just to build an error message**. Throw, and let the caller add context.
+- **Reuse before writing.** Prefer a standard tool or package to bespoke code outside the problem domain, and look for an existing helper first.
 
 ## Comments
 
 Write for an experienced software engineer who is new to this project and to cuneiform.
 
 - Give exported functions, components and types a doc comment when their name and types don't say everything: units, coordinate frames, edge cases, or why they exist.
-- Use implementation comments sparingly, for code that is surprising or genuinely complex. Don't restate what the code says.
+- Open a doc comment with what the function does, in plain words, even when the file's header says it too.
+- Use implementation comments sparingly, for code that is surprising or genuinely complex. Don't restate what the code says, or explain a standard idiom.
+- Describe the code as it is, not where it came from or how it changed: git keeps history.
+- Docs arrive with the code they describe, and leave out counts or details that would go stale with each data update.
 - Link to the doc in `docs/` that explains an algorithm, rather than explaining it again in comments.
 
 ## Testing
@@ -78,6 +92,8 @@ Write for an experienced software engineer who is new to this project and to cun
 | E2E and accessibility | Playwright, axe-core             | every PR, in CI                             |
 | Accuracy benchmark    | `npm run bench:accuracy`         | in CI, on PRs that could change recognition |
 | Performance           | `npm run bench:performance`      | by hand, never in CI                        |
+
+- **Tests state what they expect and why.** Hand-written cases with descriptive names, so a failure says what broke. No golden or snapshot files of generated output, whose diffs can't be reviewed, and no randomised brute-force tests, whose failures can't be acted on.
 
 ## Where things are
 
