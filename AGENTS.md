@@ -11,12 +11,11 @@ A mobile-first web app for entering cuneiform. You draw a sign one wedge at a ti
 1. **Never commit or push to `main`.** Work on a branch and open a pull request for Ian to review. Every change goes through a PR, however small.
 2. **`npm run check` must pass before you push.** CI runs the same command plus the e2e tests.
 3. **Respect the layers** (below). ESLint enforces them; do not disable the rule.
-4. **No default exports.** Use named exports, except in tool config files that require a default.
-5. **Tests sit beside the code:** `rank.ts` and `rank.test.ts`. A file with no test beside it should have a reason.
-6. **Small, named pieces:** one component or concept per file, files under about 300 lines, named constants instead of magic numbers.
-7. **Generated files say so in a header** and are rebuilt by a script, never edited by hand.
-8. **Don't change recognition behaviour by accident.** When a PR touches `src/core` or `data/`, the Accuracy Benchmark workflow runs the accuracy benchmark on the PR's base and on the PR, and comments with both results; check them before merging. If a behaviour change is intended, say what changed and why in the PR description.
-9. **Record decisions.** A choice that someone later might want to revisit gets a short file in `docs/decisions/`.
+4. **Tests sit beside the code:** `rank.ts` and `rank.test.ts`. A file with no test beside it should have a reason.
+5. **Small, named pieces:** one component or concept per file, files under about 300 lines, named constants instead of magic numbers.
+6. **Generated files say so in a header** and are rebuilt by a script, never edited by hand.
+7. **Don't change recognition behaviour by accident.** When a PR touches `src/core` or `data/`, the Accuracy Benchmark workflow runs the accuracy benchmark on the PR's base and on the PR, and comments with both results; check them before merging. If a behaviour change is intended, say what changed and why in the PR description.
+8. **Record decisions.** A choice that someone later might want to revisit gets a short file in `docs/decisions/`.
 
 ## Layers
 
@@ -36,8 +35,6 @@ Dependencies point one way only:
 - `app` puts the features together.
 - **Only `src/ui` imports `react-aria-components`.** Everything else imports our wrappers, such as `@/ui/Link/Link`, so the library can be swapped by changing one folder.
 
-Import our own code through the `@/` alias (`@/core/geometry`), or relatively within a folder.
-
 ## Commands
 
 | Command                           | What it does                                                                                         |
@@ -56,7 +53,18 @@ The first time you run e2e tests, install the browsers with `npx playwright inst
 
 ## Style
 
-- TypeScript strict, with `noUncheckedIndexedAccess`. Prefer narrowing over `!`; where `!` is genuinely safe, say why in a comment.
+Follow the [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html). Prettier decides formatting, so its config wins over the guide on layout and quotes. The rest of this file wins where it differs from the guide, and adds rules the guide doesn't have.
+
+Where we differ from the guide:
+
+- **File names** are camelCase for modules (`strokes.ts`) and PascalCase for components (`Link/Link.tsx`), not snake_case.
+- **Imports** between folders of `src` use the `@/` alias (`@/core/geometry`), not long relative paths. Within a folder, import relatively.
+- **A `switch` over every member of a union needs no `default`**, so the compiler reports a case that a new member leaves unhandled.
+- **Doc comments only where they add something** (see Comments), rather than on every export.
+
+Beyond the guide:
+
+- TypeScript strict, with `noUncheckedIndexedAccess`.
 - Prettier with no semicolons, for code and Markdown alike. Imports are sorted by `@ianvs/prettier-plugin-sort-imports`: Node built-ins, packages, our own `@/` modules, relative imports, then CSS.
 - Styles live in a CSS Module beside each component. Colours, spacing and type sizes come from the custom properties in `src/app/tokens.css`; don't hard-code them in components. Site-wide base styles are in `src/app/global.css`, on top of `modern-normalize`.
 - Components are queried in tests by role and accessible name, as a user would find them.
@@ -64,10 +72,9 @@ The first time you run e2e tests, install the browsers with `npx playwright inst
 
 ## Code shape
 
-- **Names say what things are.** Avoid abbreviations except for common conventions such as `i`, `n`, `x` and `y`.
 - **Branch on a kind with `switch`**, or `if`/`else`, so each case reads as an alternative, not a fallback after an early return.
   - Genuine early returns, such as precondition validation, can of course precede the main flow without nesting the bulk of code in an `else`.
-- **Write code in paragraphs.** Separate the steps of a function with a blank line, the way paragraphs separate the ideas in prose. An implementation comment introduces the paragraph below it, so give it a blank line above, unless it opens a block.
+- **Write code in paragraphs.** The guide allows blank lines within a function sparingly; we use them as a matter of course. Separate the steps of a function with a blank line, the way paragraphs separate the ideas in prose. An implementation comment introduces the paragraph below it, so give it a blank line above, unless it opens a block.
 - **Break a function up** instead of nesting loops with `break` and `continue`, or when it runs through several stages: named helpers make the flow readable.
 - **Only what's needed now.** No functions the current work doesn't use, no defensive errors a user can't act on, no copies of `readonly` data.
 - **Prefer to avoid parameters passed just to build an error message**. Throw, and let the caller add context.
