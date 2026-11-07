@@ -12,7 +12,7 @@ You need Node.js 26 or later (see `.nvmrc`).
 
 ```bash
 npm install
-npm run dev     # http://localhost:5173/wedges/
+npm run dev     # http://localhost:5173/wedges/, and on your local network
 npm run check   # type checks, lint, format check and tests
 npm run e2e     # Playwright tests on emulated phones
 ```
