@@ -5,6 +5,8 @@ import type { Sign } from "@/core/signs"
 import type { Stroke } from "@/core/strokes"
 import { CandidateList } from "@/features/candidates/CandidateList"
 import { DrawingPanel } from "@/features/drawing/DrawingPanel"
+import { SequencePanel } from "@/features/sequence/SequencePanel"
+import { useSequence } from "@/features/sequence/useSequence"
 import { Link } from "@/ui/Link/Link"
 
 import styles from "./App.module.css"
@@ -16,13 +18,13 @@ const REPO_URL = "https://github.com/ianparkinson/wedges"
 const CANDIDATE_COUNT = 3
 
 /**
- * The app shell: the signs picked so far, the drawing pad, and the
+ * The app shell: the text written so far, the drawing pad, and the
  * candidates for what is drawn on it.
  */
 export function App() {
   const database = useSignDatabase()
   const [strokes, setStrokes] = useState<readonly Stroke[]>([])
-  const [picked, setPicked] = useState("")
+  const [sequence, editSequence] = useSequence()
 
   const candidates = useMemo(
     () =>
@@ -35,16 +37,18 @@ export function App() {
   )
 
   const pick = (sign: Sign) => {
-    setPicked((text) => text + sign.char)
+    editSequence({ kind: "insert", item: sign.char })
     setStrokes([])
   }
 
   return (
     <main className={styles.page}>
       <h1 className={styles.title}>Wedges</h1>
-      <output className={styles.picked} aria-label="Picked signs">
-        {picked}
-      </output>
+      <SequencePanel
+        sequence={sequence}
+        onAction={editSequence}
+        nameOf={(char) => database?.sign(char)?.name}
+      />
       <DrawingPanel strokes={strokes} onStrokesChange={setStrokes} />
       <CandidateList
         candidates={candidates}

@@ -8,6 +8,14 @@ export interface Point {
   readonly y: number
 }
 
+/** An upright rectangle, as `getBoundingClientRect()` gives one. */
+export interface Box {
+  readonly left: number
+  readonly right: number
+  readonly top: number
+  readonly bottom: number
+}
+
 /** `value` moved into the range from `min` to `max`, if it lies outside. */
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max)

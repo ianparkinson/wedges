@@ -5,6 +5,7 @@ import { afterEach } from "vitest"
 
 afterEach(() => {
   cleanup()
+  sessionStorage.clear()
 })
 
 // jsdom implements neither canvas drawing, pointer capture, ResizeObserver
