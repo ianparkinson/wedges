@@ -36,6 +36,8 @@ export class SignDatabase {
   readonly drawable: readonly Sign[]
   /** Every sequence the Oracc data lists. */
   readonly sequences: readonly Sequence[]
+  /** How many signs the longest sequence has. */
+  readonly longestSequence: number
   private readonly byChar: ReadonlyMap<string, Sign>
   private readonly sequenceByChars: ReadonlyMap<string, Sequence>
   private cachedLookupEntries: readonly LookupEntry[] | undefined
@@ -65,6 +67,11 @@ export class SignDatabase {
 
     this.sequences = osl.sequences
     this.sequenceByChars = new Map(this.sequences.map((s) => [s.chars, s]))
+    // Spreading splits a string into whole characters, each two UTF-16 units.
+    this.longestSequence = Math.max(
+      0,
+      ...this.sequences.map((s) => [...s.chars].length),
+    )
   }
 
   /** The sign for a character, if it is in the Oracc data. */

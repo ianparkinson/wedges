@@ -3,12 +3,16 @@ import { useMemo, useState } from "react"
 import { rank } from "@/core/matcher/rank"
 import type { Sign } from "@/core/signs"
 import type { Stroke } from "@/core/strokes"
+import { suggestionsAt } from "@/core/suggest"
+import { AcceptButton } from "@/features/candidates/AcceptButton"
 import { CandidateList } from "@/features/candidates/CandidateList"
 import { DrawingPanel } from "@/features/drawing/DrawingPanel"
 import { LookupSheet } from "@/features/lookup/LookupSheet"
 import { SequencePanel } from "@/features/sequence/SequencePanel"
 import { useSequence } from "@/features/sequence/useSequence"
 import { SignInfoSheet } from "@/features/signInfo/SignInfoSheet"
+import type { SignListEntry } from "@/features/signInfo/signListEntry"
+import { SuggestionRow } from "@/features/suggestions/SuggestionRow"
 import { Button } from "@/ui/Button/Button"
 import { Link } from "@/ui/Link/Link"
 
@@ -21,16 +25,25 @@ const REPO_URL = "https://github.com/ianparkinson/wedges"
 const CANDIDATE_COUNT = 3
 
 /**
- * The app shell: the text written so far, the drawing pad, and the
- * candidates for what is drawn on it, with Look up and the candidates'
- * entries in sheets over them.
+ * An entry shown in a sheet over the app, and the candidate its Append
+ * picks, when it was opened from a candidate.
+ */
+interface ShownEntry {
+  readonly entry: SignListEntry
+  readonly append?: Sign
+}
+
+/**
+ * The app shell: the text written so far, suggestions for the signs before
+ * the cursor, the drawing pad, and the candidates for what is drawn on it,
+ * with Look up and entries in sheets over them.
  */
 export function App() {
   const database = useSignDatabase()
   const [strokes, setStrokes] = useState<readonly Stroke[]>([])
   const [sequence, editSequence] = useSequence()
   const [isLookupOpen, setLookupOpen] = useState(false)
-  const [candidateInfo, setCandidateInfo] = useState<Sign>()
+  const [shownEntry, setShownEntry] = useState<ShownEntry>()
 
   const candidates = useMemo(
     () =>
@@ -42,10 +55,19 @@ export function App() {
     [database, strokes],
   )
 
+  const suggestions = useMemo(
+    () =>
+      database
+        ? suggestionsAt(sequence, database)
+        : { sign: undefined, sequences: [] },
+    [database, sequence],
+  )
+
   const pick = (sign: Sign) => {
     editSequence({ kind: "insert", chars: sign.char })
     setStrokes([])
   }
+  const appendShown = shownEntry?.append
 
   return (
     <main className={styles.page}>
@@ -58,12 +80,20 @@ export function App() {
         onAction={editSequence}
         nameOf={(char) => database?.sign(char)?.name}
       />
-      <DrawingPanel strokes={strokes} onStrokesChange={setStrokes} />
+      <SuggestionRow
+        suggestions={suggestions}
+        onOpen={(entry) => setShownEntry({ entry })}
+      />
+      <DrawingPanel strokes={strokes} onStrokesChange={setStrokes}>
+        <AcceptButton best={candidates[0]} onPick={pick} />
+      </DrawingPanel>
       <CandidateList
         candidates={candidates}
         isLoading={!database}
         onPick={pick}
-        onInfo={setCandidateInfo}
+        onInfo={(sign) =>
+          setShownEntry({ entry: { kind: "sign", sign }, append: sign })
+        }
       />
       <p className={styles.footer}>
         Wedges is being built. Follow along on{" "}
@@ -77,10 +107,10 @@ export function App() {
       />
       {database && (
         <SignInfoSheet
-          entry={candidateInfo && { kind: "sign", sign: candidateInfo }}
+          entry={shownEntry?.entry}
           database={database}
-          onClose={() => setCandidateInfo(undefined)}
-          onAppend={() => candidateInfo && pick(candidateInfo)}
+          onClose={() => setShownEntry(undefined)}
+          {...(appendShown && { onAppend: () => pick(appendShown) })}
         />
       )}
     </main>

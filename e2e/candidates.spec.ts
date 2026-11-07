@@ -17,7 +17,7 @@ test("drawing AN puts AN first, and accepting it adds it to the text", async ({
     "AN",
   )
 
-  await candidates.getByRole("button", { name: "Accept best" }).click()
+  await page.getByRole("button", { name: "Accept" }).click()
   const signs = page.getByRole("listbox", { name: "Signs" }).getByRole("option")
   await expect(signs).toHaveCount(1)
   await expect(signs).toHaveAccessibleName("AN")
