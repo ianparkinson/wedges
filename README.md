@@ -4,7 +4,7 @@ Find cuneiform signs by drawing them, or look them up in the [Oracc Sign List](h
 
 Draw a sign one wedge at a time and pick it from the top three candidates, build up a sequence of signs and copy it, or search for a sign by name or value. Wedges is a mobile-first web app.
 
-**Status:** in development. The live site at https://ianparkinson.github.io/wedges/ is a placeholder for now.
+**Status:** in development. On the live site at https://ianparkinson.github.io/wedges/ you can draw a sign and pick it; sequences and lookup are on their way.
 
 ## Development
 
@@ -34,4 +34,4 @@ See [AGENTS.md](AGENTS.md) for how the code is organised and the rules for contr
 Wedges is released under the [MIT licence](LICENSE), code and skeletons alike.
 
 - Sign names, values and ids come from the [Oracc Sign List](https://oracc.museum.upenn.edu/osl/), released under CC0.
-- The sign skeletons were traced over [Noto Sans Cuneiform](https://fonts.google.com/noto/specimen/Noto+Sans+Cuneiform), which is licensed under the SIL Open Font License 1.1.
+- The sign skeletons were traced over [Noto Sans Cuneiform](https://fonts.google.com/noto/specimen/Noto+Sans+Cuneiform), which is licensed under the SIL Open Font License 1.1. The app shows signs in the same font, bundled from [Fontsource](https://fontsource.org/fonts/noto-sans-cuneiform).

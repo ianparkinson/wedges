@@ -9,6 +9,11 @@
   cursor: pointer;
 }
 
+.prominent {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
 .button[data-pressed] {
   background: var(--color-bg);
 }

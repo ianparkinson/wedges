@@ -7,14 +7,23 @@ import styles from "./Button.module.css"
 export interface ButtonProps {
   onPress: () => void
   isDisabled?: boolean
+  /** Draws the button with the accent colour, for the main choice among several. */
+  isProminent?: boolean
   children: ReactNode
 }
 
 /** A push button, pressed by tap, click, Enter or Space. */
-export function Button({ onPress, isDisabled = false, children }: ButtonProps) {
+export function Button({
+  onPress,
+  isDisabled = false,
+  isProminent = false,
+  children,
+}: ButtonProps) {
   return (
     <AriaButton
-      className={styles.button}
+      className={
+        isProminent ? `${styles.button} ${styles.prominent}` : styles.button
+      }
       onPress={onPress}
       isDisabled={isDisabled}
     >
