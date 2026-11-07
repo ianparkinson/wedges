@@ -64,16 +64,13 @@ The first time you run e2e tests, install the browsers with `npx playwright inst
 
 ## Code shape
 
-- **Names say what things are.** No `n`, `m` or `d` outside short loops and `x`/`y`; a constant such as `FIRST` should say first what. Test data is obviously fake (a style called `test-style`).
+- **Names say what things are.** Avoid abbreviations except for common conventions such as `i`, `n`, `x` and `y`.
 - **Branch on a kind with `switch`**, or `if`/`else`, so each case reads as an alternative, not a fallback after an early return.
-- **Break a function up** when it nests loops with `break` and `continue`, or runs through several stages: named helpers make the flow readable.
-- **Pass the domain object** (`PreparedSample`) rather than its parts, and pair settings as a tuple (`[min, max]`) rather than two fields with one doc comment.
-- **Only what's needed now.** No functions the current work doesn't use, no defensive errors a user can't act on, no copies of `readonly` data, no parameters passed just to build an error message (throw, and let the caller add context).
-- **Reuse before writing.** Prefer a standard tool or package to bespoke code outside the problem domain (Prettier formats JSON; `test/synthetic/random.ts` is the seeded random), and look for an existing helper first.
-- **Data stays faithful to its source.** Compute derived values where they're needed rather than storing them, and keep what a user might want to see, such as a sign's full Unicode name.
-- Low-level maths goes in `src/core/geometry.ts`, with its own tests. Angles are radians; convert to degrees only to compare with a setting in degrees.
-- In a regular expression, write visible characters literally (`[₀-₉ₓ]`) and invisible ones as escapes (`\u0300-\u036f`).
-- **Ranking is a hot path.** A tidy-up of `src/core/matcher` can cost speed, so run `npm run bench:performance` before and after one. munkres needs plain arrays: it is several times slower on typed-array rows.
+  - Genuine early returns, such as precondition validation, can of course precede the main flow without nesting the bulk of code in an `else`.
+- **Break a function up** instead of nesting loops with `break` and `continue`, or if runs through several stages: named helpers make the flow readable.
+- **Only what's needed now.** No functions the current work doesn't use, no defensive errors a user can't act on, no copies of `readonly` data
+- **Prefer to avoid parameters passed just to build an error message**. Throw, and let the caller add context.
+- **Reuse before writing.** Prefer a standard tool or package to bespoke code outside the problem domain, and look for an existing helper first.
 
 ## Comments
 
@@ -82,9 +79,7 @@ Write for an experienced software engineer who is new to this project and to cun
 - Give exported functions, components and types a doc comment when their name and types don't say everything: units, coordinate frames, edge cases, or why they exist.
 - Open a doc comment with what the function does, in plain words, even when the file's header says it too.
 - Use implementation comments sparingly, for code that is surprising or genuinely complex. Don't restate what the code says, or explain a standard idiom.
-- A comment should explain the code, not need the code to explain it: spell out a term ("weights 1, 2, 1" says less than "each point averaged with its neighbours, counting itself twice"), why a loop works, why a function returns early, or why a string is spread into characters (surrogate pairs).
 - Describe the code as it is, not where it came from or how it changed: git keeps history.
-- Messages people see, from lint rules or errors, make sense without reading this file.
 - Docs arrive with the code they describe, and leave out counts or details that would go stale with each data update.
 - Link to the doc in `docs/` that explains an algorithm, rather than explaining it again in comments.
 
@@ -99,9 +94,6 @@ Write for an experienced software engineer who is new to this project and to cun
 | Performance           | `npm run bench:performance`      | by hand, never in CI                        |
 
 - **Tests state what they expect and why.** Hand-written cases with descriptive names, so a failure says what broke. No golden or snapshot files of generated output, whose diffs can't be reviewed, and no randomised brute-force tests, whose failures can't be acted on.
-- Test only real rules: one skeleton per character is common, not required. A spot check of one well-known item (the sign AN) catches what counting tests miss.
-- Tests over data files cover every file in the folder, so a new font's skeletons are checked without editing the test.
-- Use Vitest's matchers, such as `toBeCloseTo`, rather than hand-rolled comparisons.
 
 ## Where things are
 

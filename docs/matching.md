@@ -57,7 +57,7 @@ Lengths are kept as logarithms because they are only ever compared as ratios.
 | `kindMismatch`       | 3.0     | wedge paired with a Winkelhaken                                                            |
 | `unmatched`          | 1.6     | each extra or missing stroke                                                               |
 
-With `d` the angle between the two wedge directions, in [0, π], and `dpos` the distance between positions:
+With `d` the angle between the two wedge directions, in `[0, π]`, and `dpos` the distance between positions:
 
 ```
 wedge–wedge:              angle · min(d/45°, (180° − d)/45° + reversed)  +  position · dpos  +  length · |ln(lenf / leng)|
@@ -126,6 +126,9 @@ Cost per comparison is O(min(n, m)² · max(n, m)). A ranking does at most one c
 | 30            | 53 ms |
 
 The budget is 50 ms, so ranking runs on the main thread after each stroke, with no Web Worker; see [decision 0006](decisions/0006-ranking-on-main-thread.md). Large signs gain least from skipping, because many skeletons have similar stroke counts.
+
+> [!IMPORTANT]
+> **Ranking is a hot path.** Modifications `src/core/matcher` can cost speed, so run `npm run bench:performance` before and after one. munkres needs plain arrays: it is several times slower on typed-array rows.
 
 ## Accuracy
 
