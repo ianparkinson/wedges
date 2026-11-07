@@ -1,0 +1,61 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.line {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  min-height: var(--touch-target);
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  cursor: text;
+}
+
+.sign {
+  padding: 0 var(--space-1);
+  font-family: var(--font-cuneiform);
+  font-size: var(--text-xl);
+  line-height: 1.2;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+}
+
+/* The cursor is drawn over the edge between two signs, taking no width. */
+.caret {
+  position: absolute;
+  top: var(--space-1);
+  bottom: var(--space-1);
+  width: 1.5px;
+  background: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.caretAfter {
+  right: 0;
+  transform: translateX(50%);
+}
+
+.caretStart {
+  left: 0;
+  transform: translateX(-50%);
+}
+
+.caretEmpty {
+  inset: var(--space-2) auto var(--space-2) var(--space-1);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

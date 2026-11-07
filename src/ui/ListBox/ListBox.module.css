@@ -1,0 +1,22 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.option[data-focus-visible] {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.untappable {
+  pointer-events: none;
+}

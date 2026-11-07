@@ -4,7 +4,7 @@ import { drawSign } from "./drawSign"
 
 const AN = "𒀭"
 
-test("drawing AN puts AN first, and accepting it adds it to the picked signs", async ({
+test("drawing AN puts AN first, and accepting it adds it to the text", async ({
   page,
 }) => {
   await page.goto("./")
@@ -18,8 +18,8 @@ test("drawing AN puts AN first, and accepting it adds it to the picked signs", a
   )
 
   await candidates.getByRole("button", { name: "Accept best" }).click()
-  await expect(page.getByRole("status", { name: "Picked signs" })).toHaveText(
-    AN,
-  )
+  const signs = page.getByRole("listbox", { name: "Signs" }).getByRole("option")
+  await expect(signs).toHaveCount(1)
+  await expect(signs).toHaveAccessibleName("AN")
   await expect(pad).toHaveAccessibleName("Drawing pad, 0 strokes")
 })
