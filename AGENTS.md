@@ -39,7 +39,7 @@ Dependencies point one way only:
 
 | Command                           | What it does                                                                                         |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `npm run dev`                     | dev server at http://localhost:5173/wedges/                                                          |
+| `npm run dev`                     | dev server at http://localhost:5173/wedges/, also on the local network for testing on a phone        |
 | `npm run check`                   | type checks, lint, format check, unit and component tests                                            |
 | `npm run e2e`                     | Playwright tests on emulated Pixel 7 (Chromium) and iPhone 14 (WebKit), against the production build |
 | `npm run format`                  | rewrite files with Prettier                                                                          |
