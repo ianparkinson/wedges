@@ -57,7 +57,7 @@ Follow the [Google TypeScript Style Guide](https://google.github.io/styleguide/t
 
 Where we differ from the guide:
 
-- **File names** are camelCase for modules (`strokes.ts`) and PascalCase for components (`Link/Link.tsx`), not snake_case.
+- **File names** are camelCase (`pairCost.ts`), not snake_case. Component files are PascalCase, named after the component they export (`Link/Link.tsx`), as is usual in React projects.
 - **Imports** between folders of `src` use the `@/` alias (`@/core/geometry`), not long relative paths. Within a folder, import relatively.
 - **A `switch` over every member of a union needs no `default`**, so the compiler reports a case that a new member leaves unhandled.
 - **Doc comments only where they add something** (see Comments), rather than on every export.
