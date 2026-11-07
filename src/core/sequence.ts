@@ -72,6 +72,11 @@ export function editSequence(
   }
 }
 
+/** The sequence as plain text, to copy into other apps. */
+export function sequenceText(sequence: SequenceState): string {
+  return sequence.items.join("")
+}
+
 /**
  * Whether to draw the cursor. Typing at the end of a text is the usual case,
  * so a cursor there is hidden, unless the user put it there.

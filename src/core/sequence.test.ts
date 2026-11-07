@@ -4,6 +4,7 @@ import {
   editSequence,
   EMPTY_SEQUENCE,
   restoreSequence,
+  sequenceText,
   showsCursor,
   type SequenceAction,
   type SequenceState,
@@ -68,6 +69,12 @@ describe("editSequence", () => {
     expect(editSequence(anKaA(1), { kind: "moveCursor", to: -1 })).toEqual(
       anKaA(0, true),
     )
+  })
+})
+
+describe("sequenceText", () => {
+  it("joins the signs into one string, wherever the cursor is", () => {
+    expect(sequenceText(anKaA(1, true))).toBe("𒀭𒅗𒀀")
   })
 })
 
