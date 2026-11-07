@@ -12,3 +12,4 @@ One short file per decision that someone might later want to revisit: what was d
 | [0006](0006-ranking-on-main-thread.md) | Rank on the main thread, without a Web Worker    | accepted |
 | [0007](0007-bundled-cuneiform-font.md) | Bundle Noto Sans Cuneiform                       | accepted |
 | [0008](0008-session-storage.md)        | Keep the text in session storage only            | accepted |
+| [0009](0009-vm-threads-pool.md)        | Run unit tests in Vitest's `vmThreads` pool      | accepted |
