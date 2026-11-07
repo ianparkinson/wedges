@@ -15,6 +15,7 @@ export const COMPOUND_OPERATORS: readonly CompoundOperator[] = [
   "+",
 ]
 
+/** A compound sign's name split into its operator and parts. */
 export interface CompoundName {
   readonly operator: CompoundOperator
   /**

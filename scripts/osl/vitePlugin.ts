@@ -14,6 +14,7 @@ const ID = "virtual:osl"
 // The \0 prefix tells other plugins the module isn't a file.
 const RESOLVED_ID = "\0" + ID
 
+/** The Vite plugin that serves the sign data as "virtual:osl". */
 export function oslPlugin(): Plugin {
   return {
     name: "wedges-osl",

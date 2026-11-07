@@ -24,6 +24,7 @@ export interface MatchWeights {
   readonly unmatched: number
 }
 
+/** The weights the app uses, set by eye. See docs/matching.md#3-cost-of-pairing-two-strokes. */
 export const defaultWeights: MatchWeights = {
   angle: 1.0,
   reversed: 0.8,
@@ -44,6 +45,11 @@ export function angleDifference(a: number, b: number): number {
   return d > Math.PI ? 2 * Math.PI - d : d
 }
 
+/**
+ * The cost of pairing two strokes, from their difference in position and, for
+ * strokes of the same kind, in direction and size. Lower is closer; strokes of
+ * different kinds cost at least `weights.kindMismatch`.
+ */
 export function pairCost(
   f: StrokeFeature,
   g: StrokeFeature,

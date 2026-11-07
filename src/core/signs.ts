@@ -12,6 +12,7 @@ export interface Sign extends OslSign {
   readonly samples: readonly PreparedSample[]
 }
 
+/** A sequence of signs with readings of its own, such as |PA.TE.SI|, read ensi₂. */
 export type Sequence = OslSequence
 
 const OSL_PAGE = "https://oracc.museum.upenn.edu/osl/"
@@ -21,11 +22,13 @@ export function oslUrl(entry: { readonly oslId: string }): string {
   return OSL_PAGE + entry.oslId
 }
 
+/** Every sign and sequence, found by character, with the samples drawings are ranked against. */
 export class SignDatabase {
   /** Every sign, in code point order. */
   readonly signs: readonly Sign[]
   /** The signs that have samples, in skeleton file order. */
   readonly drawable: readonly Sign[]
+  /** Every sequence the Oracc data lists. */
   readonly sequences: readonly Sequence[]
   private readonly byChar: ReadonlyMap<string, Sign>
   private readonly sequenceByChars: ReadonlyMap<string, Sequence>
@@ -58,10 +61,12 @@ export class SignDatabase {
     this.sequenceByChars = new Map(this.sequences.map((s) => [s.chars, s]))
   }
 
+  /** The sign for a character, if it is in the Oracc data. */
   sign(char: string): Sign | undefined {
     return this.byChar.get(char)
   }
 
+  /** The sequence with these characters, if the Oracc data lists one. */
   sequence(chars: string): Sequence | undefined {
     return this.sequenceByChars.get(chars)
   }
