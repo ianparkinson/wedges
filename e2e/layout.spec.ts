@@ -53,3 +53,22 @@ test("the pad fills the width", async ({ page }) => {
   const text = await page.getByRole("region", { name: "Text" }).boundingBox()
   expect(pad?.width).toBeCloseTo(text?.width ?? 0, 0)
 })
+
+// Chrome on Android briefly makes the viewport taller when a tab comes back
+// from the tab overview.
+test("the pad shrinks back when the screen grows and shrinks again", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 412, height: 770 })
+  await page.goto("./")
+  const pad = page.getByRole("img", { name: /Drawing pad/ })
+  await expect(page.getByText(/Draw a sign/)).toBeVisible()
+  const before = (await pad.boundingBox())?.height
+
+  await page.setViewportSize({ width: 412, height: 794 })
+  await expect
+    .poll(async () => (await pad.boundingBox())?.height)
+    .toBe((before ?? 0) + 24)
+  await page.setViewportSize({ width: 412, height: 770 })
+  await expect.poll(async () => (await pad.boundingBox())?.height).toBe(before)
+})
