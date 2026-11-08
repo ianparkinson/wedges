@@ -16,6 +16,14 @@
   height: 100dvh;
   min-height: min-content;
   padding: var(--space-3) 0;
+  /*
+   * When a tab comes back from the tab overview, Chrome on Android briefly
+   * extends the viewport behind the system navigation bar at the bottom of
+   * the screen (with gesture navigation, the strip holding the home handle),
+   * and reports the bar's height as this inset. Leaving it free keeps the
+   * pad from flickering taller.
+   */
+  padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
 }
 

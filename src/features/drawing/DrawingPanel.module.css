@@ -10,9 +10,14 @@
   max-height: calc(var(--pad-max-size) + var(--space-2) + var(--touch-target));
 }
 
-/* The pad fills the width and the height left over, within its limits. */
+/*
+ * The pad fills the width and the height left over, within its limits. The
+ * canvas is sized to match the pad, so the canvas mustn't size the pad in
+ * turn: a pad that grew once would then never shrink.
+ */
 .padArea {
   flex: 1;
+  contain: size;
   min-height: var(--pad-min-size);
   max-height: var(--pad-max-size);
 }
