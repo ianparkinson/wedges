@@ -1,5 +1,11 @@
-import { useEffect, useRef, type PointerEvent, type RefObject } from "react"
-import { useMediaQuery, useResizeObserver } from "usehooks-ts"
+import {
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useRef,
+  type PointerEvent,
+} from "react"
+import { useMediaQuery } from "usehooks-ts"
 
 import type { Point } from "@/core/geometry"
 import { classifyTrace, type Stroke } from "@/core/strokes"
@@ -25,11 +31,7 @@ export interface DrawingPadProps {
 export function DrawingPad({ strokes, onStroke }: DrawingPadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const traceRef = useRef<{ pointerId: number; points: Point[] } | null>(null)
-
-  // usehooks-ts types its refs as they were before React 19, without null.
-  const { width = 0, height = 0 } = useResizeObserver({
-    ref: canvasRef as RefObject<HTMLCanvasElement>,
-  })
+  const sizeRef = useRef({ width: 0, height: 0 })
 
   // Re-renders when the colour scheme changes, so the strokes are repainted
   // in its colours.
@@ -41,6 +43,7 @@ export function DrawingPad({ strokes, onStroke }: DrawingPadProps) {
     const ctx = canvas?.getContext("2d")
     if (!canvas || !ctx) return
 
+    const { width, height } = sizeRef.current
     const style = getComputedStyle(canvas)
     const scale = canvas.width / (width || 1)
     ctx.setTransform(scale, 0, 0, scale, 0, 0)
@@ -54,6 +57,24 @@ export function DrawingPad({ strokes, onStroke }: DrawingPadProps) {
   }
 
   useEffect(paint)
+
+  // The canvas's pixels are resized and repainted as soon as its size is
+  // known, before the browser shows the new layout. Through a re-render, the
+  // old pixels would be shown stretched to the new size for a frame.
+  const resize = useEffectEvent((canvas: HTMLCanvasElement) => {
+    const { width, height } = canvas.getBoundingClientRect()
+    sizeRef.current = { width, height }
+    canvas.width = Math.round(width * devicePixelRatio)
+    canvas.height = Math.round(height * devicePixelRatio)
+    paint()
+  })
+  useLayoutEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const observer = new ResizeObserver(() => resize(canvas))
+    observer.observe(canvas)
+    return () => observer.disconnect()
+  }, [])
 
   const onPointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     if (traceRef.current) return
@@ -102,8 +123,6 @@ export function DrawingPad({ strokes, onStroke }: DrawingPadProps) {
     <canvas
       ref={canvasRef}
       className={styles.pad}
-      width={Math.round(width * devicePixelRatio)}
-      height={Math.round(height * devicePixelRatio)}
       role="img"
       aria-label={`Drawing pad, ${strokeCount(strokes.length)}`}
       onPointerDown={onPointerDown}
