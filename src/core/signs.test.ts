@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest"
 
-import { codePoint, oslUrl, shortUnicodeName, SignDatabase } from "./signs"
+import {
+  codePoint,
+  modifierName,
+  oslUrl,
+  shortUnicodeName,
+  SignDatabase,
+} from "./signs"
 import type { OslData, SkeletonFile } from "./types"
 
 const osl: OslData = {
@@ -19,6 +25,21 @@ const osl: OslData = {
       unicodeName: "CUNEIFORM SIGN DISH",
       oslId: "o0000150",
       values: ["diš"],
+    },
+    { char: "𒁺", name: "DU", oslId: "o0000149", values: ["du"] },
+    {
+      char: "𒁼",
+      name: "DU@g",
+      oslId: "o0000150",
+      values: ["gim₅"],
+      variant: { of: "𒁺", modifier: "g" },
+    },
+    {
+      char: "𒁽",
+      name: "DU@s",
+      oslId: "o0000152",
+      values: ["gim₄"],
+      variant: { of: "𒁺", modifier: "s" },
     },
   ],
   sequences: [
@@ -55,8 +76,19 @@ describe("SignDatabase", () => {
       ["sign", "𒀀"],
       ["sign", "𒀭"],
       ["sign", "𒁹"],
+      ["sign", "𒁺"],
+      ["sign", "𒁼"],
+      ["sign", "𒁽"],
       ["sequence", "𒀭𒀭"],
     ])
+  })
+
+  it("lists a sign's variants", () => {
+    expect(db.variants("𒁺").map((s) => s.name)).toEqual(["DU@g", "DU@s"])
+  })
+
+  it("lists no variants for a sign without any", () => {
+    expect(db.variants("𒀀")).toEqual([])
   })
 
   it("knows how many signs the longest sequence has", () => {
@@ -96,5 +128,11 @@ describe("codePoint", () => {
 
   it("pads a short code point to four digits", () => {
     expect(codePoint("A")).toBe("U+0041")
+  })
+})
+
+describe("modifierName", () => {
+  it("names gunû, the variant with extra strokes", () => {
+    expect(modifierName("g")).toBe("gunû")
   })
 })

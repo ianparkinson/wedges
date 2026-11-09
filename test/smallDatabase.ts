@@ -5,10 +5,16 @@ export const PA = "𒉺"
 export const TE = "𒋼"
 export const SI = "𒋛"
 export const ŠA = "𒊭"
+export const AN = "𒀭"
+export const GA2 = "𒂷"
+export const GA2_TIMES_AN = "𒂼"
+export const LAGAR = "𒇬"
+export const LAGAR_GUNU = "𒇯"
 
 /**
- * A sign database with a few real signs, PA, TE, SI and ŠA, and the sequence
- * PA.TE.SI, read ensi₂. None has samples.
+ * A sign database with a few real signs, PA, TE, SI and ŠA, the sequence
+ * PA.TE.SI, read ensi₂, the compound |GA₂×AN| with its parts, and LAGAR with
+ * its variant LAGAR@g. None has samples.
  */
 export const smallDatabase = new SignDatabase([], {
   signs: [
@@ -39,6 +45,43 @@ export const smallDatabase = new SignDatabase([], {
       unicodeName: "CUNEIFORM SIGN SI",
       oslId: "o0000525",
       values: ["si"],
+    },
+    {
+      char: AN,
+      name: "AN",
+      unicodeName: "CUNEIFORM SIGN AN",
+      oslId: "o0000099",
+      values: ["an", "dingir"],
+    },
+    {
+      char: GA2,
+      name: "GA₂",
+      unicodeName: "CUNEIFORM SIGN GA2",
+      oslId: "o0000206",
+      values: ["ga₂"],
+    },
+    {
+      char: GA2_TIMES_AN,
+      name: "|GA₂×AN|",
+      unicodeName: "CUNEIFORM SIGN GA2 TIMES AN",
+      oslId: "o0001286",
+      values: ["ama", "dagal"],
+      compound: { operator: "×", parts: [GA2, AN] },
+    },
+    {
+      char: LAGAR,
+      name: "LAGAR",
+      unicodeName: "CUNEIFORM SIGN LAGAR",
+      oslId: "o0000307",
+      values: ["lagal", "lagar", "nagal"],
+    },
+    {
+      char: LAGAR_GUNU,
+      name: "LAGAR@g",
+      unicodeName: "CUNEIFORM SIGN LAGAR GUNU",
+      oslId: "o0000308",
+      values: ["du₆", "dul₆"],
+      variant: { of: LAGAR, modifier: "g" },
     },
   ],
   sequences: [

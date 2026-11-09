@@ -1,4 +1,12 @@
-import { codePoint, oslUrl, type SignDatabase } from "@/core/signs"
+import { Fragment } from "react"
+
+import {
+  codePoint,
+  modifierName,
+  oslUrl,
+  type Sign,
+  type SignDatabase,
+} from "@/core/signs"
 import { Button } from "@/ui/Button/Button"
 import { Link } from "@/ui/Link/Link"
 
@@ -16,7 +24,8 @@ export interface SignInfoProps {
 
 /**
  * What the Oracc Sign List says about a sign or a sequence: its characters,
- * values and code points, and a link to its page there. Append, when
+ * values and code points, the parts of a compound, how a sign and its
+ * variants are related, and a link to its page there. Append, when
  * offered, adds its characters to the text, a sequence's as one sign each.
  */
 export function SignInfo({ entry, database, onAppend }: SignInfoProps) {
@@ -48,10 +57,7 @@ export function SignInfo({ entry, database, onAppend }: SignInfoProps) {
           </>
         )}
         {entry.kind === "sign" ? (
-          <>
-            <dt>Unicode</dt>
-            <dd>{`${codePoint(chars)} ${entry.sign.unicodeName ?? ""}`}</dd>
-          </>
+          <SignFacts sign={entry.sign} database={database} />
         ) : (
           <>
             <dt>Signs</dt>
@@ -76,5 +82,62 @@ export function SignInfo({ entry, database, onAppend }: SignInfoProps) {
         </Link>
       </p>
     </div>
+  )
+}
+
+/**
+ * The facts about a sign alone: the parts of a compound, the sign a variant
+ * is a variant of, the sign's own variants, and its code point.
+ */
+function SignFacts({ sign, database }: { sign: Sign; database: SignDatabase }) {
+  const { compound, variant } = sign
+  const variants = database.variants(sign.char)
+  const nameOf = (char: string) => (
+    <>
+      <span className={styles.sign}>{char}</span> {database.sign(char)?.name}
+    </>
+  )
+
+  return (
+    <>
+      {compound && (
+        <>
+          <dt>Parts</dt>
+          <dd>
+            {compound.parts.map((part, i) => (
+              <Fragment key={i}>
+                {i > 0 && ` ${compound.operator} `}
+                {nameOf(part)}
+              </Fragment>
+            ))}
+          </dd>
+        </>
+      )}
+      {variant && (
+        <>
+          <dt>Variant of</dt>
+          <dd>
+            {nameOf(variant.of)}, {modifierName(variant.modifier)}
+          </dd>
+        </>
+      )}
+      {variants.length > 0 && (
+        <>
+          <dt>Variants</dt>
+          <dd>
+            <ul className={styles.signs}>
+              {variants.map((v) => (
+                <li key={v.char}>
+                  {nameOf(v.char)}
+                  {v.variant && `, ${modifierName(v.variant.modifier)}`}
+                </li>
+              ))}
+            </ul>
+          </dd>
+        </>
+      )}
+      <dt>Unicode</dt>
+      <dd>{`${codePoint(sign.char)} ${sign.unicodeName ?? ""}`}</dd>
+    </>
   )
 }
