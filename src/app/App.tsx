@@ -59,9 +59,11 @@ export function App() {
     () =>
       database
         ? suggestionsAt(sequence, database)
-        : { sign: undefined, sequences: [] },
+        : { changes: [], sign: undefined, sequences: [] },
     [database, sequence],
   )
+
+  const nameOf = (char: string) => database?.sign(char)?.name
 
   const pick = (sign: Sign) => {
     editSequence({ kind: "insert", chars: sign.char })
@@ -80,11 +82,19 @@ export function App() {
           <SuggestionRow
             suggestions={suggestions}
             onOpen={(entry) => setShownEntry({ entry })}
+            onChange={({ replaced, chars }) =>
+              editSequence({
+                kind: "replace",
+                count: [...replaced].length,
+                chars,
+              })
+            }
+            nameOf={nameOf}
           />
           <SequencePanel
             sequence={sequence}
             onAction={editSequence}
-            nameOf={(char) => database?.sign(char)?.name}
+            nameOf={nameOf}
           />
         </div>
         <DrawingPanel strokes={strokes} onStrokesChange={setStrokes}>

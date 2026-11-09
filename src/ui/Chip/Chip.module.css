@@ -17,6 +17,11 @@
   cursor: pointer;
 }
 
+.keepWidth {
+  flex: none;
+  min-width: auto;
+}
+
 .chip:only-child {
   max-width: 100%;
 }
@@ -28,20 +33,4 @@
 .chip[data-focus-visible] {
   outline: 2px solid var(--color-focus);
   outline-offset: -2px;
-}
-
-.text {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.label {
-  font-weight: 600;
-}
-
-.detail {
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
 }

@@ -24,6 +24,12 @@ export interface SequenceState {
 /** An edit to a {@link SequenceState}. */
 export type SequenceAction =
   | { readonly kind: "insert"; readonly chars: string }
+  | {
+      readonly kind: "replace"
+      /** How many items before the cursor to replace. */
+      readonly count: number
+      readonly chars: string
+    }
   | { readonly kind: "deleteBackward" }
   | { readonly kind: "clear" }
   | { readonly kind: "moveCursor"; readonly to: number }
@@ -38,7 +44,8 @@ export const EMPTY_SEQUENCE: SequenceState = {
 /**
  * Applies an action to a sequence, returning the sequence after it. Inserting
  * puts the characters at the cursor, one item each, and moves the cursor past
- * them. Deleting backward removes the item before the cursor, and does nothing
+ * them. Replacing does the same in place of items before the cursor, as when
+ * two signs combine into a compound. Deleting backward removes the item before the cursor, and does nothing
  * at the start. A cursor moved outside the sequence stops at its nearer end.
  */
 export function editSequence(
@@ -47,17 +54,10 @@ export function editSequence(
 ): SequenceState {
   const { items, cursor } = sequence
   switch (action.kind) {
-    case "insert": {
-      // Spreading a string splits it into whole characters. Cuneiform is
-      // outside the Basic Multilingual Plane, so each character is two
-      // UTF-16 units.
-      const inserted = [...action.chars]
-      return {
-        items: items.toSpliced(cursor, 0, ...inserted),
-        cursor: cursor + inserted.length,
-        cursorPlaced: false,
-      }
-    }
+    case "insert":
+      return replaceBeforeCursor(sequence, 0, action.chars)
+    case "replace":
+      return replaceBeforeCursor(sequence, action.count, action.chars)
     case "deleteBackward":
       return cursor === 0
         ? sequence
@@ -74,6 +74,27 @@ export function editSequence(
         cursor: clamp(action.to, 0, items.length),
         cursorPlaced: true,
       }
+  }
+}
+
+/**
+ * Puts the characters, one item each, in place of the `count` items before
+ * the cursor, or as many as there are, and moves the cursor past them.
+ */
+function replaceBeforeCursor(
+  { items, cursor }: SequenceState,
+  count: number,
+  chars: string,
+): SequenceState {
+  // Spreading a string splits it into whole characters. Cuneiform is
+  // outside the Basic Multilingual Plane, so each character is two UTF-16
+  // units.
+  const inserted = [...chars]
+  const start = Math.max(0, cursor - count)
+  return {
+    items: items.toSpliced(start, cursor - start, ...inserted),
+    cursor: start + inserted.length,
+    cursorPlaced: false,
   }
 }
 

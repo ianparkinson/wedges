@@ -5,17 +5,19 @@ import { describe, expect, it, vi } from "vitest"
 import { Chip } from "./Chip"
 
 describe("Chip", () => {
-  it("is a button named by its label and detail", async () => {
+  it("is a button showing its content", async () => {
     const onPress = vi.fn()
-    render(<Chip onPress={onPress} label="|PA.TE.SI|" detail="ensi₂" />)
-    await userEvent.click(
-      screen.getByRole("button", { name: "|PA.TE.SI| ensi₂" }),
-    )
+    render(<Chip onPress={onPress}>SI</Chip>)
+    await userEvent.click(screen.getByRole("button", { name: "SI" }))
     expect(onPress).toHaveBeenCalledOnce()
   })
 
-  it("can have a label alone", () => {
-    render(<Chip onPress={() => {}} label="SI" />)
-    expect(screen.getByRole("button")).toHaveAccessibleName("SI")
+  it("can be named apart from its content", () => {
+    render(
+      <Chip onPress={() => {}} aria-label="Swap for SI@g">
+        𒋛
+      </Chip>,
+    )
+    expect(screen.getByRole("button")).toHaveAccessibleName("Swap for SI@g")
   })
 })
