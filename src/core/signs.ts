@@ -5,7 +5,13 @@
 import type { LookupEntry } from "./lookup"
 import { prepareSample, type PreparedSample } from "./matcher/match"
 import { parseSpec } from "./spec"
-import type { OslData, OslSequence, OslSign, SkeletonFile } from "./types"
+import type {
+  OslData,
+  OslSequence,
+  OslSign,
+  SkeletonFile,
+  VariantModifier,
+} from "./types"
 
 /** A sign, with the samples to match drawings against, if it has any. */
 export interface Sign extends OslSign {
@@ -28,6 +34,23 @@ export function codePoint(char: string): string {
   return "U+" + hex.padStart(4, "0")
 }
 
+/**
+ * The names of the variant modifiers, as Assyriologists write them. Oracc's
+ * GDL specification lists them, with examples:
+ * https://oracc.museum.upenn.edu/ns/gdl/1.0/index.html
+ */
+const MODIFIER_NAMES: Readonly<Record<VariantModifier, string>> = {
+  g: "gunû",
+  t: "tenû",
+  s: "šeššig",
+  n: "nutillû",
+}
+
+/** A variant modifier's name: g is gunû, the sign with extra strokes. */
+export function modifierName(modifier: VariantModifier): string {
+  return MODIFIER_NAMES[modifier]
+}
+
 /** Every sign and sequence, found by character, with the samples drawings are ranked against. */
 export class SignDatabase {
   /** Every sign, in code point order. */
@@ -40,6 +63,7 @@ export class SignDatabase {
   readonly longestSequence: number
   private readonly byChar: ReadonlyMap<string, Sign>
   private readonly sequenceByChars: ReadonlyMap<string, Sequence>
+  private readonly variantsByBase: ReadonlyMap<string, readonly Sign[]>
   private cachedLookupEntries: readonly LookupEntry[] | undefined
 
   /**
@@ -64,6 +88,7 @@ export class SignDatabase {
     this.drawable = [...samples.keys()]
       .map((char) => this.byChar.get(char))
       .filter((sign) => sign !== undefined)
+    this.variantsByBase = groupVariantsByBase(this.signs)
 
     this.sequences = osl.sequences
     this.sequenceByChars = new Map(this.sequences.map((s) => [s.chars, s]))
@@ -77,6 +102,11 @@ export class SignDatabase {
   /** The sign for a character, if it is in the Oracc data. */
   sign(char: string): Sign | undefined {
     return this.byChar.get(char)
+  }
+
+  /** The variants of a sign, such as LAGAR@g for LAGAR, in code point order. */
+  variants(char: string): readonly Sign[] {
+    return this.variantsByBase.get(char) ?? []
   }
 
   /** The sequence with these characters, if the Oracc data lists one. */
@@ -102,6 +132,18 @@ export class SignDatabase {
     ]
     return this.cachedLookupEntries
   }
+}
+
+/** Each sign's variants, keyed by the base sign's character. */
+function groupVariantsByBase(signs: readonly Sign[]): Map<string, Sign[]> {
+  const variants = new Map<string, Sign[]>()
+  for (const sign of signs) {
+    if (!sign.variant) continue
+    const list = variants.get(sign.variant.of) ?? []
+    list.push(sign)
+    variants.set(sign.variant.of, list)
+  }
+  return variants
 }
 
 /** The sign's OSL name, then its short Unicode name if that differs. */

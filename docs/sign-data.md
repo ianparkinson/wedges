@@ -55,7 +55,7 @@ A compound's OSL name spells its parts: `|GA₂×AN|` is AN written inside GA₂
 
 ### Variants
 
-A modifier at the end of a sign's name makes a variant: `@g` gunû (extra hatching), `@t` tenû (slanted), `@s` šeššig, `@n` nutillû (unfinished). When the base sign, the name without the modifier, is encoded, `variant` records it: LAGAR@g has `{ "of": "𒇴", "modifier": "g" }`.
+A modifier at the end of a sign's name makes a variant: `@g` gunû (extra hatching), `@t` tenû (slanted), `@s` šeššig, `@n` nutillû (unfinished). When the base sign, the name without the modifier, is encoded, `variant` records it: LAGAR@g has `{ "of": "𒇬", "modifier": "g" }`.
 
 | Field      | Meaning                               |
 | ---------- | ------------------------------------- |
