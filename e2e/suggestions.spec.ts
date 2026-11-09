@@ -5,6 +5,7 @@ import { drawSign } from "./drawSign"
 const PA = "𒉺"
 const TE = "𒋼"
 const SI = "𒋛"
+const SI_GUNU = "𒋜"
 
 test("drawing PA, TE and SI offers the reading ensi₂, and opens its entry", async ({
   page,
@@ -21,6 +22,7 @@ test("drawing PA, TE and SI offers the reading ensi₂, and opens its entry", as
   await expect(suggestions.getByRole("button")).toHaveText([
     /^SI /,
     "|PA.TE.SI| ensag, ensi₂, ensik",
+    SI + SI_GUNU,
   ])
 
   await suggestions.getByRole("button", { name: /ensi₂/ }).click()

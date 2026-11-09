@@ -1,0 +1,6 @@
+.signs {
+  font-family: var(--font-cuneiform);
+  font-size: var(--text-chip-sign);
+  line-height: 1;
+  white-space: nowrap;
+}

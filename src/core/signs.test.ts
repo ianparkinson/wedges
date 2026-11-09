@@ -41,6 +41,21 @@ const osl: OslData = {
       values: ["gim₄"],
       variant: { of: "𒁺", modifier: "s" },
     },
+    { char: "𒈲", name: "MUŠ", oslId: "o0000375", values: ["muš"] },
+    {
+      char: "𒈸",
+      name: "|MUŠ%MUŠ|",
+      oslId: "o0000378",
+      values: ["hubₓ"],
+      compound: { operator: "%", parts: ["𒈲", "𒈲"] },
+    },
+    {
+      char: "𒈶",
+      name: "|MUŠ&MUŠ|",
+      oslId: "o0000377",
+      values: ["sir₂"],
+      compound: { operator: "&", parts: ["𒈲", "𒈲"] },
+    },
   ],
   sequences: [
     { chars: "𒀭𒀭", name: "|AN.AN|", oslId: "o0000100", values: ["didli"] },
@@ -79,6 +94,9 @@ describe("SignDatabase", () => {
       ["sign", "𒁺"],
       ["sign", "𒁼"],
       ["sign", "𒁽"],
+      ["sign", "𒈲"],
+      ["sign", "𒈸"],
+      ["sign", "𒈶"],
       ["sequence", "𒀭𒀭"],
     ])
   })
@@ -89,6 +107,18 @@ describe("SignDatabase", () => {
 
   it("lists no variants for a sign without any", () => {
     expect(db.variants("𒀀")).toEqual([])
+  })
+
+  it("finds the compounds made of some parts, & before %", () => {
+    expect(db.compounds("𒈲𒈲").map((s) => s.name)).toEqual([
+      "|MUŠ&MUŠ|",
+      "|MUŠ%MUŠ|",
+    ])
+    expect(db.compounds("𒀀𒀭")).toEqual([])
+  })
+
+  it("knows how many parts the biggest compound has", () => {
+    expect(db.mostCompoundParts).toBe(2)
   })
 
   it("knows how many signs the longest sequence has", () => {

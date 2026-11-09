@@ -1,15 +1,15 @@
 import { useLayoutEffect, useRef } from "react"
 
 import { clamp } from "@/core/geometry"
-import type { Suggestions } from "@/core/suggest"
+import type { Change, Suggestions } from "@/core/suggest"
 import {
   entryChars,
   entryName,
   entryValues,
   type SignListEntry,
 } from "@/features/signInfo/signListEntry"
-import { Chip } from "@/ui/Chip/Chip"
-import { InfoIcon } from "@/ui/InfoIcon/InfoIcon"
+import { InfoChip } from "@/ui/InfoChip/InfoChip"
+import { ReplacementChip } from "@/ui/ReplacementChip/ReplacementChip"
 
 import styles from "./SuggestionRow.module.css"
 
@@ -18,18 +18,29 @@ export interface SuggestionRowProps {
   suggestions: Suggestions
   /** Opens an entry, when its chip is tapped. */
   onOpen: (entry: SignListEntry) => void
+  /** Makes a change, when its chip is tapped. */
+  onChange: (change: Change) => void
+  /** The sign's name for a character, to name the changes for screen readers. */
+  nameOf: (char: string) => string | undefined
 }
 
 /**
- * A row of chips for the text before the cursor: the sign there, then each
- * sequence that ends there, each with its name and readings. Each chip opens
- * its entry. The row keeps its height when it is empty, so what is below it doesn't
- * move. When the chips don't fit, the row scrolls sideways, and goes back
- * to its start whenever they change. An edge with more chips beyond it
- * fades out.
+ * A row of chips for the text before the cursor. First come the sign there,
+ * and each sequence that ends there, each with its name and readings; then
+ * the changes that can be made there, each showing the signs it replaces, an
+ * arrow, and what it puts in their place. A change's chip makes the change,
+ * and the others open their entries. The row keeps its height when it is
+ * empty, so what is below it doesn't move. When the chips don't fit, the row
+ * scrolls sideways, and goes back to its start whenever they change. An edge
+ * with more chips beyond it fades out.
  */
-export function SuggestionRow({ suggestions, onOpen }: SuggestionRowProps) {
-  const { sign, sequences } = suggestions
+export function SuggestionRow({
+  suggestions,
+  onOpen,
+  onChange,
+  nameOf,
+}: SuggestionRowProps) {
+  const { changes, sign, sequences } = suggestions
   const entries: SignListEntry[] = [
     ...(sign ? [{ kind: "sign" as const, sign }] : []),
     ...sequences.map((sequence) => ({ kind: "sequence" as const, sequence })),
@@ -52,16 +63,44 @@ export function SuggestionRow({ suggestions, onOpen }: SuggestionRowProps) {
       aria-label="Suggestions"
     >
       {entries.map((entry) => (
-        <Chip
+        <InfoChip
           key={`${entry.kind} ${entryChars(entry)}`}
-          icon={<InfoIcon />}
           label={entryName(entry)}
           detail={entryValues(entry).join(", ")}
           onPress={() => onOpen(entry)}
         />
       ))}
+      {changes.map((change) => (
+        <ReplacementChip
+          key={`${change.kind} ${change.chars}`}
+          from={change.replaced}
+          to={change.chars}
+          aria-label={changeName(change, nameOf)}
+          onPress={() => onChange(change)}
+        />
+      ))}
     </div>
   )
+}
+
+const listFormat = new Intl.ListFormat("en")
+
+/** What a change does, in words: Combine into |GA₂×AN|, or Split into GA₂ and AN. */
+function changeName(
+  { kind, chars }: Change,
+  nameOf: (char: string) => string | undefined,
+): string {
+  const names = listFormat.format(
+    [...chars].map((char) => nameOf(char) ?? char),
+  )
+  switch (kind) {
+    case "combine":
+      return `Combine into ${names}`
+    case "swap":
+      return `Swap for ${names}`
+    case "split":
+      return `Split into ${names}`
+  }
 }
 
 /** How wide the fade is at an edge with more chips beyond it, in CSS pixels. */

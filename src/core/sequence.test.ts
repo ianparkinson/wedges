@@ -52,6 +52,24 @@ describe("editSequence", () => {
     })
   })
 
+  it("replaces the items before the cursor, leaving those after it", () => {
+    expect(
+      editSequence(anKaA(2, true), { kind: "replace", count: 2, chars: PA }),
+    ).toEqual({ items: [PA, A], cursor: 1, cursorPlaced: false })
+  })
+
+  it("replaces one item with several, with the cursor after the last", () => {
+    expect(
+      editSequence(anKaA(3), { kind: "replace", count: 1, chars: TE + SI }),
+    ).toEqual({ items: [AN, KA, TE, SI], cursor: 4, cursorPlaced: false })
+  })
+
+  it("replaces only as many items as there are before the cursor", () => {
+    expect(
+      editSequence(anKaA(1), { kind: "replace", count: 2, chars: PA }),
+    ).toEqual({ items: [PA, KA, A], cursor: 1, cursorPlaced: false })
+  })
+
   it("deletes the item before the cursor", () => {
     expect(editSequence(anKaA(2, true), { kind: "deleteBackward" })).toEqual({
       items: [AN, A],

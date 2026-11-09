@@ -2,10 +2,12 @@
  * The sign database: the skeletons joined with the Oracc Sign List data, by
  * character. It is the one place features ask about signs.
  */
+import { groupBy } from "./collections"
 import type { LookupEntry } from "./lookup"
 import { prepareSample, type PreparedSample } from "./matcher/match"
 import { parseSpec } from "./spec"
 import type {
+  CompoundOperator,
   OslData,
   OslSequence,
   OslSign,
@@ -61,9 +63,12 @@ export class SignDatabase {
   readonly sequences: readonly Sequence[]
   /** How many signs the longest sequence has. */
   readonly longestSequence: number
+  /** How many parts the compound with the most parts has. */
+  readonly mostCompoundParts: number
   private readonly byChar: ReadonlyMap<string, Sign>
   private readonly sequenceByChars: ReadonlyMap<string, Sequence>
   private readonly variantsByBase: ReadonlyMap<string, readonly Sign[]>
+  private readonly compoundsByParts: ReadonlyMap<string, readonly Sign[]>
   private cachedLookupEntries: readonly LookupEntry[] | undefined
 
   /**
@@ -88,7 +93,14 @@ export class SignDatabase {
     this.drawable = [...samples.keys()]
       .map((char) => this.byChar.get(char))
       .filter((sign) => sign !== undefined)
-    this.variantsByBase = groupVariantsByBase(this.signs)
+    this.variantsByBase = groupBy(this.signs, (s) => s.variant?.of)
+    const compounds = groupBy(this.signs, (s) => s.compound?.parts.join(""))
+    for (const group of compounds.values()) group.sort(byOperator)
+    this.compoundsByParts = compounds
+    this.mostCompoundParts = Math.max(
+      0,
+      ...this.signs.map((s) => s.compound?.parts.length ?? 0),
+    )
 
     this.sequences = osl.sequences
     this.sequenceByChars = new Map(this.sequences.map((s) => [s.chars, s]))
@@ -107,6 +119,15 @@ export class SignDatabase {
   /** The variants of a sign, such as LAGAR@g for LAGAR, in code point order. */
   variants(char: string): readonly Sign[] {
     return this.variantsByBase.get(char) ?? []
+  }
+
+  /**
+   * The compounds made of these parts, in this order, such as |GA₂×AN| for
+   * GA₂ then AN. Parts can combine in more than one way, as MUŠ and MUŠ do
+   * in |MUŠ&MUŠ| and |MUŠ%MUŠ|; × comes first, then &, %, . and +.
+   */
+  compounds(parts: string): readonly Sign[] {
+    return this.compoundsByParts.get(parts) ?? []
   }
 
   /** The sequence with these characters, if the Oracc data lists one. */
@@ -134,16 +155,14 @@ export class SignDatabase {
   }
 }
 
-/** Each sign's variants, keyed by the base sign's character. */
-function groupVariantsByBase(signs: readonly Sign[]): Map<string, Sign[]> {
-  const variants = new Map<string, Sign[]>()
-  for (const sign of signs) {
-    if (!sign.variant) continue
-    const list = variants.get(sign.variant.of) ?? []
-    list.push(sign)
-    variants.set(sign.variant.of, list)
-  }
-  return variants
+/** The order compounds are offered in, by how their parts combine. */
+const OPERATOR_ORDER: readonly CompoundOperator[] = ["×", "&", "%", ".", "+"]
+
+/** How the database orders the compounds made of the same parts. */
+function byOperator(a: Sign, b: Sign): number {
+  const rank = (sign: Sign) =>
+    OPERATOR_ORDER.indexOf(sign.compound?.operator ?? "×")
+  return rank(a) - rank(b)
 }
 
 /** The sign's OSL name, then its short Unicode name if that differs. */
