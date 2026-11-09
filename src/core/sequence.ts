@@ -17,7 +17,7 @@ export interface SequenceState {
   readonly items: readonly string[]
   /** Where the next item goes: the number of items before the cursor, from 0 to `items.length`. */
   readonly cursor: number
-  /** True when the cursor was last moved by `moveCursor`, not by an edit. */
+  /** True once the cursor has been moved by `moveCursor`, until the text is cleared. */
   readonly cursorPlaced: boolean
 }
 
@@ -52,7 +52,7 @@ export function editSequence(
   sequence: SequenceState,
   action: SequenceAction,
 ): SequenceState {
-  const { items, cursor } = sequence
+  const { items, cursor, cursorPlaced } = sequence
   switch (action.kind) {
     case "insert":
       return replaceBeforeCursor(sequence, 0, action.chars)
@@ -64,7 +64,7 @@ export function editSequence(
         : {
             items: items.toSpliced(cursor - 1, 1),
             cursor: cursor - 1,
-            cursorPlaced: false,
+            cursorPlaced,
           }
     case "clear":
       return EMPTY_SEQUENCE
@@ -82,7 +82,7 @@ export function editSequence(
  * the cursor, or as many as there are, and moves the cursor past them.
  */
 function replaceBeforeCursor(
-  { items, cursor }: SequenceState,
+  { items, cursor, cursorPlaced }: SequenceState,
   count: number,
   chars: string,
 ): SequenceState {
@@ -94,7 +94,7 @@ function replaceBeforeCursor(
   return {
     items: items.toSpliced(start, cursor - start, ...inserted),
     cursor: start + inserted.length,
-    cursorPlaced: false,
+    cursorPlaced,
   }
 }
 
@@ -105,7 +105,8 @@ export function sequenceText(sequence: SequenceState): string {
 
 /**
  * Whether to draw the cursor. Typing at the end of a text is the usual case,
- * so a cursor there is hidden, unless the user put it there.
+ * so a cursor there is hidden, unless the user has placed it: then it stays
+ * in view through later edits, until the text is cleared.
  */
 export function showsCursor(sequence: SequenceState): boolean {
   return sequence.cursor < sequence.items.length || sequence.cursorPlaced

@@ -38,7 +38,7 @@ describe("editSequence", () => {
     expect(editSequence(anKaA(1, true), { kind: "insert", chars: A })).toEqual({
       items: [AN, A, KA, A],
       cursor: 2,
-      cursorPlaced: false,
+      cursorPlaced: true,
     })
   })
 
@@ -55,7 +55,7 @@ describe("editSequence", () => {
   it("replaces the items before the cursor, leaving those after it", () => {
     expect(
       editSequence(anKaA(2, true), { kind: "replace", count: 2, chars: PA }),
-    ).toEqual({ items: [PA, A], cursor: 1, cursorPlaced: false })
+    ).toEqual({ items: [PA, A], cursor: 1, cursorPlaced: true })
   })
 
   it("replaces one item with several, with the cursor after the last", () => {
@@ -74,7 +74,7 @@ describe("editSequence", () => {
     expect(editSequence(anKaA(2, true), { kind: "deleteBackward" })).toEqual({
       items: [AN, A],
       cursor: 1,
-      cursorPlaced: false,
+      cursorPlaced: true,
     })
   })
 
@@ -122,6 +122,32 @@ describe("showsCursor", () => {
 
   it("shows a cursor that was placed at the end", () => {
     expect(showsCursor(anKaA(3, true))).toBe(true)
+  })
+
+  it("keeps showing a cursor placed at the end as signs are added, replaced and removed", () => {
+    const placed = edits(
+      { kind: "insert", chars: AN + KA },
+      { kind: "moveCursor", to: 2 },
+    )
+    const added = editSequence(placed, { kind: "insert", chars: A })
+    const replaced = editSequence(added, {
+      kind: "replace",
+      count: 2,
+      chars: PA,
+    })
+    const removed = editSequence(replaced, { kind: "deleteBackward" })
+
+    expect(showsCursor(added)).toBe(true)
+    expect(showsCursor(replaced)).toBe(true)
+    expect(showsCursor(removed)).toBe(true)
+  })
+
+  it("hides the cursor at the end again once the text is cleared", () => {
+    const placed = editSequence(anKaA(1), { kind: "moveCursor", to: 3 })
+    const cleared = editSequence(placed, { kind: "clear" })
+    const retyped = editSequence(cleared, { kind: "insert", chars: AN })
+
+    expect(showsCursor(retyped)).toBe(false)
   })
 })
 
