@@ -60,3 +60,41 @@ export function angleAt(vertex: Point, a: Point, b: Point): number {
     (ax * bx + ay * by) / (Math.hypot(ax, ay) * Math.hypot(bx, by) || 1)
   return Math.acos(clamp(cos, -1, 1))
 }
+
+/**
+ * The direction from `from` to `to`, in radians from -π to π, measured from
+ * the x axis towards the y axis: clockwise on screen, since y points down.
+ */
+export function direction(from: Point, to: Point): number {
+  return Math.atan2(to.y - from.y, to.x - from.x)
+}
+
+/** The point `length` from `origin` in the direction `angle`, in radians as {@link direction} gives them. */
+export function pointAt(origin: Point, angle: number, length: number): Point {
+  return {
+    x: origin.x + length * Math.cos(angle),
+    y: origin.y + length * Math.sin(angle),
+  }
+}
+
+/** The point halfway between `p` and `q`. */
+export function midpoint(p: Point, q: Point): Point {
+  return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 }
+}
+
+/** `p` turned about `centre` by `angle`, in radians as {@link direction} gives them. */
+export function rotate(p: Point, centre: Point, angle: number): Point {
+  const cos = Math.cos(angle)
+  const sin = Math.sin(angle)
+  const dx = p.x - centre.x
+  const dy = p.y - centre.y
+  return {
+    x: centre.x + dx * cos - dy * sin,
+    y: centre.y + dx * sin + dy * cos,
+  }
+}
+
+/** `angle`, in radians, moved by a whole number of turns into the range -π to π. */
+export function wrapAngle(angle: number): number {
+  return Math.atan2(Math.sin(angle), Math.cos(angle))
+}

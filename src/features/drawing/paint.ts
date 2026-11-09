@@ -1,6 +1,7 @@
 import type { Point } from "@/core/geometry"
 import type { Stroke } from "@/core/strokes"
 import { strokeOutline } from "@/core/strokeShape"
+import { tidyStroke } from "@/core/tidyStroke"
 
 /** What {@link paintPad} draws, in CSS pixels. */
 export interface PadPicture {
@@ -9,6 +10,11 @@ export interface PadPicture {
   readonly trace: readonly Point[] | null
   /** How deep a wedge's head is drawn. */
   readonly headSize: number
+  /**
+   * How far from a multiple of 45° a stroke may point and still be drawn
+   * lying exactly that way, in radians.
+   */
+  readonly snapTolerance: number
   readonly impressionColor: string
   readonly traceColor: string
 }
@@ -16,9 +22,9 @@ export interface PadPicture {
 const TRACE_WIDTH = 3
 
 /**
- * Clears the canvas and draws the strokes as impressions in clay, with the
- * trace in progress as a thin line over them. The context must already be
- * scaled so that one unit is one CSS pixel.
+ * Clears the canvas and draws the strokes as impressions in clay, tidied by
+ * {@link tidyStroke}, with the trace in progress as a thin line over them.
+ * The context must already be scaled so that one unit is one CSS pixel.
  */
 export function paintPad(ctx: CanvasRenderingContext2D, picture: PadPicture) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
@@ -28,7 +34,8 @@ export function paintPad(ctx: CanvasRenderingContext2D, picture: PadPicture) {
   ctx.lineJoin = "round"
   ctx.lineWidth = 1
   for (const stroke of picture.strokes) {
-    tracePath(ctx, strokeOutline(stroke, picture.headSize))
+    const tidy = tidyStroke(stroke, picture.snapTolerance)
+    tracePath(ctx, strokeOutline(tidy, picture.headSize))
     ctx.closePath()
     ctx.fill()
     ctx.stroke()

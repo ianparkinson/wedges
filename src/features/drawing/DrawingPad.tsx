@@ -16,6 +16,12 @@ import { paintPad } from "./paint"
 /** A wedge's head is drawn this deep, as a fraction of the pad's smaller side. */
 const HEAD_SIZE_FRACTION = 0.06
 
+/**
+ * A stroke within this many radians (10°) of horizontal, vertical or diagonal
+ * is drawn lying exactly so.
+ */
+const SNAP_TOLERANCE = (10 * Math.PI) / 180
+
 /** Props for {@link DrawingPad}. */
 export interface DrawingPadProps {
   /** The strokes drawn so far, in CSS pixels from the pad's top left. */
@@ -26,7 +32,8 @@ export interface DrawingPadProps {
 
 /**
  * The canvas a sign is drawn on, one stroke per finger-down. It shows the
- * strokes as impressions in clay, and the stroke in progress as a thin line.
+ * strokes as impressions in clay, tidied for display, and the stroke in
+ * progress as a thin line.
  */
 export function DrawingPad({ strokes, onStroke }: DrawingPadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -51,6 +58,7 @@ export function DrawingPad({ strokes, onStroke }: DrawingPadProps) {
       strokes,
       trace: traceRef.current?.points ?? null,
       headSize: HEAD_SIZE_FRACTION * Math.min(width, height),
+      snapTolerance: SNAP_TOLERANCE,
       impressionColor: style.getPropertyValue("--color-impression"),
       traceColor: style.getPropertyValue("--color-trace"),
     })
