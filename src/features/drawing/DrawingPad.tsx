@@ -26,7 +26,8 @@ export interface DrawingPadProps {
 
 /**
  * The canvas a sign is drawn on, one stroke per finger-down. It shows the
- * strokes as impressions in clay, and the stroke in progress as a thin line.
+ * strokes as impressions in clay, tidied for display, and the stroke in
+ * progress as a thin line.
  */
 export function DrawingPad({ strokes, onStroke }: DrawingPadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)

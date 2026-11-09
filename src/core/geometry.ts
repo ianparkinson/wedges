@@ -60,3 +60,19 @@ export function angleAt(vertex: Point, a: Point, b: Point): number {
     (ax * bx + ay * by) / (Math.hypot(ax, ay) * Math.hypot(bx, by) || 1)
   return Math.acos(clamp(cos, -1, 1))
 }
+
+/**
+ * The direction from `from` to `to`, in radians from -π to π, measured from
+ * the x axis towards the y axis: clockwise on screen, since y points down.
+ */
+export function direction(from: Point, to: Point): number {
+  return Math.atan2(to.y - from.y, to.x - from.x)
+}
+
+/** The point `length` from `origin` in the direction `angle`, in radians as {@link direction} gives them. */
+export function pointAt(origin: Point, angle: number, length: number): Point {
+  return {
+    x: origin.x + length * Math.cos(angle),
+    y: origin.y + length * Math.sin(angle),
+  }
+}

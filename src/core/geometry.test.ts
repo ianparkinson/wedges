@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest"
 import {
   angleAt,
   clamp,
+  direction,
   distance,
   pathLength,
+  pointAt,
   segmentDistance,
 } from "./geometry"
 
@@ -81,5 +83,41 @@ describe("angleAt", () => {
 
   it("is π/2 when a point is at the vertex", () => {
     expect(angleAt(vertex, vertex, { x: 1, y: 0 })).toBe(Math.PI / 2)
+  })
+})
+
+describe("direction", () => {
+  it("is 0 along the x axis", () => {
+    expect(direction({ x: 1, y: 1 }, { x: 5, y: 1 })).toBe(0)
+  })
+
+  it("is π/2 straight down the screen", () => {
+    expect(direction({ x: 1, y: 1 }, { x: 1, y: 5 })).toBeCloseTo(Math.PI / 2)
+  })
+
+  it("is -π/2 straight up the screen", () => {
+    expect(direction({ x: 1, y: 1 }, { x: 1, y: -3 })).toBeCloseTo(-Math.PI / 2)
+  })
+})
+
+describe("pointAt", () => {
+  it("goes along the x axis for angle 0", () => {
+    const p = pointAt({ x: 1, y: 2 }, 0, 5)
+    expect(p.x).toBeCloseTo(6)
+    expect(p.y).toBeCloseTo(2)
+  })
+
+  it("goes down the screen for angle π/2", () => {
+    const p = pointAt({ x: 1, y: 2 }, Math.PI / 2, 5)
+    expect(p.x).toBeCloseTo(1)
+    expect(p.y).toBeCloseTo(7)
+  })
+
+  it("undoes direction and distance", () => {
+    const from = { x: 3, y: -2 }
+    const to = { x: -4, y: 6 }
+    const p = pointAt(from, direction(from, to), distance(from, to))
+    expect(p.x).toBeCloseTo(to.x)
+    expect(p.y).toBeCloseTo(to.y)
   })
 })
