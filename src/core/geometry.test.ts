@@ -5,9 +5,12 @@ import {
   clamp,
   direction,
   distance,
+  midpoint,
   pathLength,
   pointAt,
+  rotate,
   segmentDistance,
+  wrapAngle,
 } from "./geometry"
 
 describe("clamp", () => {
@@ -119,5 +122,40 @@ describe("pointAt", () => {
     const p = pointAt(from, direction(from, to), distance(from, to))
     expect(p.x).toBeCloseTo(to.x)
     expect(p.y).toBeCloseTo(to.y)
+  })
+})
+
+describe("midpoint", () => {
+  it("is halfway between the points", () => {
+    expect(midpoint({ x: 0, y: 2 }, { x: 4, y: -6 })).toEqual({ x: 2, y: -2 })
+  })
+})
+
+describe("rotate", () => {
+  it("turns a quarter turn clockwise on screen for π/2", () => {
+    const p = rotate({ x: 3, y: 1 }, { x: 1, y: 1 }, Math.PI / 2)
+    expect(p.x).toBeCloseTo(1)
+    expect(p.y).toBeCloseTo(3)
+  })
+
+  it("leaves the centre where it is", () => {
+    const p = rotate({ x: 1, y: 1 }, { x: 1, y: 1 }, 1)
+    expect(p.x).toBeCloseTo(1)
+    expect(p.y).toBeCloseTo(1)
+  })
+})
+
+describe("wrapAngle", () => {
+  it("leaves an angle between -π and π as it is", () => {
+    expect(wrapAngle(1)).toBeCloseTo(1)
+    expect(wrapAngle(-3)).toBeCloseTo(-3)
+  })
+
+  it("moves an angle past π round to the negative side", () => {
+    expect(wrapAngle(1.5 * Math.PI)).toBeCloseTo(-0.5 * Math.PI)
+  })
+
+  it("takes off whole turns", () => {
+    expect(wrapAngle(1 + 4 * Math.PI)).toBeCloseTo(1)
   })
 })

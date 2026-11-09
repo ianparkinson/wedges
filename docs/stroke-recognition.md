@@ -27,7 +27,7 @@ or `null` for a tap. Points are in the trace's coordinates, usually CSS pixels.
 
 A wedge keeps only its two end points: the head position, the direction and the length are all that matching uses. A Winkelhaken keeps its vertex and two leg ends, from which matching derives its position, its size (mean leg length) and the direction it opens towards (the bisector of the legs).
 
-The drawing pad shows strokes a little tidier than they were drawn (`src/core/tidyStroke.ts`): a Winkelhaken's legs are both drawn at their mean length. Matching always uses the strokes as recognised.
+The drawing pad shows strokes a little tidier than they were drawn (`src/core/tidyStroke.ts`): a Winkelhaken's legs are both drawn at their mean length, and a stroke within 10° of horizontal, vertical or diagonal is turned to lie exactly so. Matching always uses the strokes as recognised.
 
 ## Algorithm
 

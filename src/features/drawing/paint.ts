@@ -10,6 +10,11 @@ export interface PadPicture {
   readonly trace: readonly Point[] | null
   /** How deep a wedge's head is drawn. */
   readonly headSize: number
+  /**
+   * How far from a multiple of 45° a stroke may point and still be drawn
+   * lying exactly that way, in radians.
+   */
+  readonly snapTolerance: number
   readonly impressionColor: string
   readonly traceColor: string
 }
@@ -29,7 +34,7 @@ export function paintPad(ctx: CanvasRenderingContext2D, picture: PadPicture) {
   ctx.lineJoin = "round"
   ctx.lineWidth = 1
   for (const stroke of picture.strokes) {
-    const tidy = tidyStroke(stroke)
+    const tidy = tidyStroke(stroke, picture.snapTolerance)
     tracePath(ctx, strokeOutline(tidy, picture.headSize))
     ctx.closePath()
     ctx.fill()
