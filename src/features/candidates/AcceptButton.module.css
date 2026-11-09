@@ -12,4 +12,6 @@
   line-height: 1;
   text-align: center;
   white-space: nowrap;
+  /* Lifts signs to the middle of the line, as in the sequence panel. */
+  translate: 0 -0.14em;
 }
