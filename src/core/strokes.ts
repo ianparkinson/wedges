@@ -6,6 +6,7 @@ import {
   angleAt,
   distance,
   pathLength,
+  pointBetween,
   segmentDistance,
   type Point,
 } from "./geometry"
@@ -27,6 +28,32 @@ export interface Winkelhaken {
 
 /** A recognised stroke: a wedge or a Winkelhaken. */
 export type Stroke = Wedge | Winkelhaken
+
+/** The points that define a stroke: a wedge's ends, a Winkelhaken's vertex and leg ends. */
+export function keyPoints(stroke: Stroke): Point[] {
+  switch (stroke.kind) {
+    case "wedge":
+      return [stroke.head, stroke.tail]
+    case "winkelhaken":
+      return [stroke.vertex, stroke.legA, stroke.legB]
+  }
+}
+
+/** The stroke with `f` applied to each of its key points. */
+export function mapPoints(stroke: Wedge, f: (p: Point) => Point): Wedge
+export function mapPoints(
+  stroke: Winkelhaken,
+  f: (p: Point) => Point,
+): Winkelhaken
+export function mapPoints(stroke: Stroke, f: (p: Point) => Point): Stroke
+export function mapPoints(stroke: Stroke, f: (p: Point) => Point): Stroke {
+  switch (stroke.kind) {
+    case "wedge":
+      return wedge(f(stroke.head), f(stroke.tail))
+    case "winkelhaken":
+      return winkelhaken(f(stroke.vertex), f(stroke.legA), f(stroke.legB))
+  }
+}
 
 /** Thresholds for {@link classifyTrace}. Lengths are in the trace's own units, usually CSS pixels. */
 export interface StrokeParams {
@@ -124,11 +151,7 @@ export function resample(points: readonly Point[], spacing: number): Point[] {
   for (const to of points.slice(1)) {
     let remaining = distance(from, to)
     while (travelled + remaining >= spacing && remaining > 0) {
-      const t = (spacing - travelled) / remaining
-      const next = {
-        x: from.x + t * (to.x - from.x),
-        y: from.y + t * (to.y - from.y),
-      }
+      const next = pointBetween(from, to, (spacing - travelled) / remaining)
       out.push(next)
       from = next
       remaining = distance(from, to)

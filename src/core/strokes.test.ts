@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest"
 
-import type { Point } from "./geometry"
-import { classifyTrace, resample, smooth } from "./strokes"
+import { pointBetween, type Point } from "./geometry"
+import {
+  classifyTrace,
+  keyPoints,
+  mapPoints,
+  resample,
+  smooth,
+  type Wedge,
+  type Winkelhaken,
+} from "./strokes"
 
 /** Points every 1 unit along the polyline through `corners`. */
 function path(...corners: Point[]): Point[] {
@@ -10,12 +18,8 @@ function path(...corners: Point[]): Point[] {
     const from = corners[i - 1]!
     const to = corners[i]!
     const steps = Math.ceil(Math.hypot(to.x - from.x, to.y - from.y))
-    for (let s = 1; s <= steps; s++) {
-      points.push({
-        x: from.x + ((to.x - from.x) * s) / steps,
-        y: from.y + ((to.y - from.y) * s) / steps,
-      })
-    }
+    for (let s = 1; s <= steps; s++)
+      points.push(pointBetween(from, to, s / steps))
   }
   return points
 }
@@ -104,5 +108,43 @@ describe("smooth", () => {
       { x: 4, y: 2 },
       { x: 8, y: 0 },
     ])
+  })
+})
+
+describe("keyPoints and mapPoints", () => {
+  const wedge: Wedge = {
+    kind: "wedge",
+    head: { x: 0, y: 0 },
+    tail: { x: 4, y: 0 },
+  }
+  const winkelhaken: Winkelhaken = {
+    kind: "winkelhaken",
+    vertex: { x: 0, y: 0 },
+    legA: { x: 3, y: -3 },
+    legB: { x: 3, y: 3 },
+  }
+  const shift = (p: Point) => ({ x: p.x + 1, y: p.y + 2 })
+
+  it("lists a wedge's head then tail, and a Winkelhaken's vertex then legs", () => {
+    expect(keyPoints(wedge)).toEqual([wedge.head, wedge.tail])
+    expect(keyPoints(winkelhaken)).toEqual([
+      winkelhaken.vertex,
+      winkelhaken.legA,
+      winkelhaken.legB,
+    ])
+  })
+
+  it("moves every key point, keeping the kind", () => {
+    expect(mapPoints(wedge, shift)).toEqual({
+      kind: "wedge",
+      head: { x: 1, y: 2 },
+      tail: { x: 5, y: 2 },
+    })
+    expect(mapPoints(winkelhaken, shift)).toEqual({
+      kind: "winkelhaken",
+      vertex: { x: 1, y: 2 },
+      legA: { x: 4, y: -1 },
+      legB: { x: 4, y: 5 },
+    })
   })
 })

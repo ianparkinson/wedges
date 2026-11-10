@@ -12,7 +12,7 @@ import {
   pointAt,
   rotate,
 } from "./geometry"
-import type { Stroke, Wedge, Winkelhaken } from "./strokes"
+import { mapPoints, type Stroke, type Wedge, type Winkelhaken } from "./strokes"
 
 /** The directions strokes snap to: every multiple of 45°, in radians. */
 const SNAP_STEP = Math.PI / 4
@@ -38,11 +38,7 @@ function tidyWedge(wedge: Wedge, snapTolerance: number): Wedge {
   if (turn === 0) return wedge
 
   const middle = midpoint(wedge.head, wedge.tail)
-  return {
-    kind: "wedge",
-    head: rotate(wedge.head, middle, turn),
-    tail: rotate(wedge.tail, middle, turn),
-  }
+  return mapPoints(wedge, (p) => rotate(p, middle, turn))
 }
 
 function tidyWinkelhaken(

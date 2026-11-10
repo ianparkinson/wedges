@@ -92,6 +92,11 @@ export function midpoint(p: Point, q: Point): Point {
   return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 }
 }
 
+/** The point a fraction `t` of the way from `p` to `q`: `p` at 0, `q` at 1. */
+export function pointBetween(p: Point, q: Point, t: number): Point {
+  return { x: p.x + t * (q.x - p.x), y: p.y + t * (q.y - p.y) }
+}
+
 /** `p` turned about `centre` by `angle`, in radians as {@link direction} gives them. */
 export function rotate(p: Point, centre: Point, angle: number): Point {
   const cos = Math.cos(angle)
