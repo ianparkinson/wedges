@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 
 import { type SequenceState } from "@/core/sequence"
+import { SignDatabase } from "@/core/signs"
 
 import { tapText } from "../../../test/tapText"
 import { SequencePanel } from "./SequencePanel"
@@ -10,7 +11,13 @@ import { SequencePanel } from "./SequencePanel"
 const AN = "𒀭"
 const KA = "𒅗"
 
-const NAMES: Record<string, string> = { [AN]: "AN", [KA]: "KA" }
+const database = new SignDatabase([], {
+  signs: [
+    { char: AN, name: "AN", oslId: "o0000099", values: ["an"] },
+    { char: KA, name: "KA", oslId: "o0000342", values: ["ka"] },
+  ],
+  sequences: [],
+})
 
 function renderPanel(sequence: SequenceState) {
   const onAction = vi.fn()
@@ -18,7 +25,7 @@ function renderPanel(sequence: SequenceState) {
     <SequencePanel
       sequence={sequence}
       onAction={onAction}
-      nameOf={(char) => NAMES[char]}
+      signDatabase={database}
     />,
   )
   return onAction
@@ -37,7 +44,7 @@ describe("SequencePanel", () => {
       <SequencePanel
         sequence={{ items: [AN], cursor: 1, cursorPlaced: false }}
         onAction={() => {}}
-        nameOf={() => undefined}
+        signDatabase={undefined}
       />,
     )
     expect(screen.getByRole("option", { name: AN })).toBeVisible()

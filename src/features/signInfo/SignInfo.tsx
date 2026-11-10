@@ -19,7 +19,7 @@ export interface SignInfoProps {
   /** The sign or sequence to show. */
   about: SignListEntry
   /** Names the signs a sequence is made of. */
-  database: SignDatabase
+  signDatabase: SignDatabase
   /** Adds the characters to the text; leave it out when they are already there. */
   onAppend?: () => void
 }
@@ -30,7 +30,7 @@ export interface SignInfoProps {
  * variants are related, and a link to its page there. Append, when
  * offered, adds its characters to the text, a sequence's as one sign each.
  */
-export function SignInfo({ about, database, onAppend }: SignInfoProps) {
+export function SignInfo({ about, signDatabase, onAppend }: SignInfoProps) {
   const chars = charsOf(about)
   const { values, formOf } = about
 
@@ -58,7 +58,7 @@ export function SignInfo({ about, database, onAppend }: SignInfoProps) {
           </>
         )}
         {about.kind === "sign" ? (
-          <SignFacts sign={about} database={database} />
+          <SignFacts sign={about} signDatabase={signDatabase} />
         ) : (
           <>
             <dt>Signs</dt>
@@ -69,7 +69,7 @@ export function SignInfo({ about, database, onAppend }: SignInfoProps) {
                     <span className={styles.sign} aria-hidden="true">
                       {char}
                     </span>{" "}
-                    {database.sign(char)?.name} {codePoint(char)}
+                    {signDatabase.sign(char)?.name} {codePoint(char)}
                   </li>
                 ))}
               </ul>
@@ -88,12 +88,19 @@ export function SignInfo({ about, database, onAppend }: SignInfoProps) {
  * The facts about a sign alone: the parts of a compound, the sign a variant
  * is a variant of, the sign's own variants, and its code point.
  */
-function SignFacts({ sign, database }: { sign: Sign; database: SignDatabase }) {
+function SignFacts({
+  sign,
+  signDatabase,
+}: {
+  sign: Sign
+  signDatabase: SignDatabase
+}) {
   const { compound, variant } = sign
-  const variants = database.variants(sign.char)
+  const variants = signDatabase.variants(sign.char)
   const nameOf = (char: string) => (
     <>
-      <span className={styles.sign}>{char}</span> {database.sign(char)?.name}
+      <span className={styles.sign}>{char}</span>{" "}
+      {signDatabase.sign(char)?.name}
     </>
   )
 

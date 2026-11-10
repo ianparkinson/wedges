@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from "react"
 
 import { clamp } from "@/core/geometry"
-import { charsOf, type SignListEntry } from "@/core/signs"
+import { charsOf, type SignDatabase, type SignListEntry } from "@/core/signs"
 import type { Change, Suggestions } from "@/core/suggest"
 import { InfoChip } from "@/ui/InfoChip/InfoChip"
 import { ReplacementChip } from "@/ui/ReplacementChip/ReplacementChip"
@@ -15,8 +15,8 @@ export interface SuggestionRowProps {
   onOpen: (listed: SignListEntry) => void
   /** Makes a change, when its chip is tapped. */
   onChange: (change: Change) => void
-  /** The sign's name for a character, to name the changes for screen readers. */
-  nameOf: (char: string) => string | undefined
+  /** Names the signs in the changes, for screen readers. */
+  signDatabase: SignDatabase | undefined
 }
 
 /**
@@ -33,7 +33,7 @@ export function SuggestionRow({
   suggestions,
   onOpen,
   onChange,
-  nameOf,
+  signDatabase,
 }: SuggestionRowProps) {
   const { changes, sign, sequences } = suggestions
   const listed: SignListEntry[] = [...(sign ? [sign] : []), ...sequences]
@@ -67,7 +67,7 @@ export function SuggestionRow({
           key={`${change.kind} ${change.chars}`}
           from={change.replaced}
           to={change.chars}
-          aria-label={changeName(change, nameOf)}
+          aria-label={changeName(change, signDatabase)}
           onPress={() => onChange(change)}
         />
       ))}
@@ -80,10 +80,10 @@ const listFormat = new Intl.ListFormat("en")
 /** What a change does, in words: Combine into |GA₂×AN|, or Split into GA₂ and AN. */
 function changeName(
   { kind, chars }: Change,
-  nameOf: (char: string) => string | undefined,
+  signDatabase: SignDatabase | undefined,
 ): string {
   const names = listFormat.format(
-    [...chars].map((char) => nameOf(char) ?? char),
+    [...chars].map((char) => signDatabase?.sign(char)?.name ?? char),
   )
   switch (kind) {
     case "combine":

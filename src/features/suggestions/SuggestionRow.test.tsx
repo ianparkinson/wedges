@@ -42,7 +42,7 @@ function renderRow(
       }}
       onOpen={handlers.onOpen ?? (() => {})}
       onChange={handlers.onChange ?? (() => {})}
-      nameOf={(char) => smallDatabase.sign(char)?.name}
+      signDatabase={smallDatabase}
     />,
   )
 }

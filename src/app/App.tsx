@@ -62,8 +62,6 @@ export function App() {
     [database, sequence],
   )
 
-  const nameOf = (char: string) => database?.sign(char)?.name
-
   const pick = (sign: Sign) => {
     editSequence({ kind: "insert", chars: sign.char })
     setStrokes([])
@@ -88,12 +86,12 @@ export function App() {
                 chars,
               })
             }
-            nameOf={nameOf}
+            signDatabase={database}
           />
           <SequencePanel
             sequence={sequence}
             onAction={editSequence}
-            nameOf={nameOf}
+            signDatabase={database}
           />
         </div>
         <DrawingPanel strokes={strokes} onStrokesChange={setStrokes}>
@@ -111,7 +109,7 @@ export function App() {
         <Link href={REPO_URL}>GitHub</Link>.
       </p>
       <LookupSheet
-        database={database}
+        signDatabase={database}
         isOpen={isLookupOpen}
         onClose={() => setLookupOpen(false)}
         onAppend={(chars) => editSequence({ kind: "insert", chars })}
@@ -119,7 +117,7 @@ export function App() {
       {database && (
         <SignInfoSheet
           about={info?.about}
-          database={database}
+          signDatabase={database}
           onClose={() => setInfo(undefined)}
           {...(appendShown && { onAppend: () => pick(appendShown) })}
         />

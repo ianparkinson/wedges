@@ -10,7 +10,11 @@ const ša = smallDatabase.sign(ŠA)!
 describe("SignInfoSheet", () => {
   it("shows the sign in a dialog named after it", () => {
     render(
-      <SignInfoSheet about={ša} database={smallDatabase} onClose={() => {}} />,
+      <SignInfoSheet
+        about={ša}
+        signDatabase={smallDatabase}
+        onClose={() => {}}
+      />,
     )
     expect(screen.getByRole("dialog", { name: "ŠA" })).toBeVisible()
   })
@@ -19,7 +23,7 @@ describe("SignInfoSheet", () => {
     render(
       <SignInfoSheet
         about={undefined}
-        database={smallDatabase}
+        signDatabase={smallDatabase}
         onClose={() => {}}
       />,
     )
@@ -32,7 +36,7 @@ describe("SignInfoSheet", () => {
     render(
       <SignInfoSheet
         about={ša}
-        database={smallDatabase}
+        signDatabase={smallDatabase}
         onClose={onClose}
         onAppend={onAppend}
       />,

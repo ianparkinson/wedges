@@ -4,6 +4,7 @@ import {
   type SequenceAction,
   type SequenceState,
 } from "@/core/sequence"
+import type { SignDatabase } from "@/core/signs"
 import { Button } from "@/ui/Button/Button"
 import { ButtonBar } from "@/ui/ButtonBar/ButtonBar"
 import { ListBox, type ListBoxOption } from "@/ui/ListBox/ListBox"
@@ -16,8 +17,8 @@ import styles from "./SequencePanel.module.css"
 export interface SequencePanelProps {
   sequence: SequenceState
   onAction: (action: SequenceAction) => void
-  /** The sign's name for a character, or undefined until the sign data has loaded. */
-  nameOf: (char: string) => string | undefined
+  /** Names the signs, once it has loaded; until then they are named by their characters. */
+  signDatabase: SignDatabase | undefined
 }
 
 /**
@@ -31,14 +32,14 @@ export interface SequencePanelProps {
 export function SequencePanel({
   sequence,
   onAction,
-  nameOf,
+  signDatabase,
 }: SequencePanelProps) {
   const { items, cursor } = sequence
   const caretAt = showsCursor(sequence) ? cursor : undefined
 
   const options: ListBoxOption[] = items.map((item, i) => ({
     id: String(i),
-    label: nameOf(item) ?? item,
+    label: signDatabase?.sign(item)?.name ?? item,
     content: (
       <span className={styles.item}>
         <span className={styles.sign}>{item}</span>
