@@ -9,7 +9,7 @@ import {
   pointBetween,
   segmentDistance,
   type Point,
-} from "./geometry"
+} from "@/lib/geometry"
 
 /** A straight wedge, drawn from its head (the wide end) towards its tail. */
 export interface Wedge {

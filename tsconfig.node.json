@@ -19,6 +19,7 @@
     "e2e",
     "scripts",
     "src/core",
+    "src/lib",
     "src/virtual.d.ts",
     "test/synthetic",
     "test/signDatabase.ts",

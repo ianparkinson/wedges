@@ -1,8 +1,8 @@
 import { useLayoutEffect, useRef } from "react"
 
-import { clamp } from "@/core/geometry"
 import { charsOf, type SignDatabase, type SignListEntry } from "@/core/signs"
 import type { Change, Suggestions } from "@/core/suggest"
+import { clamp } from "@/lib/numbers"
 import { InfoChip } from "@/ui/InfoChip/InfoChip"
 import { ReplacementChip } from "@/ui/ReplacementChip/ReplacementChip"
 

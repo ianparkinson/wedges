@@ -7,7 +7,7 @@ import tseslint from "typescript-eslint"
 
 /**
  * Layer rule (see docs/decisions/0004-layers.md):
- *   features -> ui, core;  ui -> nothing of ours;  core -> nothing but core.
+ *   features -> ui, core, lib;  ui -> lib;  core -> lib;  lib -> nothing of ours.
  * Only src/ui may import react-aria-components, so swapping the primitive
  * library touches one folder.
  */
@@ -68,6 +68,28 @@ export default defineConfig([
             layer("ui", "src/core must not depend on src/ui."),
             layer("features", "src/core must not depend on src/features."),
             layer("app", "src/core must not depend on src/app."),
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/lib/**/*.ts"],
+    languageOptions: { globals: {} },
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            reactAria,
+            { name: "react", message: "src/lib must not use React." },
+            { name: "react-dom", message: "src/lib must not use React." },
+          ],
+          patterns: [
+            layer("core", "src/lib knows nothing of the app or cuneiform."),
+            layer("ui", "src/lib must not depend on src/ui."),
+            layer("features", "src/lib must not depend on src/features."),
+            layer("app", "src/lib must not depend on src/app."),
           ],
         },
       ],

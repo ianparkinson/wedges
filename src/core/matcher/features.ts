@@ -8,7 +8,8 @@ import {
   distance,
   midpoint,
   type Point,
-} from "../geometry"
+} from "@/lib/geometry"
+
 import type { Stroke } from "../strokes"
 
 /** Keeps a zero-length wedge or leg out of a logarithm. */

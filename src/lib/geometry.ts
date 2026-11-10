@@ -1,6 +1,7 @@
 /**
- * Points, distances and other geometry shared across the app.
+ * Points, distances and angles in the plane.
  */
+import { clamp } from "./numbers"
 
 /** A point in screen-like coordinates: x to the right, y downward. */
 export interface Point {
@@ -14,11 +15,6 @@ export interface Box {
   readonly right: number
   readonly top: number
   readonly bottom: number
-}
-
-/** `value` moved into the range from `min` to `max`, if it lies outside. */
-export function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max)
 }
 
 /** Euclidean distance between two points. */

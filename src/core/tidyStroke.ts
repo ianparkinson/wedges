@@ -11,7 +11,8 @@ import {
   midpoint,
   pointAt,
   rotate,
-} from "./geometry"
+} from "@/lib/geometry"
+
 import { mapPoints, type Stroke, type Wedge, type Winkelhaken } from "./strokes"
 
 /** The directions strokes snap to: every multiple of 45°, in radians. */

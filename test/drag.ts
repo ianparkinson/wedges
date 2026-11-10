@@ -1,6 +1,6 @@
 import { fireEvent } from "@testing-library/react"
 
-import type { Point } from "@/core/geometry"
+import type { Point } from "@/lib/geometry"
 
 /** Moves per drag, so that the element sees a trace, not a jump. */
 const STEPS = 20

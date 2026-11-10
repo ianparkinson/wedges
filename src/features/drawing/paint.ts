@@ -1,7 +1,7 @@
-import type { Point } from "@/core/geometry"
 import type { Stroke } from "@/core/strokes"
 import { strokeOutline } from "@/core/strokeShape"
 import { tidyStroke } from "@/core/tidyStroke"
+import type { Point } from "@/lib/geometry"
 
 /** What {@link paintPad} draws, in CSS pixels. */
 export interface PadPicture {

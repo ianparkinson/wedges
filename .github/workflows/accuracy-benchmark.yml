@@ -7,6 +7,7 @@ on:
   pull_request:
     paths:
       - "src/core/**"
+      - "src/lib/**"
       - "data/**"
       - "scripts/benchAccuracy.ts"
       - "scripts/osl/**"

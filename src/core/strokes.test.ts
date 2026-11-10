@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { pointBetween, type Point } from "./geometry"
+import { pointBetween, type Point } from "@/lib/geometry"
+
 import {
   classifyTrace,
   keyPoints,

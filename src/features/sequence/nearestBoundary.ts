@@ -1,4 +1,4 @@
-import type { Box, Point } from "@/core/geometry"
+import type { Box, Point } from "@/lib/geometry"
 
 /**
  * The boundary between boxes nearest to a point, as the number of boxes
