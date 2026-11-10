@@ -10,6 +10,7 @@ import {
   midpoint,
   pathLength,
   pointAt,
+  pointBetween,
   rotate,
   segmentDistance,
   wrapAngle,
@@ -152,6 +153,20 @@ describe("pointAt", () => {
 describe("midpoint", () => {
   it("is halfway between the points", () => {
     expect(midpoint({ x: 0, y: 2 }, { x: 4, y: -6 })).toEqual({ x: 2, y: -2 })
+  })
+})
+
+describe("pointBetween", () => {
+  const p = { x: 0, y: 2 }
+  const q = { x: 4, y: -6 }
+
+  it("is the first point at 0 and the second at 1", () => {
+    expect(pointBetween(p, q, 0)).toEqual(p)
+    expect(pointBetween(p, q, 1)).toEqual(q)
+  })
+
+  it("is a quarter of the way along at 0.25", () => {
+    expect(pointBetween(p, q, 0.25)).toEqual({ x: 1, y: 0 })
   })
 })
 

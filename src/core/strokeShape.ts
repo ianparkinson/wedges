@@ -3,7 +3,7 @@
  * triangular head with a thin tail, and a Winkelhaken is an arrowhead with a
  * notch between its legs.
  */
-import { distance, type Point } from "./geometry"
+import { distance, midpoint, pointBetween, type Point } from "./geometry"
 import type { Stroke, Wedge, Winkelhaken } from "./strokes"
 
 /** A wedge's head is never deeper than this fraction of its length. */
@@ -63,11 +63,7 @@ function wedgeOutline({ head, tail }: Wedge, headSize: number): Point[] {
 
 /** Four points: the vertex, one leg's end, the notch, and the other leg's end. */
 function winkelhakenOutline({ vertex, legA, legB }: Winkelhaken): Point[] {
-  const middle = { x: (legA.x + legB.x) / 2, y: (legA.y + legB.y) / 2 }
-  const notch = {
-    x: middle.x + NOTCH_DEPTH * (vertex.x - middle.x),
-    y: middle.y + NOTCH_DEPTH * (vertex.y - middle.y),
-  }
+  const notch = pointBetween(midpoint(legA, legB), vertex, NOTCH_DEPTH)
   return [vertex, legA, notch, legB]
 }
 
