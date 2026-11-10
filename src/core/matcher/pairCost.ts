@@ -2,6 +2,7 @@
  * The cost of pairing one drawn stroke with one skeleton stroke. See
  * docs/matching.md#3-cost-of-pairing-two-strokes.
  */
+import { angleDifference, distance } from "../geometry"
 import type { StrokeFeature } from "./features"
 
 /** Weights for {@link pairCost}. Positions are in the normalised frame, where a sign is 1 across. */
@@ -39,12 +40,6 @@ export const defaultWeights: MatchWeights = {
 const EIGHTH_TURN = Math.PI / 4
 const QUARTER_TURN = Math.PI / 2
 
-/** The absolute difference between two angles, in [0, π]. */
-export function angleDifference(a: number, b: number): number {
-  const d = Math.abs(a - b) % (2 * Math.PI)
-  return d > Math.PI ? 2 * Math.PI - d : d
-}
-
 /**
  * The cost of pairing two strokes, from their difference in position and, for
  * strokes of the same kind, in direction and size. Lower is closer; strokes of
@@ -55,9 +50,7 @@ export function pairCost(
   g: StrokeFeature,
   weights: MatchWeights = defaultWeights,
 ): number {
-  const dx = f.position.x - g.position.x
-  const dy = f.position.y - g.position.y
-  const distance = Math.sqrt(dx * dx + dy * dy)
+  const apart = distance(f.position, g.position)
 
   if (f.kind === "wedge" && g.kind === "wedge") {
     const d = angleDifference(f.angle, g.angle)
@@ -67,19 +60,19 @@ export function pairCost(
     )
     return (
       weights.angle * angleCost +
-      weights.position * distance +
+      weights.position * apart +
       weights.length * Math.abs(f.logLength - g.logLength)
     )
   }
 
   if (f.kind === "winkelhaken" && g.kind === "winkelhaken") {
     return (
-      weights.position * distance +
+      weights.position * apart +
       weights.winkelhakenSize * Math.abs(f.logSize - g.logSize) +
       (weights.winkelhakenOpening * angleDifference(f.opening, g.opening)) /
         QUARTER_TURN
     )
   }
 
-  return weights.kindMismatch + weights.position * distance
+  return weights.kindMismatch + weights.position * apart
 }

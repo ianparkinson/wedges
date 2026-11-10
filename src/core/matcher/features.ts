@@ -2,7 +2,13 @@
  * The few numbers that matching compares for each stroke. See
  * docs/matching.md#2-features.
  */
-import type { Point } from "../geometry"
+import {
+  bisector,
+  direction,
+  distance,
+  midpoint,
+  type Point,
+} from "../geometry"
 import type { Stroke } from "../strokes"
 
 /** Keeps a zero-length wedge or leg out of a logarithm. */
@@ -40,24 +46,19 @@ export function strokeFeature(stroke: Stroke): StrokeFeature {
       const { head, tail } = stroke
       return {
         kind: "wedge",
-        position: { x: (head.x + tail.x) / 2, y: (head.y + tail.y) / 2 },
-        angle: Math.atan2(tail.y - head.y, tail.x - head.x),
-        logLength: Math.log(
-          Math.max(MIN_LENGTH, Math.hypot(tail.x - head.x, tail.y - head.y)),
-        ),
+        position: midpoint(head, tail),
+        angle: direction(head, tail),
+        logLength: Math.log(Math.max(MIN_LENGTH, distance(head, tail))),
       }
     }
     case "winkelhaken": {
-      const { vertex: v, legA: a, legB: b } = stroke
-      const la = Math.hypot(a.x - v.x, a.y - v.y) || MIN_LENGTH
-      const lb = Math.hypot(b.x - v.x, b.y - v.y) || MIN_LENGTH
-      const ox = (a.x - v.x) / la + (b.x - v.x) / lb
-      const oy = (a.y - v.y) / la + (b.y - v.y) / lb
+      const { vertex, legA, legB } = stroke
+      const legs = distance(vertex, legA) + distance(vertex, legB)
       return {
         kind: "winkelhaken",
-        position: v,
-        logSize: Math.log((la + lb) / 2),
-        opening: Math.atan2(oy, ox),
+        position: vertex,
+        logSize: Math.log(Math.max(MIN_LENGTH, legs / 2)),
+        opening: bisector(vertex, legA, legB),
       }
     }
   }

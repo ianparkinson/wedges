@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import type { Stroke } from "../strokes"
 import { strokeFeature } from "./features"
-import { angleDifference, defaultWeights, pairCost } from "./pairCost"
+import { defaultWeights, pairCost } from "./pairCost"
 
 const w = defaultWeights
 
@@ -24,13 +24,6 @@ function winkelhaken(vx: number, vy: number, size: number) {
   }
   return strokeFeature(stroke)
 }
-
-describe("angleDifference", () => {
-  it("wraps around", () => {
-    expect(angleDifference(0.1, 2 * Math.PI - 0.1)).toBeCloseTo(0.2)
-    expect(angleDifference(-Math.PI, Math.PI)).toBeCloseTo(0)
-  })
-})
 
 describe("pairCost", () => {
   it("is zero for identical strokes", () => {

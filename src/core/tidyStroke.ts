@@ -5,12 +5,12 @@
  * exactly so. Only the picture changes; the matcher sees the strokes as drawn.
  */
 import {
+  bisector,
   direction,
   distance,
   midpoint,
   pointAt,
   rotate,
-  wrapAngle,
 } from "./geometry"
 import type { Stroke, Wedge, Winkelhaken } from "./strokes"
 
@@ -54,10 +54,7 @@ function tidyWinkelhaken(
   const a = direction(vertex, legA)
   const b = direction(vertex, legB)
 
-  // The bisector is the mean of the legs' directions, measured the short way
-  // round from one to the other.
-  const bisector = a + wrapAngle(b - a) / 2
-  const turn = snapTurn(bisector, snapTolerance)
+  const turn = snapTurn(bisector(vertex, legA, legB), snapTolerance)
 
   return {
     kind: "winkelhaken",
