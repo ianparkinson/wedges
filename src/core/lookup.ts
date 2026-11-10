@@ -2,6 +2,7 @@
  * Finds signs and sign sequences by name, value, code point or the
  * characters themselves. See docs/lookup.md.
  */
+import { cuneiformChars } from "./cuneiform"
 import {
   charsOf,
   type Sign,
@@ -75,7 +76,6 @@ const SUBSCRIPT = /[₀-₉ₓ]/g
 const COMBINING_MARKS = /[\u0300-\u036f]/g
 const IGNORED = /[ʾ'’⁻|.\s]/g
 
-const CUNEIFORM = /[\u{12000}-\u{1254F}]/gu
 const CODE_POINT = /^(?:u\+)?(1[0-9a-f]{4})$/i
 
 /**
@@ -240,8 +240,8 @@ export function search(
   const raw = query.trim()
   if (!raw) return []
 
-  const pasted = raw.match(CUNEIFORM)
-  if (pasted) {
+  const pasted = cuneiformChars(raw)
+  if (pasted.length > 0) {
     return pastedSigns(index.database, pasted)
       .slice(0, limit)
       .map((found) => ({ found, match: null, tier: Tier.Exact }))

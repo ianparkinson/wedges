@@ -29,12 +29,28 @@ export interface OslData {
 
 /**
  * How the parts of a compound sign combine: × one inside another, & one above
- * the other, % crossed, and . and + side by side.
+ * the other, % crossed, and . and + side by side. Compounds made of the same
+ * parts are offered in this order.
  */
-export type CompoundOperator = "×" | "&" | "%" | "." | "+"
+export const COMPOUND_OPERATORS = ["×", "&", "%", ".", "+"] as const
 
-/** gunû, tenû, šeššig and nutillû. */
-export type VariantModifier = "g" | "t" | "s" | "n"
+/** One of the {@link COMPOUND_OPERATORS}. */
+export type CompoundOperator = (typeof COMPOUND_OPERATORS)[number]
+
+/**
+ * The modifiers that make a variant of a sign, with their names as
+ * Assyriologists write them. Oracc's GDL specification lists them, with
+ * examples: https://oracc.museum.upenn.edu/ns/gdl/1.0/index.html
+ */
+export const VARIANT_MODIFIERS = {
+  g: "gunû",
+  t: "tenû",
+  s: "šeššig",
+  n: "nutillû",
+} as const
+
+/** One of the {@link VARIANT_MODIFIERS}: g, t, s or n. */
+export type VariantModifier = keyof typeof VARIANT_MODIFIERS
 
 /** A sign in the Oracc Sign List with a Unicode character of its own. */
 export interface OslSign {

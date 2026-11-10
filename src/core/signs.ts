@@ -5,13 +5,14 @@
 import { groupBy } from "./collections"
 import { prepareSample, type PreparedSample } from "./matcher/match"
 import { parseSpec } from "./spec"
-import type {
-  CompoundOperator,
-  OslData,
-  OslSequence,
-  OslSign,
-  SkeletonFile,
-  VariantModifier,
+import {
+  COMPOUND_OPERATORS,
+  VARIANT_MODIFIERS,
+  type OslData,
+  type OslSequence,
+  type OslSign,
+  type SkeletonFile,
+  type VariantModifier,
 } from "./types"
 
 /** A sign, with the samples to match drawings against, if it has any. */
@@ -55,21 +56,9 @@ export function codePoint(char: string): string {
   return "U+" + hex.padStart(4, "0")
 }
 
-/**
- * The names of the variant modifiers, as Assyriologists write them. Oracc's
- * GDL specification lists them, with examples:
- * https://oracc.museum.upenn.edu/ns/gdl/1.0/index.html
- */
-const MODIFIER_NAMES: Readonly<Record<VariantModifier, string>> = {
-  g: "gunû",
-  t: "tenû",
-  s: "šeššig",
-  n: "nutillû",
-}
-
 /** A variant modifier's name: g is gunû, the sign with extra strokes. */
 export function modifierName(modifier: VariantModifier): string {
-  return MODIFIER_NAMES[modifier]
+  return VARIANT_MODIFIERS[modifier]
 }
 
 /** Every sign and sequence, found by character, with the samples drawings are ranked against. */
@@ -158,12 +147,9 @@ export class SignDatabase {
   }
 }
 
-/** The order compounds are offered in, by how their parts combine. */
-const OPERATOR_ORDER: readonly CompoundOperator[] = ["×", "&", "%", ".", "+"]
-
 /** How the database orders the compounds made of the same parts. */
 function byOperator(a: Sign, b: Sign): number {
   const rank = (sign: Sign) =>
-    OPERATOR_ORDER.indexOf(sign.compound?.operator ?? "×")
+    COMPOUND_OPERATORS.indexOf(sign.compound?.operator ?? "×")
   return rank(a) - rank(b)
 }
