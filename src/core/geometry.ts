@@ -69,6 +69,16 @@ export function direction(from: Point, to: Point): number {
   return Math.atan2(to.y - from.y, to.x - from.x)
 }
 
+/**
+ * The direction halfway between the directions from `vertex` to `a` and to
+ * `b`, measured the short way round, in radians from -π to π as
+ * {@link direction} gives them: where the angle at `vertex` opens towards.
+ */
+export function bisector(vertex: Point, a: Point, b: Point): number {
+  const toA = direction(vertex, a)
+  return wrapAngle(toA + wrapAngle(direction(vertex, b) - toA) / 2)
+}
+
 /** The point `length` from `origin` in the direction `angle`, in radians as {@link direction} gives them. */
 export function pointAt(origin: Point, angle: number, length: number): Point {
   return {
@@ -97,4 +107,9 @@ export function rotate(p: Point, centre: Point, angle: number): Point {
 /** `angle`, in radians, moved by a whole number of turns into the range -π to π. */
 export function wrapAngle(angle: number): number {
   return Math.atan2(Math.sin(angle), Math.cos(angle))
+}
+
+/** The absolute difference between two angles, in [0, π]. */
+export function angleDifference(a: number, b: number): number {
+  return Math.abs(wrapAngle(a - b))
 }

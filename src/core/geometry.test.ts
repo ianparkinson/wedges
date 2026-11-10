@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest"
 
 import {
   angleAt,
+  angleDifference,
+  bisector,
   clamp,
   direction,
   distance,
@@ -103,6 +105,28 @@ describe("direction", () => {
   })
 })
 
+describe("bisector", () => {
+  const vertex = { x: 0, y: 0 }
+
+  it("points between the axes for a right angle", () => {
+    expect(bisector(vertex, { x: 5, y: 0 }, { x: 0, y: 2 })).toBeCloseTo(
+      Math.PI / 4,
+    )
+  })
+
+  it("goes the short way round, across the negative x axis", () => {
+    const a = { x: -1, y: 0.1 }
+    const b = { x: -1, y: -0.1 }
+    expect(Math.abs(bisector(vertex, a, b))).toBeCloseTo(Math.PI)
+  })
+
+  it("doesn't depend on the order of the legs", () => {
+    const a = { x: 1, y: 3 }
+    const b = { x: -2, y: 1 }
+    expect(bisector(vertex, a, b)).toBeCloseTo(bisector(vertex, b, a))
+  })
+})
+
 describe("pointAt", () => {
   it("goes along the x axis for angle 0", () => {
     const p = pointAt({ x: 1, y: 2 }, 0, 5)
@@ -157,5 +181,12 @@ describe("wrapAngle", () => {
 
   it("takes off whole turns", () => {
     expect(wrapAngle(1 + 4 * Math.PI)).toBeCloseTo(1)
+  })
+})
+
+describe("angleDifference", () => {
+  it("wraps around", () => {
+    expect(angleDifference(0.1, 2 * Math.PI - 0.1)).toBeCloseTo(0.2)
+    expect(angleDifference(-Math.PI, Math.PI)).toBeCloseTo(0)
   })
 })
