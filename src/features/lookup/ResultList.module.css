@@ -7,24 +7,6 @@
   list-style: none;
 }
 
-.item {
-  position: relative;
-}
-
-/* Room on the right for the ⓘ, which sits over the card beside its button. */
-.item > :first-child {
-  width: 100%;
-  padding-inline-end: var(--touch-target);
-  text-align: start;
-}
-
-.info {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-}
-
 .result {
   display: flex;
   align-items: baseline;
