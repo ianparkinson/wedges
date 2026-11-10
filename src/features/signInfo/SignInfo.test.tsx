@@ -31,7 +31,7 @@ function fact(term: string): string | null | undefined {
 
 function renderPanel(about: SignListEntry, onAppend?: () => void) {
   render(
-    <SignInfo about={about} database={smallDatabase} onAppend={onAppend} />,
+    <SignInfo about={about} signDatabase={smallDatabase} onAppend={onAppend} />,
   )
 }
 

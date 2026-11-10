@@ -12,8 +12,8 @@ import { ResultList } from "./ResultList"
 
 /** Props for {@link LookupSheet}. */
 export interface LookupSheetProps {
-  /** The sign database, or undefined until it has loaded. */
-  database: SignDatabase | undefined
+  /** The sign signDatabase, or undefined until it has loaded. */
+  signDatabase: SignDatabase | undefined
   isOpen: boolean
   onClose: () => void
   /** Adds characters to the text. The sheet closes after. */
@@ -27,7 +27,7 @@ export interface LookupSheetProps {
  * without appending keeps it, so the sheet opens again on the same results.
  */
 export function LookupSheet({
-  database,
+  signDatabase,
   isOpen,
   onClose,
   onAppend,
@@ -35,7 +35,10 @@ export function LookupSheet({
   const [query, setQuery] = useState("")
   const [opened, setOpened] = useState<SignListEntry>()
 
-  const index = useMemo(() => database && buildIndex(database), [database])
+  const index = useMemo(
+    () => signDatabase && buildIndex(signDatabase),
+    [signDatabase],
+  )
   const results = useMemo(
     () => (index ? search(index, query) : []),
     [index, query],
@@ -54,7 +57,7 @@ export function LookupSheet({
 
   return (
     <Sheet isOpen={isOpen} onClose={close} title={opened?.name ?? "Look up"}>
-      {opened && database ? (
+      {opened && signDatabase ? (
         <div className={styles.view}>
           <div>
             <Button onPress={() => setOpened(undefined)}>
@@ -63,7 +66,7 @@ export function LookupSheet({
           </div>
           <SignInfo
             about={opened}
-            database={database}
+            signDatabase={signDatabase}
             onAppend={() => append(charsOf(opened))}
           />
         </div>
@@ -75,7 +78,7 @@ export function LookupSheet({
             onChange={setQuery}
             autoFocus
           />
-          {!database ? (
+          {!signDatabase ? (
             <p className={styles.hint}>Loading signs…</p>
           ) : results.length > 0 ? (
             <ResultList

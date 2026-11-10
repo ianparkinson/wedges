@@ -7,7 +7,7 @@ import { SignInfo } from "./SignInfo"
 export interface SignInfoSheetProps {
   /** The sign or sequence to show, or undefined to show none. */
   about: SignListEntry | undefined
-  database: SignDatabase
+  signDatabase: SignDatabase
   onClose: () => void
   /** Adds the characters to the text; leave it out when they are already there. The sheet closes after. */
   onAppend?: () => void
@@ -16,7 +16,7 @@ export interface SignInfoSheetProps {
 /** A sign or sequence's {@link SignInfo} in a sheet of its own, headed by its name. */
 export function SignInfoSheet({
   about,
-  database,
+  signDatabase,
   onClose,
   onAppend,
 }: SignInfoSheetProps) {
@@ -29,7 +29,7 @@ export function SignInfoSheet({
       {about && (
         <SignInfo
           about={about}
-          database={database}
+          signDatabase={signDatabase}
           {...(onAppend && {
             onAppend: () => {
               onAppend()

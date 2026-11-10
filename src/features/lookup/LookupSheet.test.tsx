@@ -8,7 +8,7 @@ import { LookupSheet } from "./LookupSheet"
 function renderSheet(onAppend = () => {}, onClose = () => {}) {
   render(
     <LookupSheet
-      database={smallDatabase}
+      signDatabase={smallDatabase}
       isOpen
       onClose={onClose}
       onAppend={onAppend}
