@@ -1,7 +1,5 @@
 import type { Sign } from "@/core/signs"
-import { Button } from "@/ui/Button/Button"
-import { IconButton } from "@/ui/IconButton/IconButton"
-import { InfoIcon } from "@/ui/InfoIcon/InfoIcon"
+import { ButtonWithInfo } from "@/ui/ButtonWithInfo/ButtonWithInfo"
 
 import styles from "./CandidateList.module.css"
 
@@ -32,20 +30,19 @@ export function CandidateList({
         <ul className={styles.list}>
           {candidates.map((sign, i) => (
             <li key={sign.char} className={styles.item}>
-              <Button onPress={() => onPick(sign)} isProminent={i === 0}>
-                <span className={styles.glyph} aria-hidden="true">
-                  {sign.char}
+              <ButtonWithInfo
+                onPress={() => onPick(sign)}
+                isProminent={i === 0}
+                infoLabel={`About ${sign.name}`}
+                onInfo={() => onInfo(sign)}
+              >
+                <span className={styles.content}>
+                  <span className={styles.glyph} aria-hidden="true">
+                    {sign.char}
+                  </span>
+                  <span className={styles.name}>{sign.name}</span>
                 </span>
-                <span className={styles.name}>{sign.name}</span>
-              </Button>
-              <span className={styles.info}>
-                <IconButton
-                  label={`About ${sign.name}`}
-                  onPress={() => onInfo(sign)}
-                >
-                  <InfoIcon />
-                </IconButton>
-              </span>
+              </ButtonWithInfo>
             </li>
           ))}
         </ul>

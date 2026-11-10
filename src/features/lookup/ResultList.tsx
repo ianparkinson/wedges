@@ -1,8 +1,6 @@
 import type { LookupResult } from "@/core/lookup"
 import { charsOf } from "@/core/signs"
-import { Button } from "@/ui/Button/Button"
-import { IconButton } from "@/ui/IconButton/IconButton"
-import { InfoIcon } from "@/ui/InfoIcon/InfoIcon"
+import { ButtonWithInfo } from "@/ui/ButtonWithInfo/ButtonWithInfo"
 
 import styles from "./ResultList.module.css"
 
@@ -28,8 +26,13 @@ export function ResultList({ results, onAppend, onInfo }: ResultListProps) {
         const { name } = found
         const chars = charsOf(found)
         return (
-          <li key={`${found.kind} ${chars}`} className={styles.item}>
-            <Button onPress={() => onAppend(result)}>
+          <li key={`${found.kind} ${chars}`}>
+            <ButtonWithInfo
+              onPress={() => onAppend(result)}
+              infoLabel={`About ${name}`}
+              onInfo={() => onInfo(result)}
+              infoPlacement="end"
+            >
               <span className={styles.result}>
                 <span className={styles.glyphs} aria-hidden="true">
                   {chars}
@@ -44,15 +47,7 @@ export function ResultList({ results, onAppend, onInfo }: ResultListProps) {
                   )}
                 </span>
               </span>
-            </Button>
-            <span className={styles.info}>
-              <IconButton
-                label={`About ${name}`}
-                onPress={() => onInfo(result)}
-              >
-                <InfoIcon />
-              </IconButton>
-            </span>
+            </ButtonWithInfo>
           </li>
         )
       })}
