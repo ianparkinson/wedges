@@ -19,9 +19,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "bench:accuracy": "tsx --tsconfig tsconfig.scripts.json scripts/benchAccuracy.ts",
-    "bench:performance": "tsx --tsconfig tsconfig.scripts.json scripts/benchPerformance.ts",
-    "osl-summary": "tsx --tsconfig tsconfig.scripts.json scripts/osl-summary.ts",
+    "bench:accuracy": "tsx --tsconfig tsconfig.node.json scripts/benchAccuracy.ts",
+    "bench:performance": "tsx --tsconfig tsconfig.node.json scripts/benchPerformance.ts",
+    "osl-summary": "tsx --tsconfig tsconfig.node.json scripts/osl-summary.ts",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test"
   },
   "dependencies": {
