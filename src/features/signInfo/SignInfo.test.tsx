@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 
+import type { SignListEntry } from "@/core/signs"
+
 import {
   AN,
   GA2,
@@ -15,18 +17,11 @@ import {
   TE,
 } from "../../../test/smallDatabase"
 import { SignInfo } from "./SignInfo"
-import type { SignListEntry } from "./signListEntry"
 
-const ša: SignListEntry = { kind: "sign", sign: smallDatabase.sign(ŠA)! }
-const ensi: SignListEntry = {
-  kind: "sequence",
-  sequence: smallDatabase.sequence(PA + TE + SI)!,
-}
+const ša = smallDatabase.sign(ŠA)!
+const ensi = smallDatabase.sequence(PA + TE + SI)!
 
-const signEntry = (char: string): SignListEntry => ({
-  kind: "sign",
-  sign: smallDatabase.sign(char)!,
-})
+const sign = (char: string) => smallDatabase.sign(char)!
 
 /** The text of the description beside a term, such as Parts. */
 function fact(term: string): string | null | undefined {
@@ -34,9 +29,9 @@ function fact(term: string): string | null | undefined {
     ?.textContent
 }
 
-function renderPanel(entry: SignListEntry, onAppend?: () => void) {
+function renderPanel(about: SignListEntry, onAppend?: () => void) {
   render(
-    <SignInfo entry={entry} database={smallDatabase} onAppend={onAppend} />,
+    <SignInfo about={about} database={smallDatabase} onAppend={onAppend} />,
   )
 }
 
@@ -83,17 +78,17 @@ describe("SignInfo", () => {
   })
 
   it("shows a compound's parts, joined as its name joins them", () => {
-    renderPanel(signEntry(GA2_TIMES_AN))
+    renderPanel(sign(GA2_TIMES_AN))
     expect(fact("Parts")).toBe(`${GA2} GA₂ × ${AN} AN`)
   })
 
   it("lists a sign's variants, with their modifiers", () => {
-    renderPanel(signEntry(LAGAR))
+    renderPanel(sign(LAGAR))
     expect(fact("Variants")).toBe(`${LAGAR_GUNU} LAGAR@g, gunû`)
   })
 
   it("says which sign a variant is a variant of", () => {
-    renderPanel(signEntry(LAGAR_GUNU))
+    renderPanel(sign(LAGAR_GUNU))
     expect(fact("Variant of")).toBe(`${LAGAR} LAGAR, gunû`)
   })
 

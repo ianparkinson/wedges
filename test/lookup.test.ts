@@ -6,6 +6,7 @@ import { osl } from "virtual:osl"
 import { describe, expect, it } from "vitest"
 
 import { buildIndex, search } from "@/core/lookup"
+import { charsOf } from "@/core/signs"
 
 import { signDatabase } from "./signDatabase"
 
@@ -46,10 +47,11 @@ const BEST_MATCHES: [query: string, chars: string, why: string][] = [
 ]
 
 describe("lookup on the real data", () => {
-  const index = buildIndex(signDatabase(osl).lookupEntries)
+  const index = buildIndex(signDatabase(osl))
 
   it.each(BEST_MATCHES)('"%s" finds %s first: %s', (query, chars) => {
-    expect(search(index, query, 1)[0]?.entry.chars).toBe(chars)
+    const [best] = search(index, query, 1)
+    expect(best && charsOf(best.found)).toBe(chars)
   })
 
   it("finds nothing for a word that isn't a sign", () => {

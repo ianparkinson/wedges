@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
 
 import { rank } from "@/core/matcher/rank"
-import type { Sign } from "@/core/signs"
+import type { Sign, SignListEntry } from "@/core/signs"
 import type { Stroke } from "@/core/strokes"
 import { suggestionsAt } from "@/core/suggest"
 import { AcceptButton } from "@/features/candidates/AcceptButton"
@@ -11,7 +11,6 @@ import { LookupSheet } from "@/features/lookup/LookupSheet"
 import { SequencePanel } from "@/features/sequence/SequencePanel"
 import { useSequence } from "@/features/sequence/useSequence"
 import { SignInfoSheet } from "@/features/signInfo/SignInfoSheet"
-import type { SignListEntry } from "@/features/signInfo/signListEntry"
 import { SuggestionRow } from "@/features/suggestions/SuggestionRow"
 import { Button } from "@/ui/Button/Button"
 import { Link } from "@/ui/Link/Link"
@@ -25,25 +24,25 @@ const REPO_URL = "https://github.com/ianparkinson/wedges"
 const CANDIDATE_COUNT = 3
 
 /**
- * An entry shown in a sheet over the app, and the candidate its Append
- * picks, when it was opened from a candidate.
+ * The sign or sequence shown in a sheet over the app, and the candidate its
+ * Append picks, when it was opened from a candidate.
  */
-interface ShownEntry {
-  readonly entry: SignListEntry
+interface ShownSignInfo {
+  readonly about: SignListEntry
   readonly append?: Sign
 }
 
 /**
  * The app shell: the text written so far, suggestions for the signs before
  * the cursor, the drawing pad, and the candidates for what is drawn on it,
- * with Look up and entries in sheets over them.
+ * with Look up and Sign List entries in sheets over them.
  */
 export function App() {
   const database = useSignDatabase()
   const [strokes, setStrokes] = useState<readonly Stroke[]>([])
   const [sequence, editSequence] = useSequence()
   const [isLookupOpen, setLookupOpen] = useState(false)
-  const [shownEntry, setShownEntry] = useState<ShownEntry>()
+  const [info, setInfo] = useState<ShownSignInfo>()
 
   const candidates = useMemo(
     () =>
@@ -69,7 +68,7 @@ export function App() {
     editSequence({ kind: "insert", chars: sign.char })
     setStrokes([])
   }
-  const appendShown = shownEntry?.append
+  const appendShown = info?.append
 
   return (
     <main className={styles.page}>
@@ -81,7 +80,7 @@ export function App() {
         <div className={styles.text}>
           <SuggestionRow
             suggestions={suggestions}
-            onOpen={(entry) => setShownEntry({ entry })}
+            onOpen={(about) => setInfo({ about })}
             onChange={({ replaced, chars }) =>
               editSequence({
                 kind: "replace",
@@ -104,9 +103,7 @@ export function App() {
           candidates={candidates}
           isLoading={!database}
           onPick={pick}
-          onInfo={(sign) =>
-            setShownEntry({ entry: { kind: "sign", sign }, append: sign })
-          }
+          onInfo={(sign) => setInfo({ about: sign, append: sign })}
         />
       </div>
       <p className={styles.footer}>
@@ -121,9 +118,9 @@ export function App() {
       />
       {database && (
         <SignInfoSheet
-          entry={shownEntry?.entry}
+          about={info?.about}
           database={database}
-          onClose={() => setShownEntry(undefined)}
+          onClose={() => setInfo(undefined)}
           {...(appendShown && { onAppend: () => pick(appendShown) })}
         />
       )}

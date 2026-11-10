@@ -4,15 +4,20 @@ import { describe, expect, it, vi } from "vitest"
 
 import { Tier, type LookupResult } from "@/core/lookup"
 
+import {
+  AN as AN_CHAR,
+  ŠA as ŠA_CHAR,
+  smallDatabase,
+} from "../../../test/smallDatabase"
 import { ResultList } from "./ResultList"
 
 const ŠA: LookupResult = {
-  entry: { kind: "sign", chars: "𒊭", names: ["ŠA"], values: ["ša"] },
+  found: smallDatabase.sign(ŠA_CHAR)!,
   match: { text: "ša", kind: "value" },
   tier: Tier.Exact,
 }
 const AN: LookupResult = {
-  entry: { kind: "sign", chars: "𒀭", names: ["AN"], values: ["an"] },
+  found: smallDatabase.sign(AN_CHAR)!,
   match: { text: "AN", kind: "name" },
   tier: Tier.Exact,
 }
@@ -39,7 +44,7 @@ describe("ResultList", () => {
     expect(onInfo).not.toHaveBeenCalled()
   })
 
-  it("opens a result's entry from its ⓘ", async () => {
+  it("opens a result's Sign List entry from its ⓘ", async () => {
     const onAppend = vi.fn()
     const onInfo = vi.fn()
     render(
