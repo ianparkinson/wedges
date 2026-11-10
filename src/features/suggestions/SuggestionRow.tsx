@@ -1,13 +1,8 @@
 import { useLayoutEffect, useRef } from "react"
 
 import { clamp } from "@/core/geometry"
+import { charsOf, type SignListEntry } from "@/core/signs"
 import type { Change, Suggestions } from "@/core/suggest"
-import {
-  entryChars,
-  entryName,
-  entryValues,
-  type SignListEntry,
-} from "@/features/signInfo/signListEntry"
 import { InfoChip } from "@/ui/InfoChip/InfoChip"
 import { ReplacementChip } from "@/ui/ReplacementChip/ReplacementChip"
 
@@ -16,8 +11,8 @@ import styles from "./SuggestionRow.module.css"
 /** Props for {@link SuggestionRow}. */
 export interface SuggestionRowProps {
   suggestions: Suggestions
-  /** Opens an entry, when its chip is tapped. */
-  onOpen: (entry: SignListEntry) => void
+  /** Opens the Sign List entry of a sign or sequence, when its chip is tapped. */
+  onOpen: (listed: SignListEntry) => void
   /** Makes a change, when its chip is tapped. */
   onChange: (change: Change) => void
   /** The sign's name for a character, to name the changes for screen readers. */
@@ -29,7 +24,7 @@ export interface SuggestionRowProps {
  * and each sequence that ends there, each with its name and readings; then
  * the changes that can be made there, each showing the signs it replaces, an
  * arrow, and what it puts in their place. A change's chip makes the change,
- * and the others open their entries. The row keeps its height when it is
+ * and the others open their Sign List entries. The row keeps its height when it is
  * empty, so what is below it doesn't move. When the chips don't fit, the row
  * scrolls sideways, and goes back to its start whenever they change. An edge
  * with more chips beyond it fades out.
@@ -41,10 +36,7 @@ export function SuggestionRow({
   nameOf,
 }: SuggestionRowProps) {
   const { changes, sign, sequences } = suggestions
-  const entries: SignListEntry[] = [
-    ...(sign ? [{ kind: "sign" as const, sign }] : []),
-    ...sequences.map((sequence) => ({ kind: "sequence" as const, sequence })),
-  ]
+  const listed: SignListEntry[] = [...(sign ? [sign] : []), ...sequences]
   const rowRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
@@ -62,12 +54,12 @@ export function SuggestionRow({
       role="group"
       aria-label="Suggestions"
     >
-      {entries.map((entry) => (
+      {listed.map((item) => (
         <InfoChip
-          key={`${entry.kind} ${entryChars(entry)}`}
-          label={entryName(entry)}
-          detail={entryValues(entry).join(", ")}
-          onPress={() => onOpen(entry)}
+          key={`${item.kind} ${charsOf(item)}`}
+          label={item.name}
+          detail={item.values.join(", ")}
+          onPress={() => onOpen(item)}
         />
       ))}
       {changes.map((change) => (

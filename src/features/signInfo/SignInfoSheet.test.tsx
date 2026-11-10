@@ -4,22 +4,21 @@ import { describe, expect, it, vi } from "vitest"
 
 import { ŠA, smallDatabase } from "../../../test/smallDatabase"
 import { SignInfoSheet } from "./SignInfoSheet"
-import type { SignListEntry } from "./signListEntry"
 
-const ša: SignListEntry = { kind: "sign", sign: smallDatabase.sign(ŠA)! }
+const ša = smallDatabase.sign(ŠA)!
 
 describe("SignInfoSheet", () => {
-  it("shows the entry in a dialog named after it", () => {
+  it("shows the sign in a dialog named after it", () => {
     render(
-      <SignInfoSheet entry={ša} database={smallDatabase} onClose={() => {}} />,
+      <SignInfoSheet about={ša} database={smallDatabase} onClose={() => {}} />,
     )
     expect(screen.getByRole("dialog", { name: "ŠA" })).toBeVisible()
   })
 
-  it("shows nothing without an entry", () => {
+  it("shows nothing without a sign", () => {
     render(
       <SignInfoSheet
-        entry={undefined}
+        about={undefined}
         database={smallDatabase}
         onClose={() => {}}
       />,
@@ -32,7 +31,7 @@ describe("SignInfoSheet", () => {
     const onClose = vi.fn()
     render(
       <SignInfoSheet
-        entry={ša}
+        about={ša}
         database={smallDatabase}
         onClose={onClose}
         onAppend={onAppend}

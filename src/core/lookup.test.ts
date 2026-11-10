@@ -1,26 +1,47 @@
 import { describe, expect, it } from "vitest"
 
-import { buildIndex, fold, search, Tier, type LookupEntry } from "./lookup"
+import { buildIndex, fold, search, shortUnicodeName, Tier } from "./lookup"
+import { charsOf, SignDatabase } from "./signs"
+import type { OslSign } from "./types"
 
-const entries: LookupEntry[] = [
-  { kind: "sign", chars: "𒊭", names: ["ŠA"], values: ["ša", "ša₂₁"] },
-  { kind: "sign", chars: "𒊓", names: ["SA"], values: ["sa", "ša₂"] },
-  { kind: "sign", chars: "𒀭", names: ["AN"], values: ["an", "diŋir"] },
-  { kind: "sign", chars: "𒄑", names: ["GIŠ"], values: ["giš", "ĝeš₂"] },
-  { kind: "sign", chars: "𒉺", names: ["PA"], values: ["pa"] },
-  { kind: "sign", chars: "𒋼", names: ["TE"], values: ["te"] },
-  { kind: "sign", chars: "𒋛", names: ["SI"], values: ["si"] },
-  { kind: "sign", chars: "𒂷", names: ["GA₂"], values: ["zaŋa"] },
-  { kind: "sign", chars: "𒋃", names: ["SIG₇"], values: ["zanga"] },
-  {
-    kind: "sequence",
-    chars: "𒉺𒋼𒋛",
-    names: ["|PA.TE.SI|"],
-    values: ["ensi₂", "ṣillu"],
-  },
-]
-const index = buildIndex(entries)
-const chars = (query: string) => search(index, query).map((r) => r.entry.chars)
+function sign(
+  char: string,
+  name: string,
+  values: string[],
+  unicodeName?: string,
+): OslSign {
+  return { char, name, oslId: "", values, ...(unicodeName && { unicodeName }) }
+}
+
+const index = buildIndex(
+  new SignDatabase([], {
+    signs: [
+      sign("𒊭", "ŠA", ["ša", "ša₂₁"]),
+      sign("𒊓", "SA", ["sa", "ša₂"]),
+      sign("𒀭", "AN", ["an", "diŋir"], "CUNEIFORM SIGN AN"),
+      sign("𒄑", "GIŠ", ["giš", "ĝeš₂"]),
+      sign("𒉺", "PA", ["pa"]),
+      sign("𒋼", "TE", ["te"]),
+      sign("𒋛", "SI", ["si"]),
+      sign("𒂷", "GA₂", ["zaŋa"]),
+      sign("𒋃", "SIG₇", ["zanga"]),
+      sign("𒁻", "|DU&DU|", [], "CUNEIFORM SIGN DU OVER DU"),
+    ],
+    sequences: [
+      {
+        chars: "𒉺𒋼𒋛",
+        name: "|PA.TE.SI|",
+        oslId: "",
+        values: ["ensi₂", "ṣillu"],
+      },
+    ],
+  }),
+)
+
+/** The characters of what a query finds, best first. */
+function chars(query: string): string[] {
+  return search(index, query).map((r) => charsOf(r.found))
+}
 
 describe("fold", () => {
   it.each([
@@ -61,7 +82,7 @@ describe("search", () => {
   it("finds a value without its index", () => {
     const [first] = search(index, "ges")
     expect(first).toMatchObject({
-      entry: { chars: "𒄑" },
+      found: { char: "𒄑" },
       match: { text: "ĝeš₂", kind: "value" },
       tier: Tier.Index,
     })
@@ -93,13 +114,16 @@ describe("search", () => {
     expect(chars("𒉺𒋼𒋛")).toEqual(["𒉺𒋼𒋛", "𒉺", "𒋼", "𒋛"])
   })
 
-  it("returns pasted characters it has no entry for", () => {
-    expect(search(index, "𒀀")[0]?.entry).toEqual({
-      kind: "sign",
-      chars: "𒀀",
-      names: [],
-      values: [],
-    })
+  it("leaves out pasted characters the database doesn't list", () => {
+    expect(chars("𒀀𒀭")).toEqual(["𒀭"])
+  })
+
+  it("finds a sign by its Unicode name, when that differs", () => {
+    expect(chars("du over du")).toEqual(["𒁻"])
+  })
+
+  it("doesn't add a sign's Unicode name when it is the OSL name", () => {
+    expect(search(index, "an")[0]?.match).toEqual({ text: "AN", kind: "name" })
   })
 
   it("returns nothing for a blank or unknown query", () => {
@@ -109,5 +133,15 @@ describe("search", () => {
 
   it("stops at the limit", () => {
     expect(search(index, "a", 1)).toHaveLength(1)
+  })
+})
+
+describe("shortUnicodeName", () => {
+  it.each([
+    ["CUNEIFORM SIGN GA2 TIMES AN", "GA2 TIMES AN"],
+    ["CUNEIFORM NUMERIC SIGN THREE ASH", "THREE ASH"],
+    ["CUNEIFORM PUNCTUATION SIGN DIAGONAL COLON", "DIAGONAL COLON"],
+  ])("shortens %s to %s", (name, short) => {
+    expect(shortUnicodeName(name)).toBe(short)
   })
 })

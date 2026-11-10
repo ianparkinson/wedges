@@ -1,12 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import {
-  codePoint,
-  modifierName,
-  oslUrl,
-  shortUnicodeName,
-  SignDatabase,
-} from "./signs"
+import { charsOf, codePoint, modifierName, oslUrl, SignDatabase } from "./signs"
 import type { OslData, SkeletonFile } from "./types"
 
 const osl: OslData = {
@@ -80,25 +74,15 @@ describe("SignDatabase", () => {
     expect(db.sign("𒀀")?.samples).toEqual([])
   })
 
+  it("tells signs and sequences apart by kind", () => {
+    expect(db.sign("𒀀")?.kind).toBe("sign")
+    expect(db.sequence("𒀭𒀭")?.kind).toBe("sequence")
+  })
+
   it("finds signs and sequences by their characters", () => {
     expect(db.sign("𒀀")?.name).toBe("A")
     expect(db.sequence("𒀭𒀭")?.values).toEqual(["didli"])
     expect(db.sign("𒐀")).toBeUndefined()
-  })
-
-  it("gives lookup every sign and sequence", () => {
-    expect(db.lookupEntries.map((e) => [e.kind, e.chars])).toEqual([
-      ["sign", "𒀀"],
-      ["sign", "𒀭"],
-      ["sign", "𒁹"],
-      ["sign", "𒁺"],
-      ["sign", "𒁼"],
-      ["sign", "𒁽"],
-      ["sign", "𒈲"],
-      ["sign", "𒈸"],
-      ["sign", "𒈶"],
-      ["sequence", "𒀭𒀭"],
-    ])
   })
 
   it("lists a sign's variants", () => {
@@ -124,29 +108,32 @@ describe("SignDatabase", () => {
   it("knows how many signs the longest sequence has", () => {
     expect(db.longestSequence).toBe(2)
   })
-
-  it("lets lookup find a sign by its Unicode name, when that differs", () => {
-    const names = (char: string) =>
-      db.lookupEntries.find((e) => e.chars === char)?.names
-    expect(names("𒁹")).toEqual(["DIŠ", "DISH"])
-    expect(names("𒀭")).toEqual(["AN"])
-  })
 })
 
-describe("shortUnicodeName", () => {
-  it.each([
-    ["CUNEIFORM SIGN GA2 TIMES AN", "GA2 TIMES AN"],
-    ["CUNEIFORM NUMERIC SIGN THREE ASH", "THREE ASH"],
-    ["CUNEIFORM PUNCTUATION SIGN DIAGONAL COLON", "DIAGONAL COLON"],
-  ])("shortens %s to %s", (name, short) => {
-    expect(shortUnicodeName(name)).toBe(short)
+describe("charsOf", () => {
+  const db = new SignDatabase([], osl)
+
+  it("gives a sign's one character", () => {
+    expect(charsOf(db.sign("𒀭")!)).toBe("𒀭")
+  })
+
+  it("gives all of a sequence's characters", () => {
+    expect(charsOf(db.sequence("𒀭𒀭")!)).toBe("𒀭𒀭")
   })
 })
 
 describe("oslUrl", () => {
-  it("links to the sign's Oracc page", () => {
-    expect(oslUrl({ oslId: "o0000099" })).toBe(
+  const db = new SignDatabase([], osl)
+
+  it("links to a sign's Oracc page", () => {
+    expect(oslUrl(db.sign("𒀭")!)).toBe(
       "https://oracc.museum.upenn.edu/osl/o0000099",
+    )
+  })
+
+  it("links to a sequence's Oracc page", () => {
+    expect(oslUrl(db.sequence("𒀭𒀭")!)).toBe(
+      "https://oracc.museum.upenn.edu/osl/o0000100",
     )
   })
 })

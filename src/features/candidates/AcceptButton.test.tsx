@@ -7,6 +7,7 @@ import type { Sign } from "@/core/signs"
 import { AcceptButton } from "./AcceptButton"
 
 const AN: Sign = {
+  kind: "sign",
   char: "𒀭",
   name: "AN",
   oslId: "o0000099",

@@ -2,15 +2,12 @@
  * Finds signs and sign sequences by name, value, code point or the
  * characters themselves. See docs/lookup.md.
  */
-
-/** Something lookup can find: one sign, or a sequence of signs with readings of its own. */
-export interface LookupEntry {
-  readonly kind: "sign" | "sequence"
-  /** One character for a sign, several for a sequence. */
-  readonly chars: string
-  readonly names: readonly string[]
-  readonly values: readonly string[]
-}
+import {
+  charsOf,
+  type Sign,
+  type SignDatabase,
+  type SignListEntry,
+} from "./signs"
 
 interface Key {
   readonly text: string
@@ -21,20 +18,21 @@ interface Key {
   readonly strict: string
 }
 
-interface IndexedEntry {
-  readonly entry: LookupEntry
+/** A sign or sequence, with the keys it can be found by. */
+interface Indexed {
+  readonly listed: SignListEntry
   readonly keys: readonly Key[]
 }
 
 /** An index for {@link search}, built once by {@link buildIndex}. */
 export interface LookupIndex {
-  readonly entries: readonly IndexedEntry[]
-  readonly byChars: ReadonlyMap<string, LookupEntry>
+  readonly database: SignDatabase
+  readonly indexed: readonly Indexed[]
 }
 
-/** One result of {@link search}: the entry found, and what about it matched. */
+/** One result of {@link search}: the sign or sequence found, and what about it matched. */
 export interface LookupResult {
-  readonly entry: LookupEntry
+  readonly found: SignListEntry
   /** The name or value that matched; null when the query was the characters or a code point. */
   readonly match: {
     readonly text: string
@@ -137,18 +135,44 @@ function keysFor(text: string, kind: Key["kind"]): Key[] {
   return [plain, { ...plain, folded: asNg }]
 }
 
-/** Builds the index {@link search} uses, with a key for each name and value. */
-export function buildIndex(entries: readonly LookupEntry[]): LookupIndex {
+/**
+ * Builds the index {@link search} uses, with a key for each name and value of
+ * every sign and sequence in the database.
+ */
+export function buildIndex(database: SignDatabase): LookupIndex {
+  const listed: SignListEntry[] = [...database.signs, ...database.sequences]
   return {
-    entries: entries.map((entry) => ({
-      entry,
+    database,
+    indexed: listed.map((item) => ({
+      listed: item,
       keys: [
-        ...entry.names.filter(Boolean).flatMap((t) => keysFor(t, "name")),
-        ...entry.values.flatMap((t) => keysFor(t, "value")),
+        ...namesOf(item).flatMap((t) => keysFor(t, "name")),
+        ...item.values.flatMap((t) => keysFor(t, "value")),
       ],
     })),
-    byChars: new Map(entries.map((e) => [e.chars, e])),
   }
+}
+
+/** The OSL name, then for a sign its short Unicode name if that differs. */
+function namesOf(listed: SignListEntry): string[] {
+  switch (listed.kind) {
+    case "sign": {
+      const unicode = listed.unicodeName && shortUnicodeName(listed.unicodeName)
+      return unicode && unicode !== listed.name
+        ? [listed.name, unicode]
+        : [listed.name]
+    }
+    case "sequence":
+      return [listed.name]
+  }
+}
+
+/**
+ * A Unicode name without its common prefix: CUNEIFORM SIGN GA2 TIMES AN is
+ * GA2 TIMES AN, and CUNEIFORM NUMERIC SIGN THREE ASH is THREE ASH.
+ */
+export function shortUnicodeName(name: string): string {
+  return name.replace(/^CUNEIFORM (?:NUMERIC |PUNCTUATION )?SIGN /, "")
 }
 
 function tierOf(folded: string, query: string): Tier | null {
@@ -162,7 +186,7 @@ function tierOf(folded: string, query: string): Tier | null {
 }
 
 interface Hit {
-  readonly entry: LookupEntry
+  readonly found: SignListEntry
   readonly key: Key
   readonly tier: Tier
   /** 0 when the key's exact spelling also matches at this tier, else 1. */
@@ -180,8 +204,8 @@ function compare(a: Hit, b: Hit): number {
     a.spelling - b.spelling ||
     (a.key.kind === "name" ? 0 : 1) - (b.key.kind === "name" ? 0 : 1) ||
     a.key.folded.length - b.key.folded.length ||
-    (a.entry.kind === "sign" ? 0 : 1) - (b.entry.kind === "sign" ? 0 : 1) ||
-    compareChars(a.entry.chars, b.entry.chars)
+    (a.found.kind === "sign" ? 0 : 1) - (b.found.kind === "sign" ? 0 : 1) ||
+    compareChars(charsOf(a.found), charsOf(b.found))
   )
 }
 
@@ -218,28 +242,16 @@ export function search(
 
   const pasted = raw.match(CUNEIFORM)
   if (pasted) {
-    const sequence = index.byChars.get(pasted.join(""))
-    const signs = [...new Set(pasted)].map(
-      (char): LookupEntry =>
-        index.byChars.get(char) ?? {
-          kind: "sign",
-          chars: char,
-          names: [],
-          values: [],
-        },
-    )
-    const entries = sequence?.kind === "sequence" ? [sequence, ...signs] : signs
-    return entries
+    return pastedSigns(index.database, pasted)
       .slice(0, limit)
-      .map((entry) => ({ entry, match: null, tier: Tier.Exact }))
+      .map((found) => ({ found, match: null, tier: Tier.Exact }))
   }
 
   const codePoint = CODE_POINT.exec(raw)?.[1]
   if (codePoint) {
-    const entry = index.byChars.get(
-      String.fromCodePoint(parseInt(codePoint, 16)),
-    )
-    if (entry) return [{ entry, match: null, tier: Tier.Exact }]
+    const char = String.fromCodePoint(parseInt(codePoint, 16))
+    const found = index.database.sign(char)
+    if (found) return [{ found, match: null, tier: Tier.Exact }]
   }
 
   const folded = fold(raw)
@@ -257,12 +269,12 @@ export function search(
       : 1
 
   const hits: Hit[] = []
-  for (const { entry, keys } of index.entries) {
+  for (const { listed, keys } of index.indexed) {
     let best: Hit | undefined
     for (const k of keys) {
       const tier = tierOf(k.folded, folded)
       if (tier === null) continue
-      const hit = { entry, key: k, tier, spelling: spelling(k, tier) }
+      const hit = { found: listed, key: k, tier, spelling: spelling(k, tier) }
       if (!best || compare(hit, best) < 0) best = hit
     }
     if (best) hits.push(best)
@@ -271,9 +283,25 @@ export function search(
   return hits
     .sort(compare)
     .slice(0, limit)
-    .map(({ entry, key: k, tier }) => ({
-      entry,
+    .map(({ found, key: k, tier }) => ({
+      found,
       match: { text: k.text, kind: k.kind },
       tier,
     }))
+}
+
+/**
+ * The signs for pasted characters, in order and without repeats, after the
+ * sequence they spell if there is one. Characters the database doesn't list
+ * are left out.
+ */
+function pastedSigns(
+  database: SignDatabase,
+  chars: readonly string[],
+): SignListEntry[] {
+  const sequence = database.sequence(chars.join(""))
+  const signs = [...new Set(chars)]
+    .map((char) => database.sign(char))
+    .filter((sign): sign is Sign => sign !== undefined)
+  return sequence ? [sequence, ...signs] : signs
 }

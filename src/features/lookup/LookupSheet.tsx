@@ -1,14 +1,8 @@
 import { useMemo, useState } from "react"
 
 import { buildIndex, search } from "@/core/lookup"
-import type { SignDatabase } from "@/core/signs"
+import { charsOf, type SignDatabase, type SignListEntry } from "@/core/signs"
 import { SignInfo } from "@/features/signInfo/SignInfo"
-import {
-  entryChars,
-  entryName,
-  findSignListEntry,
-  type SignListEntry,
-} from "@/features/signInfo/signListEntry"
 import { Button } from "@/ui/Button/Button"
 import { SearchField } from "@/ui/SearchField/SearchField"
 import { Sheet } from "@/ui/Sheet/Sheet"
@@ -29,7 +23,7 @@ export interface LookupSheetProps {
 /**
  * Look up: search signs and sequences by name, value, code point or the
  * characters themselves. Tapping a result appends it, and its ⓘ opens its
- * entry, which can append it too. Appending clears the query. Closing
+ * Sign List entry, which can append it too. Appending clears the query. Closing
  * without appending keeps it, so the sheet opens again on the same results.
  */
 export function LookupSheet({
@@ -39,24 +33,16 @@ export function LookupSheet({
   onAppend,
 }: LookupSheetProps) {
   const [query, setQuery] = useState("")
-  const [entry, setEntry] = useState<SignListEntry>()
+  const [opened, setOpened] = useState<SignListEntry>()
 
-  const index = useMemo(
-    () => database && buildIndex(database.lookupEntries),
-    [database],
-  )
+  const index = useMemo(() => database && buildIndex(database), [database])
   const results = useMemo(
-    () =>
-      index && database
-        ? search(index, query).filter((r) =>
-            findSignListEntry(database, r.entry),
-          )
-        : [],
-    [database, index, query],
+    () => (index ? search(index, query) : []),
+    [index, query],
   )
 
   const close = () => {
-    setEntry(undefined)
+    setOpened(undefined)
     onClose()
   }
 
@@ -67,20 +53,18 @@ export function LookupSheet({
   }
 
   return (
-    <Sheet
-      isOpen={isOpen}
-      onClose={close}
-      title={entry ? entryName(entry) : "Look up"}
-    >
-      {entry && database ? (
+    <Sheet isOpen={isOpen} onClose={close} title={opened?.name ?? "Look up"}>
+      {opened && database ? (
         <div className={styles.view}>
           <div>
-            <Button onPress={() => setEntry(undefined)}>Back to results</Button>
+            <Button onPress={() => setOpened(undefined)}>
+              Back to results
+            </Button>
           </div>
           <SignInfo
-            entry={entry}
+            about={opened}
             database={database}
-            onAppend={() => append(entryChars(entry))}
+            onAppend={() => append(charsOf(opened))}
           />
         </div>
       ) : (
@@ -96,10 +80,8 @@ export function LookupSheet({
           ) : results.length > 0 ? (
             <ResultList
               results={results}
-              onAppend={(result) => append(result.entry.chars)}
-              onInfo={(result) =>
-                setEntry(findSignListEntry(database, result.entry))
-              }
+              onAppend={({ found }) => append(charsOf(found))}
+              onInfo={({ found }) => setOpened(found)}
             />
           ) : (
             <p className={styles.hint}>

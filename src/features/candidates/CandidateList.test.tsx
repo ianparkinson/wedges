@@ -7,7 +7,7 @@ import type { Sign } from "@/core/signs"
 import { CandidateList } from "./CandidateList"
 
 function sign(char: string, name: string): Sign {
-  return { char, name, oslId: name, values: [], samples: [] }
+  return { kind: "sign", char, name, oslId: name, values: [], samples: [] }
 }
 
 const AN = sign("𒀭", "AN")

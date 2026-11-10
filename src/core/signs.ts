@@ -3,7 +3,6 @@
  * character. It is the one place features ask about signs.
  */
 import { groupBy } from "./collections"
-import type { LookupEntry } from "./lookup"
 import { prepareSample, type PreparedSample } from "./matcher/match"
 import { parseSpec } from "./spec"
 import type {
@@ -17,17 +16,37 @@ import type {
 
 /** A sign, with the samples to match drawings against, if it has any. */
 export interface Sign extends OslSign {
+  readonly kind: "sign"
   readonly samples: readonly PreparedSample[]
 }
 
 /** A sequence of signs with readings of its own, such as |PA.TE.SI|, read ensi₂. */
-export type Sequence = OslSequence
+export interface Sequence extends OslSequence {
+  readonly kind: "sequence"
+}
+
+/**
+ * Something with an entry of its own in the Oracc Sign List: one sign, or a
+ * sequence of signs with readings of its own. Both have a name, values and
+ * an OSL page.
+ */
+export type SignListEntry = Sign | Sequence
+
+/** The characters of a sign or sequence: one for a sign, several for a sequence. */
+export function charsOf(listed: SignListEntry): string {
+  switch (listed.kind) {
+    case "sign":
+      return listed.char
+    case "sequence":
+      return listed.chars
+  }
+}
 
 const OSL_PAGE = "https://oracc.museum.upenn.edu/osl/"
 
-/** The sign's page in the Oracc Sign List. */
-export function oslUrl(entry: { readonly oslId: string }): string {
-  return OSL_PAGE + entry.oslId
+/** The page of a sign or sequence in the Oracc Sign List. */
+export function oslUrl(listed: SignListEntry): string {
+  return OSL_PAGE + listed.oslId
 }
 
 /** A character's Unicode code point, written as U+ and hexadecimal: 𒀭 is U+1202D. */
@@ -69,7 +88,6 @@ export class SignDatabase {
   private readonly sequenceByChars: ReadonlyMap<string, Sequence>
   private readonly variantsByBase: ReadonlyMap<string, readonly Sign[]>
   private readonly compoundsByParts: ReadonlyMap<string, readonly Sign[]>
-  private cachedLookupEntries: readonly LookupEntry[] | undefined
 
   /**
    * Joins skeleton files with the Oracc data. Skeletons for a character the
@@ -87,6 +105,7 @@ export class SignDatabase {
 
     this.signs = osl.signs.map((sign) => ({
       ...sign,
+      kind: "sign",
       samples: samples.get(sign.char) ?? [],
     }))
     this.byChar = new Map(this.signs.map((s) => [s.char, s]))
@@ -102,7 +121,10 @@ export class SignDatabase {
       ...this.signs.map((s) => s.compound?.parts.length ?? 0),
     )
 
-    this.sequences = osl.sequences
+    this.sequences = osl.sequences.map((sequence) => ({
+      ...sequence,
+      kind: "sequence",
+    }))
     this.sequenceByChars = new Map(this.sequences.map((s) => [s.chars, s]))
     // Spreading splits a string into whole characters, each two UTF-16 units.
     this.longestSequence = Math.max(
@@ -134,25 +156,6 @@ export class SignDatabase {
   sequence(chars: string): Sequence | undefined {
     return this.sequenceByChars.get(chars)
   }
-
-  /** Signs and sequences for the lookup index, built on first use. */
-  get lookupEntries(): readonly LookupEntry[] {
-    this.cachedLookupEntries ??= [
-      ...this.signs.map((s) => ({
-        kind: "sign" as const,
-        chars: s.char,
-        names: lookupNames(s),
-        values: s.values,
-      })),
-      ...this.sequences.map((s) => ({
-        kind: "sequence" as const,
-        chars: s.chars,
-        names: [s.name],
-        values: s.values,
-      })),
-    ]
-    return this.cachedLookupEntries
-  }
 }
 
 /** The order compounds are offered in, by how their parts combine. */
@@ -163,18 +166,4 @@ function byOperator(a: Sign, b: Sign): number {
   const rank = (sign: Sign) =>
     OPERATOR_ORDER.indexOf(sign.compound?.operator ?? "×")
   return rank(a) - rank(b)
-}
-
-/** The sign's OSL name, then its short Unicode name if that differs. */
-function lookupNames(sign: Sign): string[] {
-  const unicode = sign.unicodeName && shortUnicodeName(sign.unicodeName)
-  return unicode && unicode !== sign.name ? [sign.name, unicode] : [sign.name]
-}
-
-/**
- * A Unicode name without its common prefix: CUNEIFORM SIGN GA2 TIMES AN is
- * GA2 TIMES AN, and CUNEIFORM NUMERIC SIGN THREE ASH is THREE ASH.
- */
-export function shortUnicodeName(name: string): string {
-  return name.replace(/^CUNEIFORM (?:NUMERIC |PUNCTUATION )?SIGN /, "")
 }

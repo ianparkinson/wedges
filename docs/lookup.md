@@ -1,14 +1,14 @@
 # Lookup
 
-How a typed query finds signs and sign sequences by name or value. The implementation is [`src/core/lookup.ts`](../src/core/lookup.ts); the names and values come from the Oracc Sign List data ([sign-data.md](sign-data.md)), through `SignDatabase.lookupEntries` in [`src/core/signs.ts`](../src/core/signs.ts).
+How a typed query finds signs and sign sequences by name or value. The implementation is [`src/core/lookup.ts`](../src/core/lookup.ts); the names and values come from the Oracc Sign List data ([sign-data.md](sign-data.md)), through the `SignDatabase` in [`src/core/signs.ts`](../src/core/signs.ts).
 
 ## What can be searched
 
-Each entry is a sign (one character) or a sequence (several characters with readings of their own, such as PA.TE.SI, read ensi₂). Its keys are its OSL name, its Unicode name without the common prefix (CUNEIFORM SIGN GA2 TIMES AN is `GA2 TIMES AN`, and CUNEIFORM NUMERIC SIGN and CUNEIFORM PUNCTUATION SIGN are dropped too) when that differs from the OSL name, and its values. Unicode names count as names in the ranking. `buildIndex()` folds every key once; `search(index, query, limit)` returns the best `limit` entries (40 by default), each with the key that matched.
+Lookup finds signs (one character each) and sequences (several characters with readings of their own, such as PA.TE.SI, read ensi₂). The keys of each are its OSL name, its Unicode name without the common prefix (CUNEIFORM SIGN GA2 TIMES AN is `GA2 TIMES AN`, and CUNEIFORM NUMERIC SIGN and CUNEIFORM PUNCTUATION SIGN are dropped too) when that differs from the OSL name, and its values. Unicode names count as names in the ranking. `buildIndex(database)` folds every key of every sign and sequence once; `search(index, query, limit)` returns the best `limit` of them (40 by default), each with the key that matched.
 
 Two kinds of query skip the keys:
 
-- **Cuneiform characters,** typed or pasted: the signs for each character, in order and without repeats. When the characters spell a sequence, the sequence comes first.
+- **Cuneiform characters,** typed or pasted: the signs for each character, in order and without repeats, leaving out characters the data doesn't list. When the characters spell a sequence, the sequence comes first.
 - **A code point,** such as `U+1202D` or `1202D`: that sign, if the data has it.
 
 ## Folding
@@ -29,7 +29,7 @@ So `sza`, `sha` and `ša` all find ŠA, `a2` finds a₂, and `ga2xan` finds |GA�
 
 ## Ranking
 
-Each entry is scored by its best key. Keys are matched in tiers, best first:
+Each sign or sequence is scored by its best key. Keys are matched in tiers, best first:
 
 1. **Exact:** the folded key is the query.
 2. **Index:** the key is the query plus an index, for a query that doesn't end in a digit: `dingir` finds dingir₂, and `sag` finds sagₓ.
@@ -46,5 +46,5 @@ Within a tier, results are ordered by:
 
 ## Tests
 
-- `src/core/lookup.test.ts`: folding, each tier and tie-break, code points and pasted characters, on a handful of entries.
+- `src/core/lookup.test.ts`: folding, each tier and tie-break, code points and pasted characters, on a handful of signs and one sequence.
 - `test/lookup.test.ts`: about 30 queries on the real data, each with the sign or sequence that should come first and why: ASCII stand-ins for š, ṣ, ṭ, ḫ and ŋ, values, modified and compound signs, sequences, code points and pasted characters.

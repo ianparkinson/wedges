@@ -59,10 +59,7 @@ describe("SuggestionRow", () => {
     const onOpen = vi.fn()
     renderRow({ sign: si, sequences: [paTeSi] }, { onOpen })
     await userEvent.click(screen.getByRole("button", { name: /ensi₂/ }))
-    expect(onOpen).toHaveBeenCalledExactlyOnceWith({
-      kind: "sequence",
-      sequence: paTeSi,
-    })
+    expect(onOpen).toHaveBeenCalledExactlyOnceWith(paTeSi)
   })
 
   it("offers changes after the entries, each from the signs it replaces to its own, named by what it does", () => {

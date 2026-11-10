@@ -1,24 +1,26 @@
 import { Fragment } from "react"
 
 import {
+  charsOf,
   codePoint,
   modifierName,
   oslUrl,
   type Sign,
   type SignDatabase,
+  type SignListEntry,
 } from "@/core/signs"
 import { Button } from "@/ui/Button/Button"
 import { Link } from "@/ui/Link/Link"
 
 import styles from "./SignInfo.module.css"
-import { entryChars, entryName, type SignListEntry } from "./signListEntry"
 
 /** Props for {@link SignInfo}. */
 export interface SignInfoProps {
-  entry: SignListEntry
+  /** The sign or sequence to show. */
+  about: SignListEntry
   /** Names the signs a sequence is made of. */
   database: SignDatabase
-  /** Adds the entry's characters to the text; leave it out when they are already there. */
+  /** Adds the characters to the text; leave it out when they are already there. */
   onAppend?: () => void
 }
 
@@ -28,10 +30,9 @@ export interface SignInfoProps {
  * variants are related, and a link to its page there. Append, when
  * offered, adds its characters to the text, a sequence's as one sign each.
  */
-export function SignInfo({ entry, database, onAppend }: SignInfoProps) {
-  const chars = entryChars(entry)
-  const { values, formOf, oslId } =
-    entry.kind === "sign" ? entry.sign : entry.sequence
+export function SignInfo({ about, database, onAppend }: SignInfoProps) {
+  const chars = charsOf(about)
+  const { values, formOf } = about
 
   return (
     <div className={styles.panel}>
@@ -40,7 +41,7 @@ export function SignInfo({ entry, database, onAppend }: SignInfoProps) {
       </p>
       {onAppend && (
         <Button onPress={onAppend} isProminent>
-          {entry.kind === "sign" ? "Append" : "Append all"}
+          {about.kind === "sign" ? "Append" : "Append all"}
         </Button>
       )}
       <dl className={styles.facts}>
@@ -56,8 +57,8 @@ export function SignInfo({ entry, database, onAppend }: SignInfoProps) {
             <dd>{formOf}</dd>
           </>
         )}
-        {entry.kind === "sign" ? (
-          <SignFacts sign={entry.sign} database={database} />
+        {about.kind === "sign" ? (
+          <SignFacts sign={about} database={database} />
         ) : (
           <>
             <dt>Signs</dt>
@@ -77,9 +78,7 @@ export function SignInfo({ entry, database, onAppend }: SignInfoProps) {
         )}
       </dl>
       <p className={styles.link}>
-        <Link href={oslUrl({ oslId })}>
-          {entryName(entry)} in the Oracc Sign List
-        </Link>
+        <Link href={oslUrl(about)}>{about.name} in the Oracc Sign List</Link>
       </p>
     </div>
   )
