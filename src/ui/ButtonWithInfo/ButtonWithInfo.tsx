@@ -1,8 +1,9 @@
 import type { ReactNode } from "react"
 
-import { Button } from "../Button/Button"
-import { IconButton } from "../IconButton/IconButton"
-import { InfoIcon } from "../InfoIcon/InfoIcon"
+import { Button } from "@/ui/Button/Button"
+import { IconButton } from "@/ui/IconButton/IconButton"
+import { InfoIcon } from "@/ui/InfoIcon/InfoIcon"
+
 import styles from "./ButtonWithInfo.module.css"
 
 /** Props for {@link ButtonWithInfo}. */

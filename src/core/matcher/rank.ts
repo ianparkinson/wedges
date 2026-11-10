@@ -1,7 +1,8 @@
 /**
  * Ranks signs against a drawing. See docs/matching.md#5-ranking.
  */
-import type { Stroke } from "../strokes"
+import type { Stroke } from "@/core/strokes"
+
 import { match, prepareSample, type Match, type PreparedSample } from "./match"
 import { defaultWeights, type MatchWeights } from "./pairCost"
 

@@ -1,5 +1,6 @@
-import { ArrowIcon } from "../ArrowIcon/ArrowIcon"
-import { Chip } from "../Chip/Chip"
+import { ArrowIcon } from "@/ui/ArrowIcon/ArrowIcon"
+import { Chip } from "@/ui/Chip/Chip"
+
 import styles from "./ReplacementChip.module.css"
 
 /** Props for {@link ReplacementChip}. */

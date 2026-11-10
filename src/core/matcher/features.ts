@@ -2,6 +2,7 @@
  * The few numbers that matching compares for each stroke. See
  * docs/matching.md#2-features.
  */
+import type { Stroke } from "@/core/strokes"
 import {
   bisector,
   direction,
@@ -9,8 +10,6 @@ import {
   midpoint,
   type Point,
 } from "@/lib/geometry"
-
-import type { Stroke } from "../strokes"
 
 /** Keeps a zero-length wedge or leg out of a logarithm. */
 const MIN_LENGTH = 1e-3

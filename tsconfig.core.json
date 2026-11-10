@@ -9,7 +9,8 @@
     "lib": ["ES2023"],
     "types": [],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@test/*": ["./test/*"]
     }
   },
   "include": ["src/core", "src/lib"]

@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from "vitest"
 
 import { type SequenceState } from "@/core/sequence"
 import { SignDatabase } from "@/core/signs"
+import { tapText } from "@test/tapText"
 
-import { tapText } from "../../../test/tapText"
 import { SequencePanel } from "./SequencePanel"
 
 const AN = "𒀭"

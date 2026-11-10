@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 
 import type { SignListEntry } from "@/core/signs"
-
 import {
   AN,
   GA2,
@@ -15,7 +14,8 @@ import {
   SI,
   smallDatabase,
   TE,
-} from "../../../test/smallDatabase"
+} from "@test/smallDatabase"
+
 import { SignInfo } from "./SignInfo"
 
 const ša = smallDatabase.sign(ŠA)!

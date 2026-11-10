@@ -2,7 +2,8 @@ import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 
-import { PA, SI, smallDatabase, TE } from "../../../test/smallDatabase"
+import { PA, SI, smallDatabase, TE } from "@test/smallDatabase"
+
 import { LookupSheet } from "./LookupSheet"
 
 function renderSheet(onAppend = () => {}, onClose = () => {}) {

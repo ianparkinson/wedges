@@ -4,7 +4,8 @@
  */
 import { munkres } from "munkres"
 
-import type { Stroke } from "../strokes"
+import type { Stroke } from "@/core/strokes"
+
 import { strokeFeature, type StrokeFeature } from "./features"
 import { normalize } from "./normalize"
 import { defaultWeights, pairCost, type MatchWeights } from "./pairCost"

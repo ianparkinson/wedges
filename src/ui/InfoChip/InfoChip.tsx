@@ -1,5 +1,6 @@
-import { Chip } from "../Chip/Chip"
-import { InfoIcon } from "../InfoIcon/InfoIcon"
+import { Chip } from "@/ui/Chip/Chip"
+import { InfoIcon } from "@/ui/InfoIcon/InfoIcon"
+
 import styles from "./InfoChip.module.css"
 
 /** Props for {@link InfoChip}. */
