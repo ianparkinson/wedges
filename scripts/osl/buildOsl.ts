@@ -1,21 +1,23 @@
 /**
  * Turns parsed osl.asl entries into the sign data. See docs/sign-data.md.
  */
-import type {
-  OslData,
-  OslSequence,
-  OslSign,
-  VariantModifier,
-} from "@/core/types"
-
+// The Vite config loads this file in plain Node, which knows no @/ alias.
+import { isCuneiform } from "../../src/core/cuneiform.ts"
+import {
+  VARIANT_MODIFIERS,
+  type OslData,
+  type OslSequence,
+  type OslSign,
+  type VariantModifier,
+} from "../../src/core/types.ts"
 import { splitCompound } from "./compoundParts.ts"
 import type { AslEntry } from "./parseAsl.ts"
 
-const CUNEIFORM_START = 0x12000
-const CUNEIFORM_END = 0x1254f
+/** The variant modifier letters, as a regex character class: [gtsn]. */
+const MODIFIER_LETTERS = `[${Object.keys(VARIANT_MODIFIERS).join("")}]`
 
-/** gunû, tenû, šeššig and nutillû: modifiers that make a variant of a sign. */
-const VARIANT_MODIFIER = /^([^|]+)@([gtsn])$/
+/** A variant's name: a sign that isn't a compound, @, and a variant modifier. */
+const VARIANT_NAME = new RegExp(`^([^|]+)@(${MODIFIER_LETTERS})$`)
 
 /** Maps each current sign's name to its character. */
 type CharOfName = ReadonlyMap<string, string>
@@ -45,11 +47,6 @@ function charsOf(entry: AslEntry): string[] {
 
 function codePoint(char: string): number {
   return char.codePointAt(0) ?? 0
-}
-
-function isCuneiform(char: string): boolean {
-  const code = codePoint(char)
-  return code >= CUNEIFORM_START && code <= CUNEIFORM_END
 }
 
 /** The OSL id of an entry's page: a form shares its sign's page. */
@@ -167,7 +164,7 @@ function variantOf(
   name: string,
   charOfName: CharOfName,
 ): Pick<OslSign, "variant"> {
-  const match = VARIANT_MODIFIER.exec(name)
+  const match = VARIANT_NAME.exec(name)
   const base = match ? charOfName.get(match[1]!) : undefined
   if (!match || !base) return {}
   return { variant: { of: base, modifier: match[2] as VariantModifier } }

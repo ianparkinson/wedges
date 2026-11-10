@@ -1,19 +1,11 @@
 /**
  * Reads the parts of a compound sign from its OSL name, such as |GA₂×AN|.
  */
-import type { CompoundOperator } from "@/core/types"
-
-/**
- * OSL's compound operators: × one sign inside another, & one above the
- * other, % crossed, and . and + side by side.
- */
-export const COMPOUND_OPERATORS: readonly CompoundOperator[] = [
-  "×",
-  "&",
-  "%",
-  ".",
-  "+",
-]
+// The Vite config loads this file in plain Node, which knows no @/ alias.
+import {
+  COMPOUND_OPERATORS,
+  type CompoundOperator,
+} from "../../src/core/types.ts"
 
 /** A compound sign's name split into its operator and parts. */
 export interface CompoundName {
