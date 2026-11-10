@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { parseSpec } from "../spec"
+import { parseSpec } from "@/core/spec"
+
 import { match, prepareSample } from "./match"
 import { defaultWeights } from "./pairCost"
 

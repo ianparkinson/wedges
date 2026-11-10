@@ -1,7 +1,8 @@
 import type { ReactNode } from "react"
 import { Dialog, Heading, Modal, ModalOverlay } from "react-aria-components"
 
-import { Button } from "../Button/Button"
+import { Button } from "@/ui/Button/Button"
+
 import styles from "./Sheet.module.css"
 
 /** Props for {@link Sheet}. */

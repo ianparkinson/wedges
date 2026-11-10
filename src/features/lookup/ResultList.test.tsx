@@ -3,12 +3,12 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 
 import { Tier, type LookupResult } from "@/core/lookup"
-
 import {
   AN as AN_CHAR,
   ŠA as ŠA_CHAR,
   smallDatabase,
-} from "../../../test/smallDatabase"
+} from "@test/smallDatabase"
+
 import { ResultList } from "./ResultList"
 
 const ŠA: LookupResult = {

@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 
 import type { Change, Suggestions } from "@/core/suggest"
-
 import {
   AN,
   GA2,
@@ -12,7 +11,8 @@ import {
   SI,
   smallDatabase,
   TE,
-} from "../../../test/smallDatabase"
+} from "@test/smallDatabase"
+
 import { SuggestionRow, type SuggestionRowProps } from "./SuggestionRow"
 
 const si = smallDatabase.sign(SI)!

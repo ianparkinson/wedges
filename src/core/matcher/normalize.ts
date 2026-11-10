@@ -2,7 +2,7 @@
  * Puts a drawing or a skeleton into a standard frame. See
  * docs/matching.md#1-normalisation.
  */
-import { keyPoints, mapPoints, type Stroke } from "../strokes"
+import { keyPoints, mapPoints, type Stroke } from "@/core/strokes"
 
 /** Stops a single point, or a drawing with no extent, dividing by zero. */
 const MIN_SCALE = 1e-6

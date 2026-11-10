@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import type { Stroke } from "../strokes"
+import type { Stroke } from "@/core/strokes"
+
 import { strokeFeature } from "./features"
 import { defaultWeights, pairCost } from "./pairCost"
 

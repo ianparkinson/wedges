@@ -19,6 +19,14 @@ const layer = (/** @type {string} */ name, /** @type {string} */ why) => ({
   group: [`@/${name}`, `@/${name}/**`],
   message: why,
 })
+/**
+ * Code in src reaches another folder through an alias, never `../`, so the
+ * layer patterns above see every import between folders.
+ */
+const parentFolder = {
+  group: ["../*", "../**"],
+  message: "Import from another folder through @/ or @test/, not ../.",
+}
 
 export default defineConfig([
   globalIgnores(["dist", "coverage", "playwright-report", "test-results"]),
@@ -49,7 +57,10 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      "no-restricted-imports": ["error", { paths: [reactAria] }],
+      "no-restricted-imports": [
+        "error",
+        { paths: [reactAria], patterns: [parentFolder] },
+      ],
     },
   },
   {
@@ -65,6 +76,7 @@ export default defineConfig([
             { name: "react-dom", message: "src/core must not use React." },
           ],
           patterns: [
+            parentFolder,
             layer("ui", "src/core must not depend on src/ui."),
             layer("features", "src/core must not depend on src/features."),
             layer("app", "src/core must not depend on src/app."),
@@ -86,6 +98,7 @@ export default defineConfig([
             { name: "react-dom", message: "src/lib must not use React." },
           ],
           patterns: [
+            parentFolder,
             layer("core", "src/lib knows nothing of the app or cuneiform."),
             layer("ui", "src/lib must not depend on src/ui."),
             layer("features", "src/lib must not depend on src/features."),
@@ -102,6 +115,7 @@ export default defineConfig([
         "error",
         {
           patterns: [
+            parentFolder,
             layer(
               "core",
               "src/ui is presentation only; pass data in as props.",
@@ -120,7 +134,10 @@ export default defineConfig([
         "error",
         {
           paths: [reactAria],
-          patterns: [layer("app", "src/features must not depend on src/app.")],
+          patterns: [
+            parentFolder,
+            layer("app", "src/features must not depend on src/app."),
+          ],
         },
       ],
     },

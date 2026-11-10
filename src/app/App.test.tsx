@@ -2,8 +2,9 @@ import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 
-import { drag } from "../../test/drag"
-import { tapText } from "../../test/tapText"
+import { drag } from "@test/drag"
+import { tapText } from "@test/tapText"
+
 import { App } from "./App"
 
 /** Draws AN, 300 pixels across: a vertical wedge, a horizontal one and two diagonals. */
