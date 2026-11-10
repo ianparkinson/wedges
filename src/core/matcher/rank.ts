@@ -40,23 +40,24 @@ export function rank<S extends Rankable>(
   const prepared = prepareSample(drawing)
   const queue = signs
     .filter((sign) => filter?.(sign) ?? true)
-    .map((sign) => ({
-      sign,
-      bound: Math.min(
-        ...sign.samples.map((s) => scoreLowerBound(prepared, s, weights)),
-      ),
-    }))
+    .map((sign) => {
+      const samples = sign.samples.map((sample) => ({
+        sample,
+        bound: scoreLowerBound(prepared, sample, weights),
+      }))
+      return { sign, samples, bound: Math.min(...samples.map((s) => s.bound)) }
+    })
     .sort((a, b) => a.bound - b.bound)
 
   const results: Ranked<S>[] = []
   const topScores: number[] = []
   let cutoff = Infinity
 
-  for (const { sign, bound } of queue) {
+  for (const { sign, samples, bound } of queue) {
     // The queue is in order of bound, so no later sign can make the top
     // `limit` either.
     if (bound > cutoff) break
-    const best = bestMatch(prepared, sign, weights, cutoff)
+    const best = bestMatch(prepared, sign, samples, weights, cutoff)
     if (best) {
       results.push(best)
 
@@ -70,6 +71,12 @@ export function rank<S extends Rankable>(
   return results.sort((a, b) => a.score - b.score).slice(0, limit)
 }
 
+/** A sample, with the lowest score it could get against the drawing. */
+interface BoundedSample {
+  readonly sample: PreparedSample
+  readonly bound: number
+}
+
 /**
  * The best match among the sign's samples, or undefined if none scores
  * within `cutoff`.
@@ -77,15 +84,14 @@ export function rank<S extends Rankable>(
 function bestMatch<S extends Rankable>(
   drawn: PreparedSample,
   sign: S,
+  samples: readonly BoundedSample[],
   weights: MatchWeights,
   cutoff: number,
 ): Ranked<S> | undefined {
   let best: Ranked<S> | undefined
-  for (const sample of sign.samples) {
+  for (const { sample, bound } of samples) {
     const result =
-      scoreLowerBound(drawn, sample, weights) <= cutoff
-        ? match(drawn, sample, weights, cutoff)
-        : null
+      bound <= cutoff ? match(drawn, sample, weights, cutoff) : null
     if (result && (!best || result.score < best.score)) {
       best = { ...result, sign, sample }
     }
@@ -100,10 +106,10 @@ function bestMatch<S extends Rankable>(
  * Winkelhaken with Winkelhaken, is either unpaired or paired with the other
  * kind.
  */
-export function scoreLowerBound(
+function scoreLowerBound(
   drawn: PreparedSample,
   sample: PreparedSample,
-  weights: MatchWeights = defaultWeights,
+  weights: MatchWeights,
 ): number {
   const drawnCount = drawn.features.length
   const sampleCount = sample.features.length
