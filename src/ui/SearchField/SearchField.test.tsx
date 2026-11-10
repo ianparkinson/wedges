@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, it } from "vitest"
@@ -25,6 +25,13 @@ describe("SearchField", () => {
     await userEvent.type(screen.getByRole("searchbox"), "sza")
     await userEvent.click(screen.getByRole("button", { name: "Clear search" }))
     expect(screen.getByRole("searchbox")).toHaveValue("")
+  })
+
+  it("is focused soon after it appears when it autofocuses", async () => {
+    render(
+      <SearchField label="Search" value="" onChange={() => {}} autoFocus />,
+    )
+    await waitFor(() => expect(screen.getByRole("searchbox")).toHaveFocus())
   })
 
   it("has no clear button while empty", () => {
