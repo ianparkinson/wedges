@@ -14,13 +14,14 @@ A mobile-first web app for entering cuneiform. You draw a sign one wedge at a ti
 4. **Tests sit beside the code:** `rank.ts` and `rank.test.ts`. A file with no test beside it should have a reason.
 5. **Small, named pieces:** one component or concept per file, files under about 300 lines, named constants instead of magic numbers.
 6. **Generated files say so in a header** and are rebuilt by a script, never edited by hand.
-7. **Don't change recognition behaviour by accident.** When a PR touches `src/core` or `data/`, the Accuracy Benchmark workflow runs the accuracy benchmark on the PR's base and on the PR, and comments with both results; check them before merging. If a behaviour change is intended, say what changed and why in the PR description.
+7. **Don't change recognition behaviour by accident.** When a PR touches `src/core`, `src/lib` or `data/`, the Accuracy Benchmark workflow runs the accuracy benchmark on the PR's base and on the PR, and comments with both results; check them before merging. If a behaviour change is intended, say what changed and why in the PR description.
 8. **Record decisions.** A choice that someone later might want to revisit gets a short file in `docs/decisions/`.
 
 ## Layers
 
 ```
 src/
+  lib/       pure TypeScript helpers that know nothing of the app: geometry, collections, numbers
   core/      pure TypeScript: recognition, matching, lookup, sequence editing
   ui/        thin wrappers over React Aria Components, styled with CSS Modules
   features/  the app's panels: drawing, candidates, sequence, sign info, lookup
@@ -29,7 +30,8 @@ src/
 
 Dependencies point one way only:
 
-- `core` imports nothing outside `core`: no React, no DOM. Its own tsconfig (`tsconfig.core.json`) leaves the DOM out of `lib`, so `window` or `document` there is a type error.
+- `lib` imports nothing of ours: no React, no DOM, and nothing about cuneiform or the app. Anything may import it.
+- `core` imports nothing outside `core` and `lib`: no React, no DOM. Their tsconfig (`tsconfig.core.json`) leaves the DOM out of its `lib` setting, so `window` or `document` there is a type error.
 - `ui` imports neither `core` nor `features`. It takes data as props.
 - `features` use `ui` and `core`.
 - `app` puts the features together.
@@ -58,7 +60,7 @@ Follow the [Google TypeScript Style Guide](https://google.github.io/styleguide/t
 Where we differ from the guide:
 
 - **File names** are camelCase (`pairCost.ts`), not snake_case. Component files are PascalCase, named after the component they export (`Link/Link.tsx`), as is usual in React projects.
-- **Imports** between folders of `src` use the `@/` alias (`@/core/geometry`), not long relative paths. Within a folder, import relatively.
+- **Imports** between folders of `src` use the `@/` alias (`@/lib/geometry`), not long relative paths. Within a folder, import relatively.
 - **A `switch` over every member of a union needs no `default`**, so the compiler reports a case that a new member leaves unhandled.
 
 Beyond the guide:
@@ -77,7 +79,7 @@ Beyond the guide:
 - **Break a function up** instead of nesting loops with `break` and `continue`, or when it runs through several stages: named helpers make the flow readable.
 - **Only what's needed now.** No functions the current work doesn't use, no defensive errors a user can't act on, no copies of `readonly` data.
 - **Prefer to avoid parameters passed just to build an error message**. Throw, and let the caller add context.
-- **Reuse before writing.** Prefer a standard tool or package to bespoke code outside the problem domain, and look for an existing helper first.
+- **Reuse before writing.** Prefer a standard tool or package to bespoke code outside the problem domain, and look for an existing helper first: generic helpers (points and angles, collections, numbers) are in `src/lib`. A new helper that knows nothing of cuneiform or the app goes there too, with its tests.
 
 ## Comments
 
@@ -94,7 +96,7 @@ Write for an experienced software engineer who is new to this project and to cun
 
 | Level                 | Tool                             | Runs                                        |
 | --------------------- | -------------------------------- | ------------------------------------------- |
-| Unit (`src/core`)     | Vitest                           | every PR, in `npm run check`                |
+| Unit (`core`, `lib`)  | Vitest                           | every PR, in `npm run check`                |
 | Component             | Vitest and React Testing Library | every PR, in `npm run check`                |
 | E2E and accessibility | Playwright, axe-core             | every PR, in CI                             |
 | Accuracy benchmark    | `npm run bench:accuracy`         | in CI, on PRs that could change recognition |

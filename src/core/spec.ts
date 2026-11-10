@@ -2,7 +2,8 @@
  * The spec notation for sign skeletons: strokes as compact text, such as
  * "w 5.1 0.1 5.1 10; h 2.8 5.8 8 2.16 8 9.44". See docs/skeleton-format.md.
  */
-import type { Point } from "./geometry"
+import type { Point } from "@/lib/geometry"
+
 import type { Stroke } from "./strokes"
 
 const WEDGE_OP = "w"

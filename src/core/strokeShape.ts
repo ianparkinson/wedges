@@ -3,7 +3,8 @@
  * triangular head with a thin tail, and a Winkelhaken is an arrowhead with a
  * notch between its legs.
  */
-import { distance, midpoint, pointBetween, type Point } from "./geometry"
+import { distance, midpoint, pointBetween, type Point } from "@/lib/geometry"
+
 import type { Stroke, Wedge, Winkelhaken } from "./strokes"
 
 /** A wedge's head is never deeper than this fraction of its length. */

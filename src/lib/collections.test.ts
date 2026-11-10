@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { groupBy } from "./collections"
+import { groupBy } from "@/lib/collections"
 
 describe("groupBy", () => {
   it("groups items by their key, keeping their order", () => {

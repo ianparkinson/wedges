@@ -2,8 +2,8 @@
  * Synthetic finger traces: turns skeleton strokes into noisy point lists, as
  * a person might draw them, for tests.
  */
-import type { Point } from "@/core/geometry"
 import type { Stroke } from "@/core/strokes"
+import type { Point } from "@/lib/geometry"
 
 import type { Random } from "./random"
 

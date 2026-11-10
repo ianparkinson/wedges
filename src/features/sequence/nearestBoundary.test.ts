@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import type { Box } from "@/core/geometry"
+import type { Box } from "@/lib/geometry"
 
 import { nearestBoundary } from "./nearestBoundary"
 

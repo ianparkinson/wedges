@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { segmentDistance } from "./geometry"
+import { segmentDistance } from "@/lib/geometry"
+
 import type { Wedge, Winkelhaken } from "./strokes"
 import { strokeOutline } from "./strokeShape"
 

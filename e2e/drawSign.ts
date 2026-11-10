@@ -1,9 +1,9 @@
 import type { Locator, Page } from "@playwright/test"
 
 import noto from "../data/skeletons/noto.json" with { type: "json" }
-import type { Point } from "../src/core/geometry"
 import { parseSpec } from "../src/core/spec"
 import type { Stroke } from "../src/core/strokes"
+import type { Point } from "../src/lib/geometry"
 
 /** Skeletons span 0 to 10 in each direction. */
 const SKELETON_SIZE = 10

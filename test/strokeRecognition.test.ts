@@ -4,8 +4,8 @@
  */
 import { describe, expect, it } from "vitest"
 
-import { distance, type Point } from "@/core/geometry"
 import { classifyTrace, type Stroke } from "@/core/strokes"
+import { distance, type Point } from "@/lib/geometry"
 
 import { Random } from "./synthetic/random"
 import { synthesizeTrace } from "./synthetic/traces"

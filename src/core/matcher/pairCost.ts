@@ -2,7 +2,8 @@
  * The cost of pairing one drawn stroke with one skeleton stroke. See
  * docs/matching.md#3-cost-of-pairing-two-strokes.
  */
-import { angleDifference, distance } from "../geometry"
+import { angleDifference, distance } from "@/lib/geometry"
+
 import type { StrokeFeature } from "./features"
 
 /** Weights for {@link pairCost}. Positions are in the normalised frame, where a sign is 1 across. */

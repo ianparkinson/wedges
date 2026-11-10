@@ -7,8 +7,8 @@ import {
 } from "react"
 import { useMediaQuery } from "usehooks-ts"
 
-import type { Point } from "@/core/geometry"
 import { classifyTrace, type Stroke } from "@/core/strokes"
+import type { Point } from "@/lib/geometry"
 
 import styles from "./DrawingPad.module.css"
 import { paintPad } from "./paint"

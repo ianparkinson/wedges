@@ -2,7 +2,8 @@
  * The sign database: the skeletons joined with the Oracc Sign List data, by
  * character. It is the one place features ask about signs.
  */
-import { groupBy } from "./collections"
+import { groupBy } from "@/lib/collections"
+
 import { prepareSample, type PreparedSample } from "./matcher/match"
 import { parseSpec } from "./spec"
 import {

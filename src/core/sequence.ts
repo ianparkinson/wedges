@@ -5,7 +5,7 @@
  * sending the same actions.
  */
 
-import { clamp } from "./geometry"
+import { clamp } from "@/lib/numbers"
 
 /**
  * The text being written: signs, with a cursor. Not to be confused with a

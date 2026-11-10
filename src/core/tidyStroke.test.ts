@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { distance, type Point } from "./geometry"
+import { distance, type Point } from "@/lib/geometry"
+
 import type { Wedge, Winkelhaken } from "./strokes"
 import { tidyStroke } from "./tidyStroke"
 

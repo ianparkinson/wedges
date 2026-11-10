@@ -1,6 +1,6 @@
-# 0004: Three layers with one-way dependencies
+# 0004: Layers with one-way dependencies
 
-- **Date:** 3 November 2026
+- **Date:** 3 November 2026, updated 10 November 2026 for `lib` ([0010](0010-lib-layer.md))
 - **Status:** accepted
 
 ## Context
@@ -11,7 +11,8 @@ The recognition code should stay usable outside this app, for example by a futur
 
 The code splits into `src/core`, `src/ui` and `src/features`, with `src/app` putting them together:
 
-- `core` is pure TypeScript and imports nothing outside itself: no React, no DOM.
+- `lib` holds pure TypeScript helpers that know nothing of the app, such as geometry. It imports nothing of ours, and anything may import it.
+- `core` is pure TypeScript and imports nothing outside itself and `lib`: no React, no DOM.
 - `ui` is presentation only and imports neither `core` nor `features`.
 - `features` use `ui` and `core`. `app` uses everything.
 
@@ -19,7 +20,7 @@ This is enforced by tools, not convention: `no-restricted-imports` rules in `esl
 
 ## Consequences
 
-When the tracing app starts, `core/` and `data/` can move into a shared package in an npm workspace without untangling anything. Until then a single app is simpler.
+When the tracing app starts, `core/`, `lib/` and `data/` can move into a shared package in an npm workspace without untangling anything. Until then a single app is simpler.
 
 ## Revisit when
 
