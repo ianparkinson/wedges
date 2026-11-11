@@ -8,6 +8,9 @@ import {
 
 import styles from "./SearchField.module.css"
 
+/** Animation frames to wait before autofocusing on Android. */
+const FOCUS_DELAY_FRAMES = 3
+
 /** Props for {@link SearchField}. */
 export interface SearchFieldProps {
   label: string
@@ -38,24 +41,31 @@ export function SearchField({
   const inputRef = useRef<HTMLInputElement>(null)
   useImperativeHandle(ref, () => inputRef.current!, [])
 
-  // Focusing the field before it has been painted opens Android's keyboard
+  // On Android, focusing the field before it is on screen opens the keyboard
   // first, and Chrome keeps showing the old screen until the keyboard is fully
-  // open. The field is rendered in the task that showed it, and the first
-  // animation frame callback runs before that frame is painted, so it is still
-  // too early. The second runs a frame later, once the field is on screen.
+  // open. This effect runs before the browser paints the field, so there wait
+  // a few animation frames: on a phone, two proved too few.
   //
-  // iOS only opens the keyboard for focus given while handling a tap, so there
-  // the field is focused straight away.
+  // Elsewhere the field is focused straight away. iOS needs that, as it only
+  // opens the keyboard for focus given while handling a tap.
   useLayoutEffect(() => {
     if (!autoFocus) return
 
-    if (isIOS()) {
-      inputRef.current?.focus()
-    } else {
-      let frame = requestAnimationFrame(() => {
-        frame = requestAnimationFrame(() => inputRef.current?.focus())
-      })
+    if (isAndroid()) {
+      let frame = 0
+      const focusAfter = (frames: number) => {
+        frame = requestAnimationFrame(() => {
+          if (frames > 1) {
+            focusAfter(frames - 1)
+          } else {
+            inputRef.current?.focus()
+          }
+        })
+      }
+      focusAfter(FOCUS_DELAY_FRAMES)
       return () => cancelAnimationFrame(frame)
+    } else {
+      inputRef.current?.focus()
     }
   }, [autoFocus])
 
@@ -92,11 +102,7 @@ export function SearchField({
   )
 }
 
-/** Whether this is an iPhone or iPad, including an iPad that says it is a Mac. */
-function isIOS(): boolean {
-  const { platform, maxTouchPoints } = navigator
-  return (
-    /^(iPhone|iPad|iPod)/.test(platform) ||
-    (platform === "MacIntel" && maxTouchPoints > 1)
-  )
+/** Whether this is an Android phone or tablet. */
+function isAndroid(): boolean {
+  return /Android/.test(navigator.userAgent)
 }

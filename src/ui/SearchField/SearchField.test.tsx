@@ -31,20 +31,22 @@ describe("SearchField", () => {
     expect(screen.getByRole("searchbox")).toHaveValue("")
   })
 
-  it("autofocuses once it has been drawn", async () => {
+  it("autofocuses straight away", () => {
+    render(
+      <SearchField label="Search" value="" onChange={() => {}} autoFocus />,
+    )
+    expect(screen.getByRole("searchbox")).toHaveFocus()
+  })
+
+  it("autofocuses a few frames later on Android, once it is on screen", async () => {
+    vi.spyOn(navigator, "userAgent", "get").mockReturnValue(
+      "Mozilla/5.0 (Linux; Android 16; Pixel 7) Mobile",
+    )
     render(
       <SearchField label="Search" value="" onChange={() => {}} autoFocus />,
     )
     expect(screen.getByRole("searchbox")).not.toHaveFocus()
     await waitFor(() => expect(screen.getByRole("searchbox")).toHaveFocus())
-  })
-
-  it("autofocuses straight away on an iPhone, so its keyboard opens", () => {
-    vi.spyOn(navigator, "platform", "get").mockReturnValue("iPhone")
-    render(
-      <SearchField label="Search" value="" onChange={() => {}} autoFocus />,
-    )
-    expect(screen.getByRole("searchbox")).toHaveFocus()
   })
 
   it("has no clear button while empty", () => {
