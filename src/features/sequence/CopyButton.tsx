@@ -2,8 +2,7 @@ import { useState } from "react"
 import { useCopyToClipboard, useTimeout } from "usehooks-ts"
 
 import { Button } from "@/ui/Button/Button"
-
-import styles from "./CopyButton.module.css"
+import { ScreenReaderStatus } from "@/ui/ScreenReaderStatus/ScreenReaderStatus"
 
 /** How long the button says whether it copied, in milliseconds. */
 const CONFIRMATION_MS = 2000
@@ -41,9 +40,7 @@ export function CopyButton({ text }: CopyButtonProps) {
       >
         {label(outcome)}
       </Button>
-      <span className={styles.status} role="status">
-        {outcome === "none" ? "" : label(outcome)}
-      </span>
+      <ScreenReaderStatus message={outcome === "none" ? "" : label(outcome)} />
     </>
   )
 }
