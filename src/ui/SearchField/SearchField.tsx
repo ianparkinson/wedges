@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useRef, type Ref } from "react"
+import { useImperativeHandle, useLayoutEffect, useRef, type Ref } from "react"
 import {
   Button as AriaButton,
   SearchField as AriaSearchField,
@@ -43,12 +43,20 @@ export function SearchField({
   // open. The field is rendered in the task that showed it, and the first
   // animation frame callback runs before that frame is painted, so it is still
   // too early. The second runs a frame later, once the field is on screen.
-  useEffect(() => {
+  //
+  // iOS only opens the keyboard for focus given while handling a tap, so there
+  // the field is focused straight away.
+  useLayoutEffect(() => {
     if (!autoFocus) return
-    let frame = requestAnimationFrame(() => {
-      frame = requestAnimationFrame(() => inputRef.current?.focus())
-    })
-    return () => cancelAnimationFrame(frame)
+
+    if (isIOS()) {
+      inputRef.current?.focus()
+    } else {
+      let frame = requestAnimationFrame(() => {
+        frame = requestAnimationFrame(() => inputRef.current?.focus())
+      })
+      return () => cancelAnimationFrame(frame)
+    }
   }, [autoFocus])
 
   return (
@@ -81,5 +89,14 @@ export function SearchField({
         )}
       </div>
     </AriaSearchField>
+  )
+}
+
+/** Whether this is an iPhone or iPad, including an iPad that says it is a Mac. */
+function isIOS(): boolean {
+  const { platform, maxTouchPoints } = navigator
+  return (
+    /^(iPhone|iPad|iPod)/.test(platform) ||
+    (platform === "MacIntel" && maxTouchPoints > 1)
   )
 }
