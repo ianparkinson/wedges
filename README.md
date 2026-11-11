@@ -4,7 +4,13 @@ Find cuneiform signs by drawing them, or look them up in the [Oracc Sign List](h
 
 Draw a sign one wedge at a time and pick it from the top three candidates, build up a sequence of signs and copy it, or search for a sign by name or value. Wedges is a mobile-first web app.
 
-**Status:** in development. On the live site at https://ianparkinson.github.io/wedges/ you can draw a sign and pick it; sequences and lookup are on their way.
+**Try it at [ianparkinson.github.io/wedges](https://ianparkinson.github.io/wedges/).**
+
+## Current limitations
+
+- Signs are drawn and shown in one font, Noto Sans Cuneiform, so a sign is recognised only when it is drawn the way Noto writes it.
+- Not every sign can be drawn yet. Those that can't can still be found with Look up.
+- The skeletons used for recognition were traced by hand and are scruffy, with uneven lengths and angles, so some signs are harder to draw than they should be.
 
 ## Development
 

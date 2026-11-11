@@ -26,7 +26,7 @@ describe("DrawingPanel", () => {
         onStrokesChange={onStrokesChange}
       />,
     )
-    await userEvent.click(screen.getByRole("button", { name: "Undo stroke" }))
+    await userEvent.click(screen.getByRole("button", { name: "Undo" }))
     expect(onStrokesChange).toHaveBeenCalledWith([horizontal])
   })
 
@@ -44,7 +44,7 @@ describe("DrawingPanel", () => {
 
   it("disables undo and clear while the pad is empty", () => {
     render(<DrawingPanel strokes={[]} onStrokesChange={() => {}} />)
-    expect(screen.getByRole("button", { name: "Undo stroke" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "Undo" })).toBeDisabled()
     expect(screen.getByRole("button", { name: "Clear" })).toBeDisabled()
   })
 

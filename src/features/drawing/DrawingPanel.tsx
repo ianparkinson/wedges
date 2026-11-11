@@ -39,7 +39,7 @@ export function DrawingPanel({
           onPress={() => onStrokesChange(strokes.slice(0, -1))}
           isDisabled={empty}
         >
-          Undo stroke
+          Undo
         </Button>
         <Button onPress={() => onStrokesChange([])} isDisabled={empty}>
           Clear

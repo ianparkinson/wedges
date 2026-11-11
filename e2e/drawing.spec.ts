@@ -14,7 +14,7 @@ test("each stroke drawn on the pad stays there until undone or cleared", async (
   await drawSign(page, pad, AN)
   await expect(pad).toHaveAccessibleName("Drawing pad, 4 strokes")
 
-  await page.getByRole("button", { name: "Undo stroke" }).click()
+  await page.getByRole("button", { name: "Undo" }).click()
   await expect(pad).toHaveAccessibleName("Drawing pad, 3 strokes")
 
   await page.getByRole("button", { name: "Clear", exact: true }).click()
