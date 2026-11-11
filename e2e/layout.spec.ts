@@ -40,6 +40,20 @@ test("the text, suggestions, pad and candidates all fit on the screen", async ({
   }
 })
 
+test("the candidates share the pad's width", async ({ page }) => {
+  await page.goto("./")
+  const pad = page.getByRole("img", { name: /Drawing pad/ })
+  await drawSign(page, pad, AN)
+
+  const rows = page.getByRole("region", { name: "Candidates" }).getByRole("row")
+  await expect(rows).toHaveCount(3)
+  const padBox = (await pad.boundingBox())!
+  const first = (await rows.first().boundingBox())!
+  const last = (await rows.last().boundingBox())!
+  expect(first.x).toBeCloseTo(padBox.x, 0)
+  expect(last.x + last.width).toBeCloseTo(padBox.x + padBox.width, 0)
+})
+
 test("nothing sticks out sideways on a narrow phone", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 })
   await page.goto("./")
