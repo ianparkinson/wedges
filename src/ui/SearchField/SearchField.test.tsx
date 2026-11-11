@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
-import { describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { SearchField } from "./SearchField"
 
@@ -11,6 +11,10 @@ function Field() {
 }
 
 describe("SearchField", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("is a search box named by its label", async () => {
     render(<Field />)
     await userEvent.type(
@@ -27,11 +31,20 @@ describe("SearchField", () => {
     expect(screen.getByRole("searchbox")).toHaveValue("")
   })
 
-  it("is focused soon after it appears when it autofocuses", async () => {
+  it("autofocuses once it has been drawn", async () => {
     render(
       <SearchField label="Search" value="" onChange={() => {}} autoFocus />,
     )
+    expect(screen.getByRole("searchbox")).not.toHaveFocus()
     await waitFor(() => expect(screen.getByRole("searchbox")).toHaveFocus())
+  })
+
+  it("autofocuses straight away on an iPhone, so its keyboard opens", () => {
+    vi.spyOn(navigator, "platform", "get").mockReturnValue("iPhone")
+    render(
+      <SearchField label="Search" value="" onChange={() => {}} autoFocus />,
+    )
+    expect(screen.getByRole("searchbox")).toHaveFocus()
   })
 
   it("has no clear button while empty", () => {
