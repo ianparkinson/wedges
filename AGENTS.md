@@ -112,6 +112,7 @@ Write for an experienced software engineer who is new to this project and to cun
 - `e2e/`: Playwright specs.
 - `test/`: test setup, and tests that use seeded synthetic drawings from `synthetic/`.
 - `scripts/`: Node scripts, run with `tsx`.
+- `public/`: files served as they are, such as the favicon. The build renders the home-screen icon from the favicon (`scripts/touchIcon/`).
 - `.github/workflows/`: `ci.yml` (every PR and push to `main`) and `deploy.yml` (deploys `main` to GitHub Pages after CI passes).
 
 ## Data and licences

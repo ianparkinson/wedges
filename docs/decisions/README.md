@@ -15,3 +15,4 @@ One short file per decision that someone might later want to revisit: what was d
 | [0009](0009-vm-threads-pool.md)        | Run unit tests in Vitest's `vmThreads` pool      | accepted |
 | [0010](0010-lib-layer.md)              | Generic helpers in `src/lib`, apart from `core`  | accepted |
 | [0011](0011-back-closes-sheets.md)     | Back closes the open sheet                       | accepted |
+| [0012](0012-touch-icon-at-build.md)    | Render the home-screen icon at build time        | accepted |

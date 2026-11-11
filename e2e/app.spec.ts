@@ -10,6 +10,17 @@ test("the app loads with an empty drawing pad", async ({ page }) => {
   ).toBeVisible()
 })
 
+test("the page's icons are served", async ({ page, request }) => {
+  await page.goto("./")
+  const icons = page.locator('link[rel="icon"], link[rel="apple-touch-icon"]')
+  await expect(icons).toHaveCount(2)
+  for (const href of await icons.evaluateAll((links) =>
+    links.map((link) => (link as HTMLLinkElement).href),
+  )) {
+    expect((await request.get(href)).ok(), href).toBe(true)
+  }
+})
+
 test("the app has no serious accessibility violations", async ({ page }) => {
   await page.goto("./")
   const results = await new AxeBuilder({ page }).analyze()
