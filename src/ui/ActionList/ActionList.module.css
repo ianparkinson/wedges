@@ -1,0 +1,76 @@
+/* Holds the key handler only, and takes no part in the layout. */
+.wrapper {
+  display: contents;
+}
+
+.list {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.vertical {
+  flex-direction: column;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: center;
+  cursor: pointer;
+}
+
+.prominent {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* In a row, the main choice gets more of the width. */
+.horizontal > .prominent {
+  flex: 1.5;
+}
+
+.item[data-pressed] {
+  background: var(--color-bg);
+}
+
+.item[data-focus-visible] {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* The content is clipped where it is too wide for the item. */
+.content {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.info {
+  position: absolute;
+  right: 0;
+}
+
+.horizontal .info {
+  top: 0;
+}
+
+/* Room is kept for the ⓘ, so the content never runs under it. */
+.vertical > .item {
+  justify-content: flex-start;
+  padding-inline-end: var(--touch-target);
+  text-align: start;
+}
+
+.vertical .info {
+  top: 50%;
+  transform: translateY(-50%);
+}

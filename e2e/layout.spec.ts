@@ -28,7 +28,7 @@ test("the text, suggestions, pad and candidates all fit on the screen", async ({
   await drawSign(page, pad, AN)
 
   const candidates = page.getByRole("region", { name: "Candidates" })
-  await expect(candidates.getByRole("listitem")).toHaveCount(3)
+  await expect(candidates.getByRole("row")).toHaveCount(3)
   for (const part of [
     page.getByRole("region", { name: "Text" }),
     page.getByRole("group", { name: "Suggestions" }),

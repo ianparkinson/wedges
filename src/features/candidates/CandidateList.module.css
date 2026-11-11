@@ -7,20 +7,10 @@
 .list {
   display: flex;
   min-height: var(--candidate-height);
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
-.item {
-  display: flex;
+.list > * {
   flex: 1;
-  min-width: 0;
-}
-
-.item:first-child {
-  flex: 1.5;
 }
 
 .content {
@@ -36,7 +26,7 @@
   line-height: 1.2;
 }
 
-.item:first-child .glyph {
+.best {
   font-size: var(--text-glyph);
 }
 

@@ -37,9 +37,7 @@ describe("App", () => {
 
     drawAN(pad)
     const candidates = screen.getByRole("region", { name: "Candidates" })
-    expect(within(candidates).getAllByRole("button")[0]).toHaveAccessibleName(
-      "AN",
-    )
+    expect(within(candidates).getAllByRole("row")[0]).toHaveAccessibleName("AN")
 
     await userEvent.click(screen.getByRole("button", { name: "Accept" }))
     expect(screen.getByRole("option", { name: "AN" })).toBeVisible()
@@ -80,8 +78,8 @@ describe("App", () => {
     await screen.findByText(/Draw a sign/)
     await userEvent.click(screen.getByRole("button", { name: "Look up" }))
     await userEvent.type(screen.getByRole("searchbox"), "sza")
-    const results = screen.getByRole("list", { name: "Results" })
-    await userEvent.click(within(results).getByRole("button", { name: "ŠA" }))
+    const results = screen.getByRole("grid", { name: "Results" })
+    await userEvent.click(within(results).getByRole("row", { name: "ŠA" }))
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
     expect(screen.getByRole("option", { name: "ŠA" })).toBeVisible()
