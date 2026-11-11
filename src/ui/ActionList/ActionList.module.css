@@ -1,10 +1,16 @@
-/* Holds the key handler only, and takes no part in the layout. */
+/*
+ * Holds the key handler, and is what the parent lays out: the list fills it,
+ * so the list fills whatever room the parent gives the component.
+ */
 .wrapper {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .list {
   display: flex;
+  flex: 1;
   gap: var(--space-2);
 }
 
