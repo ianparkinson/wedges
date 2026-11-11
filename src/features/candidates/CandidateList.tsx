@@ -1,5 +1,6 @@
 import type { Sign } from "@/core/signs"
 import { ButtonWithInfo } from "@/ui/ButtonWithInfo/ButtonWithInfo"
+import { ScreenReaderStatus } from "@/ui/ScreenReaderStatus/ScreenReaderStatus"
 
 import styles from "./CandidateList.module.css"
 
@@ -16,7 +17,7 @@ export interface CandidateListProps {
 /**
  * The signs that best match the drawing, each with its glyph and name, the
  * best one largest. Tapping one picks it; the ⓘ in its corner opens its
- * entry instead.
+ * entry instead. Screen readers hear the candidates' names as they change.
  */
 export function CandidateList({
   candidates,
@@ -26,6 +27,7 @@ export function CandidateList({
 }: CandidateListProps) {
   return (
     <section className={styles.panel} aria-label="Candidates">
+      <ScreenReaderStatus message={announcement(candidates)} />
       {candidates.length > 0 ? (
         <ul className={styles.list}>
           {candidates.map((sign, i) => (
@@ -53,4 +55,10 @@ export function CandidateList({
       )}
     </section>
   )
+}
+
+function announcement(candidates: readonly Sign[]): string {
+  return candidates.length > 0
+    ? `Candidates: ${candidates.map((sign) => sign.name).join(", ")}`
+    : ""
 }

@@ -87,4 +87,30 @@ describe("CandidateList", () => {
     )
     expect(screen.getByText("Loading signs…")).toBeInTheDocument()
   })
+
+  it("tells screen readers the candidates' names", () => {
+    render(
+      <CandidateList
+        candidates={[AN, MAŠ, BAD]}
+        isLoading={false}
+        onPick={() => {}}
+        onInfo={() => {}}
+      />,
+    )
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Candidates: AN, MAŠ, BAD",
+    )
+  })
+
+  it("tells screen readers nothing without candidates", () => {
+    render(
+      <CandidateList
+        candidates={[]}
+        isLoading={false}
+        onPick={() => {}}
+        onInfo={() => {}}
+      />,
+    )
+    expect(screen.getByRole("status")).toBeEmptyDOMElement()
+  })
 })
