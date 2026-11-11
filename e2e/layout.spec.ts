@@ -40,6 +40,21 @@ test("the text, suggestions, pad and candidates all fit on the screen", async ({
   }
 })
 
+test("nothing sticks out sideways on a narrow phone", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 })
+  await page.goto("./")
+  const pad = page.getByRole("img", { name: /Drawing pad/ })
+  await expect(page.getByText(/Draw a sign/)).toBeVisible()
+  await drawSign(page, pad, AN)
+
+  // Accept is at its widest when it shows a candidate.
+  await expect(page.getByRole("button", { name: "Accept" })).toBeEnabled()
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - window.innerWidth,
+  )
+  expect(overflow).toBe(0)
+})
+
 test("the pad stops growing on a very tall screen", async ({ page }) => {
   await page.setViewportSize({ width: 412, height: 1600 })
   await page.goto("./")
