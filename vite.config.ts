@@ -4,13 +4,14 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vitest/config"
 
 import { oslPlugin } from "./scripts/osl/vitePlugin.ts"
+import { touchIconPlugin } from "./scripts/touchIcon/vitePlugin.ts"
 
 // GitHub Pages serves the site from https://ianparkinson.github.io/wedges/.
 const base = "/wedges/"
 
 export default defineConfig({
   base,
-  plugins: [react(), oslPlugin()],
+  plugins: [react(), oslPlugin(), touchIconPlugin()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
