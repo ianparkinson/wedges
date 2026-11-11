@@ -1,11 +1,21 @@
-import { render, screen, waitFor } from "@testing-library/react"
+import { cleanup, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { StrictMode } from "react"
-import { describe, expect, it, vi } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { Sheet } from "./Sheet"
 
 describe("Sheet", () => {
+  // A sheet left open pops its history entry as it unmounts, but the pop lands
+  // in a later task. Wait for it, so that the next test starts on the app's
+  // own entry and its back isn't swallowed by the pending one.
+  afterEach(async () => {
+    cleanup()
+    await waitFor(() => {
+      expect(history.state).toBeNull()
+    })
+  })
+
   it("is a dialog named by its title", () => {
     render(
       <Sheet isOpen onClose={() => {}} title="Look up">
