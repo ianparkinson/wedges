@@ -6,15 +6,15 @@ import { Button } from "@/ui/Button/Button"
 import { ButtonBar } from "./ButtonBar"
 
 describe("ButtonBar", () => {
-  it("shows its buttons in order", () => {
+  it("shows its buttons in order, with the main one last", () => {
     render(
-      <ButtonBar>
-        <Button onPress={() => {}}>Undo</Button>
+      <ButtonBar end={<Button onPress={() => {}}>Copy</Button>}>
         <Button onPress={() => {}}>Backspace</Button>
+        <Button onPress={() => {}}>Clear</Button>
       </ButtonBar>,
     )
     expect(
       screen.getAllByRole("button").map((button) => button.textContent),
-    ).toEqual(["Undo", "Backspace"])
+    ).toEqual(["Backspace", "Clear", "Copy"])
   })
 })

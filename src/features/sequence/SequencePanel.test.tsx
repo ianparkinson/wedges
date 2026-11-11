@@ -96,7 +96,7 @@ describe("SequencePanel", () => {
       cursorPlaced: false,
     })
     await userEvent.click(screen.getByRole("button", { name: "Backspace" }))
-    await userEvent.click(screen.getByRole("button", { name: "Clear text" }))
+    await userEvent.click(screen.getByRole("button", { name: "Clear" }))
     expect(onAction.mock.calls).toEqual([
       [{ kind: "deleteBackward" }],
       [{ kind: "clear" }],
@@ -126,9 +126,9 @@ describe("SequencePanel", () => {
     expect(setData).not.toHaveBeenCalled()
   })
 
-  it("disables Backspace at the start, and Clear text when empty", () => {
+  it("disables Backspace at the start, and Clear when empty", () => {
     renderPanel({ items: [], cursor: 0, cursorPlaced: false })
     expect(screen.getByRole("button", { name: "Backspace" })).toBeDisabled()
-    expect(screen.getByRole("button", { name: "Clear text" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "Clear" })).toBeDisabled()
   })
 })

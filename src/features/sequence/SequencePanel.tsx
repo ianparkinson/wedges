@@ -83,7 +83,7 @@ export function SequencePanel({
           selectsOnTap={false}
         />
       </div>
-      <ButtonBar>
+      <ButtonBar end={<CopyButton text={sequenceText(sequence)} />}>
         <Button
           onPress={() => onAction({ kind: "deleteBackward" })}
           isDisabled={cursor === 0}
@@ -94,9 +94,8 @@ export function SequencePanel({
           onPress={() => onAction({ kind: "clear" })}
           isDisabled={items.length === 0}
         >
-          Clear text
+          Clear
         </Button>
-        <CopyButton text={sequenceText(sequence)} />
       </ButtonBar>
     </section>
   )

@@ -3,10 +3,18 @@
   gap: var(--space-2);
 }
 
-.bar > button {
-  flex: 1 1 auto;
+/* With very large text, a label breaks rather than being cut off. */
+.bar button {
   min-width: 0;
-  padding-inline: var(--space-2);
-  /* With very large text, a label breaks rather than being cut off. */
   overflow-wrap: anywhere;
+}
+
+.end {
+  display: flex;
+  min-width: var(--main-button-width);
+  margin-inline-start: auto;
+}
+
+.end > button {
+  flex: 1;
 }

@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 
 import type { Stroke } from "@/core/strokes"
 import { Button } from "@/ui/Button/Button"
+import { ButtonBar } from "@/ui/ButtonBar/ButtonBar"
 
 import { DrawingPad } from "./DrawingPad"
 import styles from "./DrawingPanel.module.css"
@@ -10,13 +11,13 @@ import styles from "./DrawingPanel.module.css"
 export interface DrawingPanelProps {
   strokes: readonly Stroke[]
   onStrokesChange: (strokes: readonly Stroke[]) => void
-  /** More buttons, at the right-hand end of the row under the pad. */
+  /** The main button, at the right-hand end of the row under the pad. */
   children?: ReactNode
 }
 
 /**
  * The drawing pad, with buttons to undo the last stroke or clear them all,
- * and any others given at the right-hand end of their row. The pad fills the
+ * and the button given at the right-hand end of their row. The pad fills the
  * panel's width, and is as tall as the space allows, between its minimum and
  * maximum sizes.
  */
@@ -34,7 +35,7 @@ export function DrawingPanel({
           onStroke={(stroke) => onStrokesChange([...strokes, stroke])}
         />
       </div>
-      <div className={styles.actions}>
+      <ButtonBar end={children}>
         <Button
           onPress={() => onStrokesChange(strokes.slice(0, -1))}
           isDisabled={empty}
@@ -44,9 +45,7 @@ export function DrawingPanel({
         <Button onPress={() => onStrokesChange([])} isDisabled={empty}>
           Clear
         </Button>
-        <span className={styles.spacer} />
-        {children}
-      </div>
+      </ButtonBar>
     </section>
   )
 }
