@@ -118,11 +118,9 @@ describe("App", () => {
     ).not.toBeInTheDocument()
   })
 
-  it("links to the source repository", () => {
+  it("opens About from the header", async () => {
     render(<App />)
-    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
-      "href",
-      "https://github.com/ianparkinson/wedges",
-    )
+    await userEvent.click(screen.getByRole("button", { name: "About Wedges" }))
+    expect(screen.getByRole("dialog", { name: "About Wedges" })).toBeVisible()
   })
 })

@@ -41,14 +41,14 @@
   gap: var(--space-2);
 }
 
+/* The help button sits beside the title, the way a footnote would. */
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
 .title {
   margin: 0;
   font-size: var(--text-lg);
-}
-
-.footer {
-  margin: 0;
-  padding-bottom: var(--space-4);
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
 }
