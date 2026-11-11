@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { StrictMode } from "react"
 import { describe, expect, it, vi } from "vitest"
 
 import { Sheet } from "./Sheet"
@@ -45,5 +46,62 @@ describe("Sheet", () => {
     )
     await userEvent.keyboard("{Escape}")
     expect(onClose).toHaveBeenCalledOnce()
+  })
+
+  it("closes when the browser goes back", async () => {
+    const onClose = vi.fn()
+    render(
+      <Sheet isOpen onClose={onClose} title="Look up">
+        Contents
+      </Sheet>,
+    )
+    await waitFor(() => {
+      expect(history.state).not.toBeNull()
+    })
+
+    history.back()
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalledOnce()
+    })
+  })
+
+  it("takes its entry out of the history when it closes some other way", async () => {
+    const { rerender } = render(
+      <Sheet isOpen onClose={() => {}} title="Look up">
+        Contents
+      </Sheet>,
+    )
+    await waitFor(() => {
+      expect(history.state).not.toBeNull()
+    })
+
+    rerender(
+      <Sheet isOpen={false} onClose={() => {}} title="Look up">
+        Contents
+      </Sheet>,
+    )
+    await waitFor(() => {
+      expect(history.state).toBeNull()
+    })
+  })
+
+  it("adds one entry when StrictMode opens it twice", async () => {
+    const onClose = vi.fn()
+    render(
+      <StrictMode>
+        <Sheet isOpen onClose={onClose} title="Look up">
+          Contents
+        </Sheet>
+      </StrictMode>,
+    )
+    await waitFor(() => {
+      expect(history.state).not.toBeNull()
+    })
+
+    history.back()
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalledOnce()
+    })
+    expect(history.state).toBeNull()
   })
 })
