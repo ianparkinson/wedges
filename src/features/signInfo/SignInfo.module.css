@@ -10,6 +10,7 @@
   font-size: var(--text-glyph);
   line-height: 1.2;
   text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .facts {
