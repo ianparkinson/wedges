@@ -20,8 +20,8 @@ test("tapping a sequence adds each of its signs to the text", async ({
   await page.getByRole("button", { name: "Look up" }).click()
   await page.getByRole("searchbox").fill("ensi2")
   await page
-    .getByRole("list", { name: "Results" })
-    .getByRole("button", { name: "|PA.TE.SI| ensi₂" })
+    .getByRole("grid", { name: "Results" })
+    .getByRole("row", { name: "|PA.TE.SI| ensi₂" })
     .click()
 
   const signs = page.getByRole("region", { name: "Text" }).getByRole("option")
@@ -32,11 +32,36 @@ test("Look up has no serious accessibility violations", async ({ page }) => {
   await page.goto("./")
   await page.getByRole("button", { name: "Look up" }).click()
   await page.getByRole("searchbox").fill("sza")
-  await expect(page.getByRole("list", { name: "Results" })).toBeVisible()
+  await expect(page.getByRole("grid", { name: "Results" })).toBeVisible()
 
   const results = await new AxeBuilder({ page }).analyze()
   const serious = results.violations.filter(
     (v) => v.impact === "serious" || v.impact === "critical",
   )
   expect(serious).toEqual([])
+})
+
+test("the keyboard moves through the results, back up to the search, and across to an ⓘ", async ({
+  page,
+}) => {
+  await page.goto("./")
+  await page.getByRole("button", { name: "Look up" }).click()
+  await page.getByRole("searchbox").fill("sza")
+  const rows = page.getByRole("grid", { name: "Results" }).getByRole("row")
+
+  await page.keyboard.press("ArrowDown")
+  await expect(rows.first()).toBeFocused()
+  await page.keyboard.press("ArrowDown")
+  await expect(rows.nth(1)).toBeFocused()
+  await page.keyboard.press("ArrowUp")
+  await expect(rows.first()).toBeFocused()
+  await page.keyboard.press("ArrowUp")
+  await expect(page.getByRole("searchbox")).toBeFocused()
+  await page.keyboard.press("ArrowDown")
+  await page.keyboard.press("ArrowRight")
+  await expect(
+    page.getByRole("button", { name: "About ŠA", exact: true }),
+  ).toBeFocused()
+  await page.keyboard.press("Enter")
+  await expect(page.getByRole("dialog", { name: "ŠA" })).toBeVisible()
 })

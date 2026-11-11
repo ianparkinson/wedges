@@ -25,12 +25,12 @@ const AN: LookupResult = {
 describe("ResultList", () => {
   it("shows each result's name, and the value that matched", () => {
     render(<ResultList results={[ŠA]} onAppend={() => {}} onInfo={() => {}} />)
-    expect(screen.getAllByRole("button")[0]).toHaveAccessibleName("ŠA ša")
+    expect(screen.getAllByRole("row")[0]).toHaveAccessibleName("ŠA ša")
   })
 
   it("doesn't repeat a name that matched", () => {
     render(<ResultList results={[AN]} onAppend={() => {}} onInfo={() => {}} />)
-    expect(screen.getAllByRole("button")[0]).toHaveAccessibleName("AN")
+    expect(screen.getAllByRole("row")[0]).toHaveAccessibleName("AN")
   })
 
   it("appends the result tapped", async () => {
@@ -39,7 +39,7 @@ describe("ResultList", () => {
     render(
       <ResultList results={[ŠA, AN]} onAppend={onAppend} onInfo={onInfo} />,
     )
-    await userEvent.click(screen.getByRole("button", { name: "AN" }))
+    await userEvent.click(screen.getByRole("row", { name: "AN" }))
     expect(onAppend).toHaveBeenCalledExactlyOnceWith(AN)
     expect(onInfo).not.toHaveBeenCalled()
   })

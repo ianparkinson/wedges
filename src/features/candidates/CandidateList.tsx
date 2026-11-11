@@ -1,5 +1,5 @@
 import type { Sign } from "@/core/signs"
-import { ButtonWithInfo } from "@/ui/ButtonWithInfo/ButtonWithInfo"
+import { ActionList } from "@/ui/ActionList/ActionList"
 import { ScreenReaderStatus } from "@/ui/ScreenReaderStatus/ScreenReaderStatus"
 
 import styles from "./CandidateList.module.css"
@@ -25,29 +25,38 @@ export function CandidateList({
   onPick,
   onInfo,
 }: CandidateListProps) {
+  const byChar = new Map(candidates.map((sign) => [sign.char, sign]))
   return (
     <section className={styles.panel} aria-label="Candidates">
       <ScreenReaderStatus message={announcement(candidates)} />
       {candidates.length > 0 ? (
-        <ul className={styles.list}>
-          {candidates.map((sign, i) => (
-            <li key={sign.char} className={styles.item}>
-              <ButtonWithInfo
-                onPress={() => onPick(sign)}
-                isProminent={i === 0}
-                infoLabel={`About ${sign.name}`}
-                onInfo={() => onInfo(sign)}
-              >
+        <div className={styles.list}>
+          <ActionList
+            label="Candidates"
+            orientation="horizontal"
+            items={candidates.map((sign, i) => ({
+              id: sign.char,
+              label: sign.name,
+              infoLabel: `About ${sign.name}`,
+              isProminent: i === 0,
+              content: (
                 <span className={styles.content}>
-                  <span className={styles.glyph} aria-hidden="true">
+                  <span
+                    className={
+                      i === 0 ? `${styles.glyph} ${styles.best}` : styles.glyph
+                    }
+                    aria-hidden="true"
+                  >
                     {sign.char}
                   </span>
                   <span className={styles.name}>{sign.name}</span>
                 </span>
-              </ButtonWithInfo>
-            </li>
-          ))}
-        </ul>
+              ),
+            }))}
+            onAction={(char) => onPick(byChar.get(char)!)}
+            onInfo={(char) => onInfo(byChar.get(char)!)}
+          />
+        </div>
       ) : (
         <p className={styles.hint}>
           {isLoading ? "Loading signs…" : "Draw a sign, one wedge at a time."}

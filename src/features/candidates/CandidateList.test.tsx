@@ -24,9 +24,7 @@ describe("CandidateList", () => {
         onInfo={() => {}}
       />,
     )
-    const items = within(screen.getByRole("list"))
-      .getAllByRole("button")
-      .filter((button) => !button.getAttribute("aria-label"))
+    const items = within(screen.getByRole("grid")).getAllByRole("row")
     expect(items.map((item) => item.textContent)).toEqual([
       "𒀭AN",
       "𒈦MAŠ",
@@ -44,7 +42,7 @@ describe("CandidateList", () => {
         onInfo={() => {}}
       />,
     )
-    await userEvent.click(screen.getByRole("button", { name: "MAŠ" }))
+    await userEvent.click(screen.getByRole("row", { name: "MAŠ" }))
     expect(onPick).toHaveBeenCalledExactlyOnceWith(MAŠ)
   })
 

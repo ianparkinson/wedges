@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useImperativeHandle, useRef, type Ref } from "react"
 import {
   Button as AriaButton,
   SearchField as AriaSearchField,
@@ -17,6 +17,10 @@ export interface SearchFieldProps {
    * Focuses the field once it has been drawn, which opens a phone's keyboard.
    */
   autoFocus?: boolean
+  /** Called when the down arrow key is pressed, such as to move into results below. */
+  onArrowDown?: () => void
+  /** The text field, for focusing it from elsewhere. */
+  ref?: Ref<HTMLInputElement>
 }
 
 /**
@@ -28,8 +32,11 @@ export function SearchField({
   value,
   onChange,
   autoFocus = false,
+  onArrowDown,
+  ref,
 }: SearchFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+  useImperativeHandle(ref, () => inputRef.current!, [])
 
   // Focusing the field before it has been painted opens Android's keyboard
   // first, and Chrome keeps showing the old screen until the keyboard is fully
@@ -45,7 +52,19 @@ export function SearchField({
   }, [autoFocus])
 
   return (
-    <AriaSearchField className={styles.field} value={value} onChange={onChange}>
+    <AriaSearchField
+      className={styles.field}
+      value={value}
+      onChange={onChange}
+      onKeyDown={(event) => {
+        if (event.key !== "ArrowDown" || !onArrowDown) {
+          event.continuePropagation()
+          return
+        }
+        event.preventDefault()
+        onArrowDown()
+      }}
+    >
       <Label className={styles.label}>{label}</Label>
       <div className={styles.box}>
         <Input

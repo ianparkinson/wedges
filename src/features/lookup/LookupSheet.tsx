@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 
 import { buildIndex, search } from "@/core/lookup"
 import { charsOf, type SignDatabase, type SignListEntry } from "@/core/signs"
@@ -23,7 +23,8 @@ export interface LookupSheetProps {
 /**
  * Look up: search signs and sequences by name, value, code point or the
  * characters themselves. Tapping a result appends it, and its ⓘ opens its
- * Sign List entry, which can append it too. Appending clears the query. Closing
+ * Sign List entry, which can append it too. The arrow keys move between the
+ * search field and the results. Appending clears the query. Closing
  * without appending keeps it, so the sheet opens again on the same results.
  */
 export function LookupSheet({
@@ -34,6 +35,8 @@ export function LookupSheet({
 }: LookupSheetProps) {
   const [query, setQuery] = useState("")
   const [opened, setOpened] = useState<SignListEntry>()
+  const resultsRef = useRef<HTMLDivElement>(null)
+  const searchRef = useRef<HTMLInputElement>(null)
 
   const index = useMemo(
     () => signDatabase && buildIndex(signDatabase),
@@ -77,11 +80,15 @@ export function LookupSheet({
             value={query}
             onChange={setQuery}
             autoFocus
+            onArrowDown={() => resultsRef.current?.focus()}
+            ref={searchRef}
           />
           {!signDatabase ? (
             <p className={styles.hint}>Loading signs…</p>
           ) : results.length > 0 ? (
             <ResultList
+              ref={resultsRef}
+              onArrowUpFromFirst={() => searchRef.current?.focus()}
               results={results}
               onAppend={({ found }) => append(charsOf(found))}
               onInfo={({ found }) => setOpened(found)}

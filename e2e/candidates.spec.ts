@@ -13,9 +13,7 @@ test("drawing AN puts AN first, and accepting it adds it to the text", async ({
   await expect(candidates.getByText(/Draw a sign/)).toBeVisible()
 
   await drawSign(page, pad, AN)
-  await expect(candidates.getByRole("button").first()).toHaveAccessibleName(
-    "AN",
-  )
+  await expect(candidates.getByRole("row").first()).toHaveAccessibleName("AN")
 
   await page.getByRole("button", { name: "Accept" }).click()
   const signs = page.getByRole("listbox", { name: "Signs" }).getByRole("option")

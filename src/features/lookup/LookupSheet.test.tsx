@@ -17,11 +17,9 @@ function renderSheet(onAppend = () => {}, onClose = () => {}) {
   )
 }
 
-/** The results' own buttons, which append, without their ⓘ buttons. */
 function results() {
-  return within(screen.getByRole("list", { name: "Results" })).getAllByRole(
-    "button",
-    { name: /^(?!About )/ },
+  return within(screen.getByRole("grid", { name: "Results" })).getAllByRole(
+    "row",
   )
 }
 
@@ -41,6 +39,25 @@ describe("LookupSheet", () => {
     renderSheet()
     await userEvent.type(screen.getByRole("searchbox"), "ensi2")
     expect(results()[0]).toHaveAccessibleName("|PA.TE.SI| ensi₂")
+  })
+
+  it("moves from the search field into the results with the down arrow key", async () => {
+    const onAppend = vi.fn()
+    renderSheet(onAppend)
+    await userEvent.type(screen.getByRole("searchbox"), "ensi2")
+    await userEvent.keyboard("{ArrowDown}")
+    expect(results()[0]).toHaveFocus()
+    await userEvent.keyboard("{Enter}")
+    expect(onAppend).toHaveBeenCalledExactlyOnceWith(PA + TE + SI)
+  })
+
+  it("moves back up from the first result to the search field", async () => {
+    renderSheet()
+    await userEvent.type(screen.getByRole("searchbox"), "an")
+    await userEvent.keyboard("{ArrowDown}")
+    expect(results()[0]).toHaveFocus()
+    await userEvent.keyboard("{ArrowUp}")
+    expect(screen.getByRole("searchbox")).toHaveFocus()
   })
 
   it("says so when nothing is found", async () => {
