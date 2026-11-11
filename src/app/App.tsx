@@ -4,6 +4,7 @@ import { rank } from "@/core/matcher/rank"
 import type { Sign, SignListEntry } from "@/core/signs"
 import type { Stroke } from "@/core/strokes"
 import { suggestionsAt } from "@/core/suggest"
+import { AboutSheet } from "@/features/about/AboutSheet"
 import { AcceptButton } from "@/features/candidates/AcceptButton"
 import { CandidateList } from "@/features/candidates/CandidateList"
 import { DrawingPanel } from "@/features/drawing/DrawingPanel"
@@ -13,12 +14,11 @@ import { useSequence } from "@/features/sequence/useSequence"
 import { SignInfoSheet } from "@/features/signInfo/SignInfoSheet"
 import { SuggestionRow } from "@/features/suggestions/SuggestionRow"
 import { Button } from "@/ui/Button/Button"
-import { Link } from "@/ui/Link/Link"
+import { HelpIcon } from "@/ui/HelpIcon/HelpIcon"
+import { IconButton } from "@/ui/IconButton/IconButton"
 
 import styles from "./App.module.css"
 import { useSignDatabase } from "./useSignDatabase"
-
-const REPO_URL = "https://github.com/ianparkinson/wedges"
 
 /** How many candidates the app shows for a drawing. */
 const CANDIDATE_COUNT = 3
@@ -35,13 +35,14 @@ interface ShownSignInfo {
 /**
  * The app shell: the text written so far, suggestions for the signs before
  * the cursor, the drawing pad, and the candidates for what is drawn on it,
- * with Look up and Sign List entries in sheets over them.
+ * with Look up, Sign List entries and About in sheets over them.
  */
 export function App() {
   const database = useSignDatabase()
   const [strokes, setStrokes] = useState<readonly Stroke[]>([])
   const [sequence, editSequence] = useSequence()
   const [isLookupOpen, setLookupOpen] = useState(false)
+  const [isAboutOpen, setAboutOpen] = useState(false)
   const [info, setInfo] = useState<ShownSignInfo>()
 
   const candidates = useMemo(
@@ -72,7 +73,12 @@ export function App() {
     <main className={styles.page}>
       <div className={styles.screen}>
         <header className={styles.header}>
-          <h1 className={styles.title}>Wedges</h1>
+          <div className={styles.titleGroup}>
+            <h1 className={styles.title}>Wedges</h1>
+            <IconButton label="About Wedges" onPress={() => setAboutOpen(true)}>
+              <HelpIcon />
+            </IconButton>
+          </div>
           <Button onPress={() => setLookupOpen(true)}>Look up</Button>
         </header>
         <div className={styles.text}>
@@ -104,16 +110,13 @@ export function App() {
           onInfo={(sign) => setInfo({ about: sign, append: sign })}
         />
       </div>
-      <p className={styles.footer}>
-        Wedges is being built. Follow along on{" "}
-        <Link href={REPO_URL}>GitHub</Link>.
-      </p>
       <LookupSheet
         signDatabase={database}
         isOpen={isLookupOpen}
         onClose={() => setLookupOpen(false)}
         onAppend={(chars) => editSequence({ kind: "insert", chars })}
       />
+      <AboutSheet isOpen={isAboutOpen} onClose={() => setAboutOpen(false)} />
       {database && (
         <SignInfoSheet
           about={info?.about}

@@ -24,7 +24,7 @@ src/
   lib/       pure TypeScript helpers that know nothing of the app: geometry, collections, numbers
   core/      pure TypeScript: recognition, matching, lookup, sequence editing
   ui/        thin wrappers over React Aria Components, styled with CSS Modules
-  features/  the app's panels: drawing, candidates, sequence, sign info, lookup
+  features/  the app's panels: drawing, candidates, sequence, sign info, lookup, about
   app/       the app shell, layout, providers and tokens.css
 ```
 

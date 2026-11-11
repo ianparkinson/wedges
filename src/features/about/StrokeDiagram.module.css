@@ -1,0 +1,30 @@
+.diagram {
+  display: block;
+  flex: none;
+  width: 7.5rem;
+  height: 5rem;
+}
+
+.clay {
+  fill: var(--color-clay);
+}
+
+.impression {
+  fill: var(--color-impression);
+  stroke: var(--color-impression);
+  stroke-linejoin: round;
+}
+
+.path {
+  fill: none;
+  stroke: var(--color-trace);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.arrowHead,
+.start {
+  fill: var(--color-trace);
+}
