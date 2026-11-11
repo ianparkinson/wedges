@@ -12,6 +12,8 @@
   --color-border: #d8cbb8;
   --color-clay: #e4d3b4;
   --color-impression: #5a3f28;
+  --color-pad-dot: rgb(90 63 40 / 0.12);
+  --color-pad-shadow: rgb(90 63 40 / 0.25);
   --color-trace: #8a4b1f;
   --color-overlay: rgb(0 0 0 / 0.3);
 
@@ -53,6 +55,8 @@
     --color-border: #4a3e33;
     --color-clay: #3a2f25;
     --color-impression: #e8d6bc;
+    --color-pad-dot: rgb(232 214 188 / 0.12);
+    --color-pad-shadow: rgb(0 0 0 / 0.4);
     --color-trace: #e0a070;
     --color-overlay: rgb(0 0 0 / 0.5);
   }
