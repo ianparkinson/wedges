@@ -37,6 +37,17 @@ describe("AboutSheet", () => {
     )
   })
 
+  it("says that visits are counted with GoatCounter, without cookies", () => {
+    render(<AboutSheet isOpen onClose={() => {}} />)
+    expect(screen.getByRole("link", { name: "GoatCounter" })).toHaveAttribute(
+      "href",
+      "https://www.goatcounter.com/",
+    )
+    expect(
+      screen.getByRole("link", { name: "GoatCounter" }).parentElement,
+    ).toHaveTextContent(/sets no cookies/)
+  })
+
   it("names the licences of the code, the sign data and the font", () => {
     render(<AboutSheet isOpen onClose={() => {}} />)
     const licences = screen.getByRole("list")

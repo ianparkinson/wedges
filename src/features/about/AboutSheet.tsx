@@ -14,6 +14,7 @@ const LICENSE_URL = `${REPO_URL}/blob/main/LICENSE`
 const OSL_URL = "https://oracc.museum.upenn.edu/osl/"
 const NOTO_URL = "https://fonts.google.com/noto/specimen/Noto+Sans+Cuneiform"
 const OFL_URL = "https://openfontlicense.org/"
+const GOATCOUNTER_URL = "https://www.goatcounter.com/"
 
 // The diagrams' strokes and finger paths, in StrokeDiagram's 120 × 80 units.
 // Each path runs beside its stroke, in the direction it is drawn.
@@ -46,7 +47,8 @@ export interface AboutSheetProps {
 
 /**
  * About Wedges: how to draw a wedge and a Winkelhaken, where the source code
- * is, and the licences of the code and the data and font it uses.
+ * is, how visits are counted, and the licences of the code and the data and
+ * font it uses.
  */
 export function AboutSheet({ isOpen, onClose }: AboutSheetProps) {
   return (
@@ -87,6 +89,16 @@ export function AboutSheet({ isOpen, onClose }: AboutSheetProps) {
             <Link href={REPO_URL}>GitHub</Link>. If something doesn&apos;t work,{" "}
             <Link href={ISSUES_URL}>report a bug</Link>. For questions and
             suggestions, <Link href={DISCUSSIONS_URL}>start a discussion</Link>.
+          </p>
+        </section>
+
+        <section className={styles.section}>
+          <h3 className={styles.heading}>Privacy</h3>
+          <p className={styles.text}>
+            Wedges counts visits with{" "}
+            <Link href={GOATCOUNTER_URL}>GoatCounter</Link>, which sets no
+            cookies and keeps no personal data. The text you write stays on your
+            device.
           </p>
         </section>
 
