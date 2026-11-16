@@ -17,3 +17,4 @@ One short file per decision that someone might later want to revisit: what was d
 | [0011](0011-back-closes-sheets.md)     | Back closes the open sheet                       | accepted |
 | [0012](0012-touch-icon-at-build.md)    | Render the home-screen icon at build time        | accepted |
 | [0013](0013-goatcounter-analytics.md)  | Count visits with GoatCounter                    | accepted |
+| [0014](0014-update-osl.md)             | A pull request with each new `osl.asl`           | accepted |

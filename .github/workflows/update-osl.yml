@@ -1,0 +1,59 @@
+name: Update OSL
+
+# Copies the latest osl.asl from github.com/oracc/osl over data/osl.asl and
+# opens a pull request, or updates the open one, when it has changed. CI and
+# the accuracy benchmark then run on that pull request.
+on:
+  schedule:
+    # Daily at 06:00 UTC.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: update-osl
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    name: Update osl.asl
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # The pull request is opened with the Wedges updates app's token, not
+      # GITHUB_TOKEN, because pull requests opened with GITHUB_TOKEN don't
+      # start other workflows, so CI and the benchmark wouldn't run.
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.UPDATES_APP_CLIENT_ID }}
+          private-key: ${{ secrets.UPDATES_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+
+      - name: Copy latest osl.asl
+        id: copy
+        run: scripts/updateOsl.sh "$RUNNER_TEMP/body.md" >> "$GITHUB_OUTPUT"
+
+      - uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          sign-commits: true
+          add-paths: data/osl.asl
+          branch: update-osl
+          delete-branch: true
+          commit-message: |
+            Update osl.asl to oracc/osl@${{ steps.copy.outputs.short }}
+
+            From https://github.com/oracc/osl/commit/${{ steps.copy.outputs.sha }}
+          title: Update osl.asl to oracc/osl@${{ steps.copy.outputs.short }}
+          body-path: ${{ runner.temp }}/body.md
+          assignees: ianparkinson
+          reviewers: ianparkinson
