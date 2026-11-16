@@ -49,11 +49,8 @@ jobs:
           add-paths: data/osl.asl
           branch: update-osl
           delete-branch: true
-          commit-message: |
-            Update osl.asl to oracc/osl@${{ steps.copy.outputs.short }}
-
-            From https://github.com/oracc/osl/commit/${{ steps.copy.outputs.sha }}
-          title: Update osl.asl to oracc/osl@${{ steps.copy.outputs.short }}
+          commit-message: ${{ steps.copy.outputs.commit-message }}
+          title: ${{ steps.copy.outputs.title }}
           body-path: ${{ runner.temp }}/body.md
           assignees: ianparkinson
           reviewers: ianparkinson

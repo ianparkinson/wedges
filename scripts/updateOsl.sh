@@ -6,9 +6,10 @@
 #
 # The description names the upstream commit, lists the upstream commits since
 # the commit the old copy came from, and gives npm run osl-summary's counts
-# before and after. Prints the upstream commit as sha=... and short=... lines,
-# which the Update OSL workflow reads as step outputs. Run from the repo root,
-# after npm ci.
+# before and after. Prints a commit title and message, with the same list of
+# upstream commits, as title=... and commit-message<<... lines, which the
+# Update OSL workflow reads as step outputs. Run from the repo root, after
+# npm ci.
 set -euo pipefail
 
 body=$1
@@ -37,6 +38,8 @@ done
 upstream show HEAD:00lib/osl.asl > data/osl.asl
 sha=$(upstream rev-parse HEAD)
 short=$(upstream rev-parse --short HEAD)
+title="Update osl.asl to oracc/osl@$short"
+unmatched="No upstream commit matches the old \`data/osl.asl\`, so it had been edited or came from elsewhere."
 
 npm run --silent osl-summary > "$work/after.txt"
 
@@ -48,7 +51,7 @@ npm run --silent osl-summary > "$work/after.txt"
     echo
     upstream log --format="- [%h](https://github.com/oracc/osl/commit/%H) %ad %s" --date=short "$from..HEAD" -- 00lib/osl.asl
   else
-    echo "No upstream commit matches the old \`data/osl.asl\`, so it had been edited or came from elsewhere."
+    echo "$unmatched"
   fi
   echo
   echo "\`npm run osl-summary\`, before and after:"
@@ -59,5 +62,17 @@ npm run --silent osl-summary > "$work/after.txt"
   echo "Check CI and the accuracy benchmark's comment before merging."
 } > "$body"
 
-echo "sha=$sha"
-echo "short=$short"
+echo "title=$title"
+echo "commit-message<<END_OF_COMMIT_MESSAGE"
+echo "$title"
+echo
+echo "From https://github.com/oracc/osl/commit/$sha"
+echo
+if [ -n "$from" ]; then
+  echo "Upstream commits since the last update:"
+  echo
+  upstream log --format="%h %ad %s" --date=short "$from..HEAD" -- 00lib/osl.asl
+else
+  echo "$unmatched"
+fi
+echo "END_OF_COMMIT_MESSAGE"
