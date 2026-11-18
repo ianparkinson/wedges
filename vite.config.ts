@@ -5,13 +5,14 @@ import { defineConfig } from "vitest/config"
 
 import { oslPlugin } from "./scripts/osl/vitePlugin.ts"
 import { touchIconPlugin } from "./scripts/touchIcon/vitePlugin.ts"
+import { usagePlugin } from "./scripts/usage/vitePlugin.ts"
 
 // GitHub Pages serves the site from https://ianparkinson.github.io/wedges/.
 const base = "/wedges/"
 
 export default defineConfig({
   base,
-  plugins: [react(), oslPlugin(), touchIconPlugin()],
+  plugins: [react(), oslPlugin(), usagePlugin(), touchIconPlugin()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

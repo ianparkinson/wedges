@@ -28,9 +28,10 @@ export function useSignDatabase(): SignDatabase | undefined {
 }
 
 async function loadSignDatabase(): Promise<SignDatabase> {
-  const [{ osl }, { default: noto }] = await Promise.all([
+  const [{ osl }, { usage }, { default: noto }] = await Promise.all([
     import("virtual:osl"),
+    import("virtual:usage"),
     import("../../data/skeletons/noto.json"),
   ])
-  return new SignDatabase([noto as SkeletonFile], osl)
+  return new SignDatabase([noto as SkeletonFile], osl, usage)
 }

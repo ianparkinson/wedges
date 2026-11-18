@@ -16,3 +16,15 @@ it("has usage files that match their schema", () => {
     )
   }
 })
+
+it("puts the readings people expect first for the signs in discussion #78", async () => {
+  const { usage } = await import("virtual:usage")
+  const first = (chars: string) => [
+    usage[chars]?.sux?.[0]?.value,
+    usage[chars]?.akk?.[0]?.value,
+  ]
+
+  // KAK and KALAM@g: du₃ and un are the usual readings in both languages.
+  expect(first("𒆕")).toEqual(["du₃", "du₃"])
+  expect(first("𒌦")).toEqual(["un", "un"])
+})

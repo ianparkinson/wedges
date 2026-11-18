@@ -53,6 +53,7 @@ describe("AboutSheet", () => {
     const licences = screen.getByRole("list")
     expect(licences).toHaveTextContent(/MIT licence/)
     expect(licences).toHaveTextContent(/Oracc Sign List, released under CC0/)
+    expect(licences).toHaveTextContent(/glossaries of the Oracc projects/)
     expect(licences).toHaveTextContent(/SIL Open Font License/)
   })
 

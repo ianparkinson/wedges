@@ -12,6 +12,7 @@ const ISSUES_URL = `${REPO_URL}/issues/new?title=`
 const DISCUSSIONS_URL = `${REPO_URL}/discussions/new/choose`
 const LICENSE_URL = `${REPO_URL}/blob/main/LICENSE`
 const OSL_URL = "https://oracc.museum.upenn.edu/osl/"
+const ORACC_URL = "https://oracc.museum.upenn.edu/"
 const NOTO_URL = "https://fonts.google.com/noto/specimen/Noto+Sans+Cuneiform"
 const OFL_URL = "https://openfontlicense.org/"
 const GOATCOUNTER_URL = "https://www.goatcounter.com/"
@@ -112,6 +113,11 @@ export function AboutSheet({ isOpen, onClose }: AboutSheetProps) {
             <li>
               Sign names and values come from the{" "}
               <Link href={OSL_URL}>Oracc Sign List</Link>, released under CC0.
+            </li>
+            <li>
+              How often values are used, and the words they write, come from the
+              glossaries of the <Link href={ORACC_URL}>Oracc</Link> projects,
+              released under CC0.
             </li>
             <li>
               Signs are shown in{" "}

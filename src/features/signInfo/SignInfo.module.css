@@ -29,10 +29,19 @@
   overflow-wrap: anywhere;
 }
 
-.signs {
+.signs,
+.usage {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.usage li + li {
+  margin-top: var(--space-1);
+}
+
+.words {
+  color: var(--color-text-muted);
 }
 
 .sign {

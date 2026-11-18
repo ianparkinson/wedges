@@ -3,20 +3,20 @@
  * See docs/usage-data.md.
  */
 import type { OslData } from "../../src/core/types.ts"
-import { LANGUAGES, type Language } from "./usageCount.ts"
+import { LANGUAGES, type Language, type ValueUsage } from "./usageCount.ts"
 
-/** How many times each value is used, by language. */
+/** How many times each value is used, and the words it writes, by language. */
 export type UsageCounts = Partial<
-  Record<Language, Readonly<Record<string, { n: number }>>>
+  Record<Language, Readonly<Record<string, ValueUsage>>>
 >
 
 /**
  * Adds each sign's and sequence's values in order of use, as `valuesByUse`.
- * A value's place comes from its share of
- * the sign's uses in Sumerian plus its share in Akkadian, so a value common in
- * either language comes early. A larger Sumerian share breaks a tie, and
- * values used in neither keep OSL's order, after the rest. Also adds how often
- * each value is used in both languages together.
+ * A value's place comes from its share of the sign's uses in Sumerian plus
+ * its share in Akkadian, so a value common in either language comes early. A
+ * larger Sumerian share breaks a tie, and values used in neither keep OSL's
+ * order, after the rest. Also adds how often each value is used in both
+ * languages together.
  */
 export function orderValues(osl: OslData, usage: UsageCounts): OslData {
   const order = <T extends { values: readonly string[] }>(item: T): T => ({
