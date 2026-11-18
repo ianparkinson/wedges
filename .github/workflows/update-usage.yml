@@ -1,0 +1,55 @@
+name: Update usage
+
+# Rebuilds data/usage/ from the glossaries of every public Oracc project and
+# opens a pull request, or updates the open one, when the counts have changed.
+on:
+  schedule:
+    # Monthly, on the 1st at 06:00 UTC.
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+
+concurrency:
+  group: update-usage
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    name: Update sign usage
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      # The pull request is opened with the Wedges updates app's token, not
+      # GITHUB_TOKEN, because pull requests opened with GITHUB_TOKEN don't
+      # start other workflows, so CI wouldn't run.
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.UPDATES_APP_CLIENT_ID }}
+          private-key: ${{ secrets.UPDATES_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+
+      - name: Rebuild data/usage
+        id: build
+        run: scripts/updateUsage.sh "$RUNNER_TEMP/body.md" >> "$GITHUB_OUTPUT"
+
+      - uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          sign-commits: true
+          add-paths: data/usage
+          branch: update-usage
+          delete-branch: true
+          commit-message: ${{ steps.build.outputs.commit-message }}
+          title: ${{ steps.build.outputs.title }}
+          body-path: ${{ runner.temp }}/body.md
+          assignees: ianparkinson
+          reviewers: ianparkinson

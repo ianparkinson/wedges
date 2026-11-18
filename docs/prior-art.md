@@ -60,6 +60,7 @@ A mature research area, but a different problem: finding and identifying signs i
 
 - **Oracc Sign List (OSL)**: [oracc.museum.upenn.edu/osl](https://oracc.museum.upenn.edu/osl/), with the source at [github.com/oracc/osl](https://github.com/oracc/osl) (`00lib/osl.asl`). It's public domain (CC0) and covers 1,225 of the 1,234 Unicode cuneiform characters. Each sign has a name, values (readings), Unicode mapping, numbers in other sign lists (MZL, ABZL, HZL…), and links to eBL and Wikidata. Wedges uses it for sign names, values and links.
 - **ORACC and CDLI corpora**: transliterated texts, the obvious source for sign frequency counts if ranking ever weights candidates by how common they are. Neither gives counts per Unicode character directly; you'd map readings to signs through OSL. Frequencies also vary a lot by period, language and genre.
+- **Oracc glossaries**: each lemmatised Oracc project's JSON download (CC0) has glossaries that count every spelling of every word. Wedges counts how often each value is used in Sumerian and Akkadian from them ([usage-data.md](usage-data.md)).
 - **Fonts**: Noto Sans Cuneiform (SIL Open Font License) was used as the tracing reference for the sign skeletons. Its signs are drawn as single merged outlines, not separate wedges, so skeletons can't be pulled out of it automatically. Fonts in other styles, such as the Neo-Assyrian Assurbanipal font, could serve as references for variant skeletons.
 
 ## How this project relates to it
@@ -68,6 +69,7 @@ A mature research area, but a different problem: finding and identifying signs i
 - **Data the project is built on:**
   - the skeletons were traced over Noto Sans Cuneiform glyphs (SIL Open Font License)
   - sign names and values come from the Oracc Sign List (CC0)
+  - value usage is counted from Oracc's glossaries (CC0)
   - character names come from the Unicode Character Database
 - **Ideas with precedents, credited in the README:**
   - CuneiPainter: drawing wedges on a phone to identify a sign

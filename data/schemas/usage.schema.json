@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ianparkinson.github.io/wedges/schemas/usage.schema.json",
+  "title": "Sign value usage",
+  "description": "How often each sign value is used in one language, and the words it writes, counted from Oracc's glossaries. See docs/usage-data.md.",
+  "type": "object",
+  "required": ["comment", "language", "projects", "values"],
+  "additionalProperties": false,
+  "properties": {
+    "comment": { "type": "string" },
+    "language": {
+      "description": "Oracc's code for the language: sux for Sumerian, akk for Akkadian.",
+      "enum": ["sux", "akk"]
+    },
+    "projects": {
+      "description": "The Oracc projects whose glossaries in this language were counted.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "values": {
+      "description": "Usage by value, in lower case, with any qualifier, such as kuₓ(DU).",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["n"],
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "description": "How many times the value is used.",
+            "type": "integer",
+            "minimum": 1
+          },
+          "words": {
+            "description": "The words the value writes, most common first.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["cf", "gw", "pos", "n"],
+              "additionalProperties": false,
+              "properties": {
+                "cf": { "description": "Citation form.", "type": "string" },
+                "gw": {
+                  "description": "Guide word, in English.",
+                  "type": "string"
+                },
+                "pos": {
+                  "description": "Part of speech, as Oracc tags it, such as N or V/t.",
+                  "type": "string"
+                },
+                "n": {
+                  "description": "How many of the value's uses write this word.",
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
