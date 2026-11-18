@@ -42,6 +42,19 @@ describe("SignInfo", () => {
     expect(screen.getByText("U+122AD CUNEIFORM SIGN SHA")).toBeVisible()
   })
 
+  it("lists the common values in each language last, Sumerian first, with the words they write", () => {
+    renderPanel(ša)
+    const terms = screen.getAllByRole("term").map((t) => t.textContent)
+    expect(terms.slice(-2)).toEqual(["Sumerian", "Akkadian"])
+    expect(fact("Sumerian")).toBe("ša₃ šag “heart” (noun)ša")
+    expect(fact("Akkadian")).toBe("ša")
+  })
+
+  it("shows no languages without usage data", () => {
+    renderPanel(sign(PA))
+    expect(screen.queryByText("Sumerian")).toBeNull()
+  })
+
   it("links to the sign's page in the Oracc Sign List", () => {
     renderPanel(ša)
     expect(

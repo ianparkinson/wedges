@@ -12,6 +12,7 @@ import {
   type OslData,
   type OslSequence,
   type OslSign,
+  type SignUsage,
   type SkeletonFile,
   type VariantModifier,
 } from "./types"
@@ -81,12 +82,19 @@ export class SignDatabase {
   private readonly variantsByBase: ReadonlyMap<string, readonly Sign[]>
   private readonly compoundsByParts: ReadonlyMap<string, readonly Sign[]>
   private readonly valueUses: Readonly<Record<string, number>>
+  private readonly usageByChars: Readonly<Record<string, SignUsage>>
 
   /**
-   * Joins skeleton files with the Oracc data. Skeletons for a character the
-   * Oracc data doesn't list are left out; the data tests check there are none.
+   * Joins skeleton files with the Oracc data, and with each sign's and
+   * sequence's common values by language, keyed by characters. Skeletons for
+   * a character the Oracc data doesn't list are left out; the data tests
+   * check there are none.
    */
-  constructor(skeletonFiles: readonly SkeletonFile[], osl: OslData) {
+  constructor(
+    skeletonFiles: readonly SkeletonFile[],
+    osl: OslData,
+    usage: Readonly<Record<string, SignUsage>> = {},
+  ) {
     const samples = new Map<string, PreparedSample[]>()
     for (const file of skeletonFiles) {
       for (const { char, spec } of file.skeletons) {
@@ -122,6 +130,7 @@ export class SignDatabase {
     }))
     this.sequenceByChars = new Map(this.sequences.map((s) => [s.chars, s]))
     this.valueUses = osl.valueUses ?? {}
+    this.usageByChars = usage
     // Spreading splits a string into whole characters, each two UTF-16 units.
     this.longestSequence = Math.max(
       0,
@@ -135,6 +144,14 @@ export class SignDatabase {
    */
   uses(value: string): number {
     return this.valueUses[value] ?? 0
+  }
+
+  /**
+   * A sign's or sequence's common values in Sumerian and Akkadian, by its
+   * characters, if the glossaries count any. See docs/usage-data.md.
+   */
+  usage(chars: string): SignUsage | undefined {
+    return this.usageByChars[chars]
   }
 
   /** The sign for a character, if it is in the Oracc data. */

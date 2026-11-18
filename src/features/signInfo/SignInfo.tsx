@@ -9,6 +9,8 @@ import {
   type SignDatabase,
   type SignListEntry,
 } from "@/core/signs"
+import type { SignUsage, UsageLanguage } from "@/core/types"
+import { describeWord } from "@/core/usage"
 import { Button } from "@/ui/Button/Button"
 import { Link } from "@/ui/Link/Link"
 
@@ -26,12 +28,14 @@ export interface SignInfoProps {
 
 /**
  * What the Oracc Sign List says about a sign or a sequence: its characters,
- * values and code points, the parts of a compound, how a sign and its
+ * values and code points, its common values in Sumerian and Akkadian with
+ * the words they write, the parts of a compound, how a sign and its
  * variants are related, and a link to its page there. Append, when
  * offered, adds its characters to the text, a sequence's as one sign each.
  */
 export function SignInfo({ about, signDatabase, onAppend }: SignInfoProps) {
   const chars = charsOf(about)
+  const usage = signDatabase.usage(chars)
   const { values, formOf } = about
 
   return (
@@ -76,6 +80,7 @@ export function SignInfo({ about, signDatabase, onAppend }: SignInfoProps) {
             </dd>
           </>
         )}
+        {usage && <UsageFacts usage={usage} />}
       </dl>
       <p className={styles.link}>
         <Link href={oslUrl(about)}>{about.name} in the Oracc Sign List</Link>
@@ -146,4 +151,41 @@ function SignFacts({
       <dd>{`${codePoint(sign.char)} ${sign.unicodeName ?? ""}`}</dd>
     </>
   )
+}
+
+/** The languages with usage data, in the order the panel shows them. */
+const LANGUAGES: readonly { code: UsageLanguage; name: string }[] = [
+  { code: "sux", name: "Sumerian" },
+  { code: "akk", name: "Akkadian" },
+]
+
+/**
+ * A sign's common values in each language, most used first, each with the
+ * main words it writes. See docs/usage-data.md.
+ */
+function UsageFacts({ usage }: { usage: SignUsage }) {
+  return LANGUAGES.map(({ code, name }) => {
+    const common = usage[code]
+    if (!common) return null
+    return (
+      <Fragment key={code}>
+        <dt>{name}</dt>
+        <dd>
+          <ul className={styles.usage}>
+            {common.map(({ value, words }) => (
+              <li key={value}>
+                {value}
+                {words.length > 0 && (
+                  <span className={styles.words}>
+                    {" "}
+                    {words.map((w) => describeWord(w, value)).join(", ")}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </dd>
+      </Fragment>
+    )
+  })
 }

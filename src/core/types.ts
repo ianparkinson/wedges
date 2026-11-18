@@ -106,3 +106,32 @@ export interface OslSequence {
   readonly valuesByUse?: readonly string[]
   readonly formOf?: string
 }
+
+/** A language the usage data covers, by Oracc's code: Sumerian or Akkadian. */
+export type UsageLanguage = "sux" | "akk"
+
+/**
+ * A word in an Oracc glossary: its citation form, English guide word and
+ * part of speech, such as du "build" V/t. A name's guide word is a number
+ * that tells apart names spelled alike.
+ */
+export interface UsageWord {
+  readonly cf: string
+  readonly gw: string
+  readonly pos: string
+}
+
+/** A value commonly used in a language, and the main words it writes. */
+export interface CommonValue {
+  readonly value: string
+  /** Most used first; empty when the value mostly spells sounds or affixes. */
+  readonly words: readonly UsageWord[]
+}
+
+/**
+ * A sign's or sequence's common values in each language, most used first,
+ * built from data/usage/. See docs/usage-data.md.
+ */
+export type SignUsage = Readonly<
+  Partial<Record<UsageLanguage, readonly CommonValue[]>>
+>

@@ -4,3 +4,13 @@ declare module "virtual:osl" {
 
   export const osl: OslData
 }
+
+/**
+ * What the sign info panel shows about each sign's usage, by its characters,
+ * built at build time by scripts/usage/vitePlugin.ts.
+ */
+declare module "virtual:usage" {
+  import type { SignUsage } from "@/core/types"
+
+  export const usage: Readonly<Record<string, SignUsage>>
+}
