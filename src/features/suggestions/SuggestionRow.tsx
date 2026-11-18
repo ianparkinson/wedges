@@ -58,7 +58,7 @@ export function SuggestionRow({
         <InfoChip
           key={`${item.kind} ${charsOf(item)}`}
           label={item.name}
-          detail={item.values.join(", ")}
+          detail={item.valuesByUse.join(", ")}
           onPress={() => onOpen(item)}
         />
       ))}

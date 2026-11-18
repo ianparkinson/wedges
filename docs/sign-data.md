@@ -30,6 +30,7 @@ One entry per Unicode cuneiform character (U+12000–U+1254F) that OSL lists, in
 | `unicodeName` | the character's Unicode name, as OSL gives it                                                                           |
 | `oslId`       | the id of the OSL page, `https://oracc.museum.upenn.edu/osl/<oslId>`                                                    |
 | `values`      | readings, in OSL order, as OSL's pages show them: without a trailing `?` (uncertain) or a language tag (`%akk`)         |
+| `valuesByUse` | the same values, most used first ([usage-data.md](usage-data.md))                                                       |
 | `formOf`      | when OSL lists the character as a form of another sign, rather than as a sign: that sign's name. The page is the sign's |
 | `compound`    | for a compound of encoded signs: the operator and the parts' characters (below)                                         |
 | `variant`     | for a variant of an encoded sign: the base sign's character and the modifier (below)                                    |

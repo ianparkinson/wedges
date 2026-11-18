@@ -19,12 +19,14 @@ import {
 /** A sign, with the samples to match drawings against, if it has any. */
 export interface Sign extends OslSign {
   readonly kind: "sign"
+  readonly valuesByUse: readonly string[]
   readonly samples: readonly PreparedSample[]
 }
 
 /** A sequence of signs with readings of its own, such as |PA.TE.SI|, read ensi₂. */
 export interface Sequence extends OslSequence {
   readonly kind: "sequence"
+  readonly valuesByUse: readonly string[]
 }
 
 /**
@@ -78,6 +80,7 @@ export class SignDatabase {
   private readonly sequenceByChars: ReadonlyMap<string, Sequence>
   private readonly variantsByBase: ReadonlyMap<string, readonly Sign[]>
   private readonly compoundsByParts: ReadonlyMap<string, readonly Sign[]>
+  private readonly valueUses: Readonly<Record<string, number>>
 
   /**
    * Joins skeleton files with the Oracc data. Skeletons for a character the
@@ -96,6 +99,7 @@ export class SignDatabase {
     this.signs = osl.signs.map((sign) => ({
       ...sign,
       kind: "sign",
+      valuesByUse: sign.valuesByUse ?? sign.values,
       samples: samples.get(sign.char) ?? [],
     }))
     this.byChar = new Map(this.signs.map((s) => [s.char, s]))
@@ -114,13 +118,23 @@ export class SignDatabase {
     this.sequences = osl.sequences.map((sequence) => ({
       ...sequence,
       kind: "sequence",
+      valuesByUse: sequence.valuesByUse ?? sequence.values,
     }))
     this.sequenceByChars = new Map(this.sequences.map((s) => [s.chars, s]))
+    this.valueUses = osl.valueUses ?? {}
     // Spreading splits a string into whole characters, each two UTF-16 units.
     this.longestSequence = Math.max(
       0,
       ...this.sequences.map((s) => [...s.chars].length),
     )
+  }
+
+  /**
+   * How many times a value is used in Sumerian and Akkadian together, as
+   * counted from Oracc's glossaries; 0 when they don't count it.
+   */
+  uses(value: string): number {
+    return this.valueUses[value] ?? 0
   }
 
   /** The sign for a character, if it is in the Oracc data. */

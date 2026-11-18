@@ -13,6 +13,8 @@ import {
 interface Key {
   readonly text: string
   readonly kind: "name" | "value"
+  /** For a value, how many times it is used; 0 for a name. */
+  readonly uses: number
   /** Folded to plain ASCII. */
   readonly folded: string
   /** Folded, but keeping š, ṣ, ṭ and ḫ apart. */
@@ -118,8 +120,8 @@ function withoutIndex(key: string): string {
   return key.replace(/(\d+|x)$/, "")
 }
 
-function key(text: string, kind: Key["kind"]): Key {
-  return { text, kind, folded: fold(text), strict: foldStrict(text) }
+function key(text: string, kind: Key["kind"], uses: number): Key {
+  return { text, kind, uses, folded: fold(text), strict: foldStrict(text) }
 }
 
 /**
@@ -128,8 +130,8 @@ function key(text: string, kind: Key["kind"]): Key {
  * and dingir. That key keeps the real spelling for the exact-spelling
  * tie-break, so a value written with ng still comes first for "dingir".
  */
-function keysFor(text: string, kind: Key["kind"]): Key[] {
-  const plain = key(text, kind)
+function keysFor(text: string, kind: Key["kind"], uses = 0): Key[] {
+  const plain = key(text, kind, uses)
   if (!/[ŋĝ]/i.test(text)) return [plain]
   const asNg = fold(text.replace(/[ŋĝ]/g, "ng").replace(/[ŊĜ]/g, "NG"))
   return [plain, { ...plain, folded: asNg }]
@@ -147,7 +149,7 @@ export function buildIndex(database: SignDatabase): LookupIndex {
       listed: item,
       keys: [
         ...namesOf(item).flatMap((t) => keysFor(t, "name")),
-        ...item.values.flatMap((t) => keysFor(t, "value")),
+        ...item.values.flatMap((t) => keysFor(t, "value", database.uses(t))),
       ],
     })),
   }
@@ -196,13 +198,14 @@ interface Hit {
 /**
  * Best first: by tier; then a key whose spelling matches exactly (with "sh"
  * and "sz" read as š), so "sha" finds ŠA before SA; then names before values,
- * shorter keys, signs before sequences, and code point.
+ * more used values, shorter keys, signs before sequences, and code point.
  */
 function compare(a: Hit, b: Hit): number {
   return (
     a.tier - b.tier ||
     a.spelling - b.spelling ||
     (a.key.kind === "name" ? 0 : 1) - (b.key.kind === "name" ? 0 : 1) ||
+    b.key.uses - a.key.uses ||
     a.key.folded.length - b.key.folded.length ||
     (a.found.kind === "sign" ? 0 : 1) - (b.found.kind === "sign" ? 0 : 1) ||
     compareChars(charsOf(a.found), charsOf(b.found))
