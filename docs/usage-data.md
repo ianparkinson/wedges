@@ -33,6 +33,10 @@ The projects overlap heavily, since umbrella projects repeat their subprojects' 
 
 Some of Oracc's glossary files are cut short. The script checks that each file ends where its JSON does, and skips and names in the update's pull request any that don't, rather than count part of one. A glossary that still fails to parse stops the run.
 
+## How the app uses it
+
+When the app is built, [`scripts/usage/orderValues.ts`](../scripts/usage/orderValues.ts) lists each sign's values in order of use too, as `valuesByUse`, so the suggestion chips can show the common readings first. The sign info panel keeps OSL's order. A value's place comes from its share of the sign's uses in Sumerian plus its share in Akkadian, so a reading common in either language comes early; the Sumerian share breaks a tie, and values neither glossary counts follow in OSL's order. The sign data also carries how often each value is used in both languages together, which look-up uses to rank equally good matches ([lookup.md](lookup.md)). Without the files in `data/usage/`, values keep OSL's order.
+
 ## Keeping it up to date
 
 `.github/workflows/update-usage.yml` runs [`scripts/updateUsage.sh`](../scripts/updateUsage.sh) monthly, and by hand from the Actions tab, and opens a pull request when the counts change ([0015](decisions/0015-usage-data.md)). The script downloads every public project's zip (about 2 GB) and runs `npm run build-usage` on them, which takes about a quarter of an hour. It can be run by hand too.

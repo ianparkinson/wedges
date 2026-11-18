@@ -9,7 +9,7 @@
 
 ## Decision
 
-`.github/workflows/update-osl.yml` runs every day, and by hand from the Actions tab. Through `scripts/updateOsl.sh`, which can also be run by hand, it copies `00lib/osl.asl` from github.com/oracc/osl and, when it differs from ours, uses [`peter-evans/create-pull-request`](https://github.com/peter-evans/create-pull-request) to open a pull request from the `update-osl` branch, or update the open one, assigned to Ian. Nothing is merged without review.
+`.github/workflows/update-osl.yml` runs every day, and by hand from the Actions tab. Through `scripts/updateOsl.sh`, which can also be run by hand, it copies `00lib/osl.asl` from github.com/oracc/osl and, when it differs from ours, uses [`peter-evans/create-pull-request`](https://github.com/peter-evans/create-pull-request) to open a pull request from the `bots/update-osl` branch, or update the open one, assigned to Ian. Nothing is merged without review.
 
 - **The pull request is opened by a GitHub App, Wedges updates**, whose token comes from `actions/create-github-app-token`. Pull requests opened with the workflow's own `GITHUB_TOKEN` don't start other workflows, so CI and the accuracy benchmark wouldn't run. An app's tokens last an hour and need no renewing, unlike a personal access token. The app can write contents and pull requests in this repo only. Its client id is the repository variable `UPDATES_APP_CLIENT_ID`, and its private key the secret `UPDATES_APP_PRIVATE_KEY`.
 - **Commits are signed by the app** (`sign-commits`), so they show as its own and need no author email.

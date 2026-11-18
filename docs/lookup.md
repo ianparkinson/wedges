@@ -40,9 +40,10 @@ Within a tier, results are ordered by:
 
 1. **Exact spelling:** a key that also matches before folding away š, ṣ, ṭ and ḫ (with sh and sz read as š) comes first, so `sha` finds ŠA before SA, while `sa` finds SA before ŠA.
 2. Names before values.
-3. Shorter keys.
-4. Signs before sequences.
-5. Code point order.
+3. More used values, as counted from Oracc's glossaries ([usage-data.md](usage-data.md)): `du` finds KAK, read du₃, before the other signs with a value du with an index.
+4. Shorter keys.
+5. Signs before sequences.
+6. Code point order.
 
 ## Tests
 

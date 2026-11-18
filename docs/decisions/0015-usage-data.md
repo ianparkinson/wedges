@@ -11,8 +11,8 @@ Many signs have dozens of values, which OSL lists alphabetically, so users can't
 
 - **Counts come from the glossaries in every public Oracc project's JSON zip**, not from a chosen list of projects. Akkadian has no combined glossary, and the projects overlap so much that each word is counted once, by its place in its text. Taking every project then costs nothing in double counting and misses nothing.
 - **Sumerian and Akkadian only.** Urartian is the only other cuneiform language with real data on Oracc, and too little to be worth a section. Names count under their text's main language.
-- **One committed file per language, keyed by value**, in `data/usage/`. The build will join it to `osl.asl`, so an OSL update needs no new usage data, and the files are reviewed as a diff in each update.
-- **A monthly workflow opens a pull request** with the rebuilt files, from the `update-usage` branch, using the Wedges updates app as [0014](0014-update-osl.md) does. Oracc's glossaries change far less often than `osl.asl`. No file records the date: git does.
+- **One committed file per language, keyed by value**, in `data/usage/`. The build joins it to `osl.asl`, so an OSL update needs no new usage data, and the files are reviewed as a diff in each update.
+- **A monthly workflow opens a pull request** with the rebuilt files, from the `bots/update-usage` branch, using the Wedges updates app as [0014](0014-update-osl.md) does. Oracc's glossaries change far less often than `osl.asl`. No file records the date: git does.
 - **The missing intermediate certificate is fetched on each run** from the address in Oracc's certificate, and checked against the runner's trusted roots, rather than stored in the repo, where it would need replacing when Oracc renews.
 - The script reads glossaries with the `stream-json` package and zips with `unzip`, so the 2 GB ePSD2 glossary never has to fit in memory.
 

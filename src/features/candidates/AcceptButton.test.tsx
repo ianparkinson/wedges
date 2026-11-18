@@ -12,6 +12,7 @@ const AN: Sign = {
   name: "AN",
   oslId: "o0000099",
   values: [],
+  valuesByUse: [],
   samples: [],
 }
 

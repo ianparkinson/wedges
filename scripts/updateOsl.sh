@@ -58,8 +58,6 @@ npm run --silent osl-summary > "$work/after.txt"
   echo '```'
   cat "$work/before.txt" "$work/after.txt"
   echo '```'
-  echo
-  echo "Check CI and the accuracy benchmark's comment before merging."
 } > "$body"
 
 echo "title=$title"

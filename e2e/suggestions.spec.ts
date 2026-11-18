@@ -21,7 +21,7 @@ test("drawing PA, TE and SI offers the reading ensi₂, and opens its entry", as
   const suggestions = page.getByRole("group", { name: "Suggestions" })
   await expect(suggestions.getByRole("button")).toHaveText([
     /^SI /,
-    "|PA.TE.SI| ensag, ensi₂, ensik",
+    "|PA.TE.SI| ensi₂, ensag, ensik",
     SI + SI_GUNU,
   ])
 

@@ -21,10 +21,18 @@ export interface SkeletonEntry {
   readonly comments?: string
 }
 
-/** The sign data, built from the Oracc Sign List's osl.asl. */
+/**
+ * The sign data, built from the Oracc Sign List's osl.asl, with the values
+ * in order of use too when there is usage data.
+ */
 export interface OslData {
   readonly signs: readonly OslSign[]
   readonly sequences: readonly OslSequence[]
+  /**
+   * How many times each value is used in Sumerian and Akkadian together, for
+   * the values Oracc's glossaries count. See docs/usage-data.md.
+   */
+  readonly valueUses?: Readonly<Record<string, number>>
 }
 
 /**
@@ -61,7 +69,14 @@ export interface OslSign {
   readonly unicodeName?: string
   /** The id of the sign's OSL page. */
   readonly oslId: string
+  /** In OSL order. */
   readonly values: readonly string[]
+  /**
+   * The same values, most used first. The build always adds it; data made by
+   * hand, as in tests, can leave it out, and the sign database then uses the
+   * OSL order.
+   */
+  readonly valuesByUse?: readonly string[]
   /** When OSL lists the character as a form of a sign, that sign's name. */
   readonly formOf?: string
   /** For a compound of encoded signs: how they combine, and their characters. */
@@ -81,6 +96,13 @@ export interface OslSequence {
   readonly chars: string
   readonly name: string
   readonly oslId: string
+  /** In OSL order. */
   readonly values: readonly string[]
+  /**
+   * The same values, most used first. The build always adds it; data made by
+   * hand, as in tests, can leave it out, and the sign database then uses the
+   * OSL order.
+   */
+  readonly valuesByUse?: readonly string[]
   readonly formOf?: string
 }

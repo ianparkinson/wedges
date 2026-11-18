@@ -131,6 +131,19 @@ describe("search", () => {
     expect(chars("xyzzy")).toEqual([])
   })
 
+  it("puts the more used of two equally good values first", () => {
+    const signs = [sign("𒂃", "DUL", ["du₆"]), sign("𒆕", "KAK", ["du₃"])]
+    const unused = buildIndex(new SignDatabase([], { signs, sequences: [] }))
+    const used = buildIndex(
+      new SignDatabase([], { signs, sequences: [], valueUses: { "du₃": 10 } }),
+    )
+    const found = (i: typeof index) =>
+      search(i, "du").map((r) => charsOf(r.found))
+
+    expect(found(unused)).toEqual(["𒂃", "𒆕"])
+    expect(found(used)).toEqual(["𒆕", "𒂃"])
+  })
+
   it("stops at the limit", () => {
     expect(search(index, "a", 1)).toHaveLength(1)
   })

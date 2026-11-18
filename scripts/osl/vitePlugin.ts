@@ -1,11 +1,15 @@
 /**
- * Serves the sign data, built from data/osl.asl, as the module
- * "virtual:osl", so the app gets it without a generated file in the repo.
+ * Serves the sign data, built from data/osl.asl and ordered by the usage in
+ * data/usage/, as the module "virtual:osl", so the app gets it without a
+ * generated file in the repo.
  */
+import { existsSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 
 import type { Plugin } from "vite"
 
+import { usageFile } from "../usage/loadUsage.ts"
+import { LANGUAGES } from "../usage/usageCount.ts"
 import { loadOsl, OSL_ASL } from "./loadOsl.ts"
 
 // Vite's convention for a module that isn't a file is a "virtual:" prefix.
@@ -24,6 +28,10 @@ export function oslPlugin(): Plugin {
     load(id) {
       if (id !== RESOLVED_ID) return undefined
       this.addWatchFile(fileURLToPath(OSL_ASL))
+      for (const language of LANGUAGES) {
+        const file = usageFile(language)
+        if (existsSync(file)) this.addWatchFile(fileURLToPath(file))
+      }
 
       // This is the source of the module the app imports. Browsers load a
       // large object faster from JSON.parse of a string than from a
