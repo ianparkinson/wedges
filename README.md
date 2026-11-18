@@ -31,6 +31,7 @@ See [AGENTS.md](AGENTS.md) for how the code is organised and the rules for contr
 - [Matching](docs/matching.md): how strokes are matched against sign skeletons and ranked.
 - [Skeleton format](docs/skeleton-format.md): the spec notation for sign skeletons, and the skeleton files.
 - [Sign data](docs/sign-data.md): names, values, compounds, variants and sequences from the Oracc Sign List.
+- [Usage data](docs/usage-data.md): how often each value is used in Sumerian and Akkadian, from Oracc's glossaries.
 - [Lookup](docs/lookup.md): how a query finds signs and sequences by name or value.
 - [Prior art](docs/prior-art.md): related projects, data sources and licences.
 - [Decision records](docs/decisions/): why things are the way they are.
@@ -40,4 +41,5 @@ See [AGENTS.md](AGENTS.md) for how the code is organised and the rules for contr
 Wedges is released under the [MIT licence](LICENSE), code and skeletons alike.
 
 - Sign names, values and ids come from the [Oracc Sign List](https://oracc.museum.upenn.edu/osl/), released under CC0.
+- How often each value is used, and the words it writes, are counted from the glossaries of [Oracc](https://oracc.museum.upenn.edu/)'s public projects, released under CC0.
 - The sign skeletons were traced over [Noto Sans Cuneiform](https://fonts.google.com/noto/specimen/Noto+Sans+Cuneiform), which is licensed under the SIL Open Font License 1.1. The app shows signs in the same font, bundled from [Fontsource](https://fontsource.org/fonts/noto-sans-cuneiform).
