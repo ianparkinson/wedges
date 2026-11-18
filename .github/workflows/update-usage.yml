@@ -46,7 +46,7 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           sign-commits: true
           add-paths: data/usage
-          branch: update-usage
+          branch: bots/update-usage
           delete-branch: true
           commit-message: ${{ steps.build.outputs.commit-message }}
           title: ${{ steps.build.outputs.title }}

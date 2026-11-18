@@ -47,7 +47,7 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           sign-commits: true
           add-paths: data/osl.asl
-          branch: update-osl
+          branch: bots/update-osl
           delete-branch: true
           commit-message: ${{ steps.copy.outputs.commit-message }}
           title: ${{ steps.copy.outputs.title }}

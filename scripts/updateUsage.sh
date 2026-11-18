@@ -55,8 +55,6 @@ title="Update sign usage from Oracc's glossaries"
   cat "$work/summary.md"
   echo
   echo "Public projects with no JSON to download: ${missing[*]:-none}."
-  echo
-  echo "Check CI before merging."
 } > "$body"
 
 echo "title=$title"
