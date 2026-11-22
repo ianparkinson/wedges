@@ -5,10 +5,10 @@
     "version": "2.001",
     "unitsPerEm": 1000
   },
-  "comments": "Placeholder data: traced by hand over Noto Sans Cuneiform in October 2026, so not particularly accurate, then fitted to each glyph's extent in November 2026. The head sizes are synthetic: every wedge has head 15. The Winkelhaken angle is the one the hand tracing used, not the font's.",
+  "comments": "Placeholder data: traced by hand over Noto Sans Cuneiform in October 2026, so not particularly accurate, then fitted to each glyph's extent in November 2026. The head sizes are synthetic: every wedge has head 15. The Winkelhaken angle is the font's, measured from its glyphs.",
   "wedges": "tapered",
   "headLean": 0,
-  "winkelhakenAngle": 70,
+  "winkelhakenAngle": 100,
   "skeletons": [
     {
       "text": "𒀀",

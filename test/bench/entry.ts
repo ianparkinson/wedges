@@ -11,7 +11,7 @@ import { signDatabase, skeletonDrawings } from "../signDatabase"
 import { synthesizeDrawing } from "../synthetic/drawings"
 import { Random } from "../synthetic/random"
 
-const NOISE = 0.6
+const NOISE = 0.06
 const DRAWINGS = 10
 const CANDIDATES = 3
 

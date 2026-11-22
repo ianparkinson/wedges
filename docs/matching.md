@@ -134,7 +134,7 @@ The budget is 50 ms, so ranking runs on the main thread after each stroke, with 
 
 ## Accuracy
 
-`npm run bench:accuracy` draws every skeleton 40 times with noise: endpoints jittered by 0.6 grid units (6% of the sign's size), stroke order shuffled, and flicks on 30% of wedges. It reports how often the right sign comes first and in the top three, and fails below 95% and 98%. The Accuracy Benchmark workflow runs it, before and after, on each pull request that touches `src/core`, `src/lib`, `data/` or the benchmark itself, and it takes a few minutes on a desktop.
+`npm run bench:accuracy` draws every skeleton 40 times with noise: wedge ends and Winkelhaken vertices jittered by 6% of the sign's size (`--noise 0.06`), Winkelhaken tips jittered in proportion to their legs, stroke order shuffled, and flicks on 30% of wedges. It reports how often the right sign comes first and in the top three, and fails below 95% and 98%. The Accuracy Benchmark workflow runs it, before and after, on each pull request that touches `src/core`, `src/lib`, `data/` or the benchmark itself, and it takes a few minutes on a desktop.
 
 | Skeletons | Right sign first | In top 3 |
 | --------- | ---------------- | -------- |

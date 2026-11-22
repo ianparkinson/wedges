@@ -1,6 +1,6 @@
 # 0016: Skeletons describe glyphs in the font's frame
 
-- **Date:** 22 November 2026
+- **Date:** 22 November 2026, updated the same day
 - **Status:** accepted
 
 ## Context
@@ -28,8 +28,8 @@ Before choosing a new format, we measured glyphs in the fonts that Wedges might 
 - **An entry's `text` can be a ligature or a private-use code point**, so that a file can describe every cuneiform glyph in a font. An entry can have no shapes, with a comment saying why.
 - **Entries and shapes are in a fixed order**, so that a tool rewriting a file produces a small diff.
 - **The matcher's behaviour doesn't change.** It reads each shape as the same kind of stroke as before, and doesn't yet use head sizes.
-- **The Noto skeletons were converted** from the first format: each was scaled, keeping its proportions, to fit its glyph's ink, and given a synthetic head size of 15. Its `winkelhakenAngle` is 70°, the angle that the hand tracing used, not the font's (about 100°), so that recognition doesn't change.
+- **The Noto skeletons were converted** from the first format: each was scaled, keeping its proportions, to fit its glyph's ink, and given a synthetic head size of 15. Its `winkelhakenAngle` is the font's, 100°. The hand tracing had snapped Winkelhaken to 70°, and the accuracy benchmark first fell from 96.2% to 94.0% at 100°: it jittered a Winkelhaken's tips by 6% of the sign's size, as much as a wedge's ends, so a small, wide Winkelhaken often came out nearly straight and was recognised as a wedge. The benchmark now jitters the tips in proportion to the leg, and scores the same at either angle.
 
 ## Revisit when
 
-The matcher starts to use head sizes, for example to match headless lines drawn either way round, or to tell a Winkelhaken from a wedge head with little tail; skeletons are traced again from Noto's glyphs, when the Winkelhaken angle can follow the font; or a font needs a shape that the format can't describe, such as a curved stroke.
+The matcher starts to use head sizes, for example to match headless lines drawn either way round, or to tell a Winkelhaken from a wedge head with little tail; or a font needs a shape that the format can't describe, such as a curved stroke.

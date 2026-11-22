@@ -4,7 +4,7 @@
  * sign comes first and in the top three. Run by hand before merging a change
  * to matching or skeletons:
  *
- *   npm run bench:accuracy [-- --noise 0.6 --trials 40]
+ *   npm run bench:accuracy [-- --noise 0.06 --trials 40]
  *
  * Exits with an error below the accuracy floors.
  */
@@ -26,7 +26,7 @@ const SHOWN_CONFUSIONS = 15
 
 const { values } = parseArgs({
   options: {
-    noise: { type: "string", default: "0.6" },
+    noise: { type: "string", default: "0.06" },
     trials: { type: "string", default: "40" },
   },
 })

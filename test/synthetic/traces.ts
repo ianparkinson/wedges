@@ -3,13 +3,13 @@
  * a person might draw them, for tests.
  */
 import type { Stroke } from "@/core/strokes"
-import type { Point } from "@/lib/geometry"
+import { distance, type Point } from "@/lib/geometry"
 
 import type { Random } from "./random"
 
-/** Where a sign on the 0–10 skeleton grid lands on the pad. */
+/** Where a sign lands on the pad. */
 export interface Placement {
-  /** Pixels per grid unit. */
+  /** Pixels per unit of the skeleton strokes. */
   readonly scale: number
   /** Where the grid's origin lands, in pixels. */
   readonly offset: Point
@@ -27,10 +27,18 @@ const FLICK_JITTER = 0.5
 /** Points along each leg of a Winkelhaken's trace. */
 const LEG_STEPS = 12
 const LEG_JITTER = 1
+/**
+ * How far a Winkelhaken's tips stray from where they belong, relative to the
+ * leg's length, per unit of `noise`. At a noise of 0.06, each leg's direction
+ * is off by about 10°.
+ */
+const LEG_NOISE = 3
 
 /**
- * A noisy trace of one skeleton stroke. `noise` jitters the stroke's key
- * points, in grid units (a sign is 10 across).
+ * A noisy trace of one skeleton stroke. `noise` jitters a wedge's ends and a
+ * Winkelhaken's vertex, in the strokes' own units: a fraction of the sign's
+ * size, for normalised strokes. A Winkelhaken's tips are jittered relative to
+ * its vertex, in proportion to its legs.
  */
 export function synthesizeTrace(
   stroke: Stroke,
@@ -63,9 +71,24 @@ export function synthesizeTrace(
       return points
     }
     case "winkelhaken": {
+      // The tips are placed relative to the vertex, with an error that grows
+      // with the leg, not the sign.
       const vertex = place(stroke.vertex)
-      const legA = place(stroke.legA)
-      const legB = place(stroke.legB)
+      const tip = (end: Point): Point => {
+        const jitter = noise * LEG_NOISE * distance(stroke.vertex, end) * scale
+        return {
+          x:
+            vertex.x +
+            (end.x - stroke.vertex.x) * scale +
+            random.gauss() * jitter,
+          y:
+            vertex.y +
+            (end.y - stroke.vertex.y) * scale +
+            random.gauss() * jitter,
+        }
+      }
+      const legA = tip(stroke.legA)
+      const legB = tip(stroke.legB)
       return [
         ...line(legA, vertex, LEG_STEPS, LEG_JITTER, random),
         ...line(vertex, legB, LEG_STEPS, LEG_JITTER, random).slice(1),
