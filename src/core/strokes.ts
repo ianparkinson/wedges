@@ -128,11 +128,17 @@ export function classifyTrace(
   return wedge(first, end)
 }
 
-function wedge(head: Point, tail: Point): Wedge {
+/** A wedge from its head to its tail. */
+export function wedge(head: Point, tail: Point): Wedge {
   return { kind: "wedge", head, tail }
 }
 
-function winkelhaken(vertex: Point, legA: Point, legB: Point): Winkelhaken {
+/** A Winkelhaken with its point at `vertex` and its legs ending at `legA` and `legB`. */
+export function winkelhaken(
+  vertex: Point,
+  legA: Point,
+  legB: Point,
+): Winkelhaken {
   return { kind: "winkelhaken", vertex, legA, legB }
 }
 

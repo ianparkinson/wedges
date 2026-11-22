@@ -10,6 +10,7 @@
  */
 import { parseArgs } from "node:util"
 
+import { prepareDrawing } from "@/core/matcher/match"
 import { rank } from "@/core/matcher/rank"
 
 import { signDatabase, skeletonDrawings } from "../test/signDatabase"
@@ -45,7 +46,9 @@ const started = performance.now()
 for (const { sign, strokes } of skeletons) {
   for (let trial = 0; trial < trials; trial++) {
     const drawing = synthesizeDrawing(strokes, noise, random)
-    const results = rank(drawing, db.drawable, { limit: CANDIDATES })
+    const results = rank(prepareDrawing(drawing), db.drawable, {
+      limit: CANDIDATES,
+    })
     const position = results.findIndex((r) => r.sign === sign)
 
     total++

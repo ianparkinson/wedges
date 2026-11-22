@@ -1,9 +1,7 @@
 /**
  * Ranks signs against a drawing. See docs/matching.md#5-ranking.
  */
-import type { Stroke } from "@/core/strokes"
-
-import { match, prepareSample, type Match, type PreparedSample } from "./match"
+import { match, type Match, type PreparedSample } from "./match"
 import { defaultWeights, type MatchWeights } from "./pairCost"
 
 /** Anything with samples to match against, usually a sign. */
@@ -28,23 +26,23 @@ export interface RankOptions<S extends Rankable> {
 }
 
 /**
- * The best `limit` signs for a drawing, best first, each scored by its best
+ * The best `limit` signs for a drawing, prepared by
+ * `prepareDrawing()`, best first, each scored by its best
  * sample. Signs whose score can't reach the top `limit` are skipped without
  * being matched. Ties keep the order of `signs`.
  */
 export function rank<S extends Rankable>(
-  drawing: readonly Stroke[],
+  drawing: PreparedSample,
   signs: readonly S[],
   { limit = Infinity, filter, weights = defaultWeights }: RankOptions<S> = {},
 ): Ranked<S>[] {
-  if (drawing.length === 0) return []
-  const prepared = prepareSample(drawing)
+  if (drawing.features.length === 0) return []
   const queue = signs
     .filter((sign) => filter?.(sign) ?? true)
     .map((sign) => {
       const samples = sign.samples.map((sample) => ({
         sample,
-        bound: scoreLowerBound(prepared, sample, weights),
+        bound: scoreLowerBound(drawing, sample, weights),
       }))
       return { sign, samples, bound: Math.min(...samples.map((s) => s.bound)) }
     })
@@ -58,7 +56,7 @@ export function rank<S extends Rankable>(
     // The queue is in order of bound, so no later sign can make the top
     // `limit` either.
     if (bound > cutoff) break
-    const best = bestMatch(prepared, sign, samples, weights, cutoff)
+    const best = bestMatch(drawing, sign, samples, weights, cutoff)
     if (best) {
       results.push(best)
 

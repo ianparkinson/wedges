@@ -2,36 +2,78 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ianparkinson.github.io/wedges/schemas/skeletons.schema.json",
   "title": "Sign skeletons",
-  "description": "Skeletons that drawings are matched against, for one script style or font. See docs/skeleton-format.md.",
+  "description": "Skeletons that drawings are matched against, traced over one font. See docs/skeleton-format.md.",
   "type": "object",
-  "required": ["version", "style", "skeletons"],
+  "required": [
+    "version",
+    "font",
+    "wedges",
+    "headLean",
+    "winkelhakenAngle",
+    "skeletons"
+  ],
   "additionalProperties": false,
   "properties": {
-    "version": { "const": 1 },
-    "style": {
-      "description": "The script style or font the file follows.",
-      "enum": ["noto"]
+    "version": { "const": 2 },
+    "font": {
+      "description": "The font the skeletons were traced over.",
+      "type": "object",
+      "required": ["family", "version", "unitsPerEm"],
+      "additionalProperties": false,
+      "properties": {
+        "family": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "unitsPerEm": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "credit": {
+      "description": "The attribution the app must show when it uses this file.",
+      "type": "string"
     },
     "comments": {
       "description": "Notes on the file: who or what made it, and when.",
       "type": "string"
     },
+    "wedges": {
+      "description": "Whether the font's wedges have a head then a tail, or taper over their whole length.",
+      "enum": ["headed", "tapered"]
+    },
+    "headAspect": {
+      "description": "A wedge head's depth divided by its size, in a headed font.",
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "headLean": {
+      "description": "The angle of a wedge head's back edge from square to its tail, in degrees, anticlockwise.",
+      "type": "number"
+    },
+    "winkelhakenAngle": {
+      "description": "The angle between a Winkelhaken's legs, in degrees.",
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 180
+    },
     "skeletons": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["char", "spec"],
+        "required": ["text"],
+        "anyOf": [{ "required": ["shapes"] }, { "required": ["comments"] }],
         "additionalProperties": false,
         "properties": {
-          "char": {
-            "description": "The Unicode character, a single code point.",
+          "text": {
+            "description": "The characters the font draws as this glyph: one or more code points, each cuneiform or private-use.",
             "type": "string",
-            "pattern": "^[\\u{12000}-\\u{1254F}]$"
+            "pattern": "^[\\u{12000}-\\u{1254F}\\u{E000}-\\u{F8FF}\\u{F0000}-\\u{FFFFD}\\u{100000}-\\u{10FFFD}]+$"
           },
-          "spec": {
-            "description": "The strokes, in spec notation.",
-            "type": "string",
-            "minLength": 1
+          "shapes": {
+            "description": "The shapes, one string each, in the order docs/skeleton-format.md defines.",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^(?:w(?: -?\\d+(?:\\.\\d+)?){5}|k(?: -?\\d+(?:\\.\\d+)?){4})$"
+            }
           },
           "comments": {
             "description": "Notes on this entry, for people editing the file.",
@@ -40,5 +82,8 @@
         }
       }
     }
-  }
+  },
+  "if": { "properties": { "wedges": { "const": "headed" } } },
+  "then": { "required": ["headAspect"] },
+  "else": { "not": { "required": ["headAspect"] } }
 }

@@ -24,8 +24,8 @@ describe("the sign data built from data/osl.asl", () => {
   })
 
   it("has an entry for every skeleton", () => {
-    const missing = noto.skeletons.filter((t) => !chars.has(t.char))
-    expect(missing.map((t) => t.char)).toEqual([])
+    const missing = noto.skeletons.filter((t) => !chars.has(t.text))
+    expect(missing.map((t) => t.text)).toEqual([])
   })
 
   it("refers only to signs it lists", () => {

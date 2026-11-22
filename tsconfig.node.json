@@ -24,6 +24,7 @@
     "src/virtual.d.ts",
     "test/synthetic",
     "test/signDatabase.ts",
+    "test/skeletonStrokes.ts",
     "test/bench"
   ]
 }

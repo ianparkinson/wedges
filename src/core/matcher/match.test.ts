@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { parseSpec } from "@/core/spec"
-
-import { match, prepareSample } from "./match"
+import type { StrokeFeature } from "./features"
+import { match, type PreparedSample } from "./match"
 import { defaultWeights } from "./pairCost"
 
 const {
@@ -13,23 +12,48 @@ const {
   winkelhakenSize,
 } = defaultWeights
 
-/** Two wedges that fix the frame, so the third stroke stays where it's put. */
-const FRAME = "w 0 0 10 0; w 0 10 10 10"
+const DEGREES = Math.PI / 180
 
-function matchSpecs(drawn: string, skeleton: string, cutoff?: number) {
-  return match(
-    prepareSample(parseSpec(drawn)),
-    prepareSample(parseSpec(skeleton)),
-    defaultWeights,
-    cutoff,
-  )
+/** A wedge's features: its midpoint, direction in degrees (y down), and length. */
+function wedge(
+  x: number,
+  y: number,
+  direction: number,
+  length: number,
+): StrokeFeature {
+  return {
+    kind: "wedge",
+    position: { x, y },
+    angle: direction * DEGREES,
+    logLength: Math.log(length),
+  }
+}
+
+/** A Winkelhaken's features: its vertex, opening direction in degrees, and leg length. */
+function winkelhaken(
+  x: number,
+  y: number,
+  opening: number,
+  size: number,
+): StrokeFeature {
+  return {
+    kind: "winkelhaken",
+    position: { x, y },
+    logSize: Math.log(size),
+    opening: opening * DEGREES,
+  }
+}
+
+/** Features already in the normalised frame, where a sign is 1 across. */
+function sample(...features: StrokeFeature[]): PreparedSample {
+  return { features, wedges: features.filter((f) => f.kind === "wedge").length }
 }
 
 describe("match", () => {
   it("doesn't care about stroke order", () => {
-    const result = matchSpecs(
-      "w 0 7 10 7; w 0 3 10 3",
-      "w 0 3 10 3; w 0 7 10 7",
+    const result = match(
+      sample(wedge(0.5, 0.7, 0, 1), wedge(0.5, 0.3, 0, 1)),
+      sample(wedge(0.5, 0.3, 0, 1), wedge(0.5, 0.7, 0, 1)),
     )
     expect(result?.score).toBe(0)
     expect(result?.pairs).toEqual([
@@ -39,9 +63,9 @@ describe("match", () => {
   })
 
   it("pairs wedges drawn tail first with their counterparts", () => {
-    const result = matchSpecs(
-      "w 10 5 0 5; w 5 10 5 0",
-      "w 0 5 10 5; w 5 0 5 10",
+    const result = match(
+      sample(wedge(0.5, 0.5, 180, 1), wedge(0.5, 0.5, -90, 1)),
+      sample(wedge(0.5, 0.5, 0, 1), wedge(0.5, 0.5, 90, 1)),
     )
     expect(result?.pairs).toEqual([
       [0, 0],
@@ -52,9 +76,9 @@ describe("match", () => {
   })
 
   it("doesn't care about the order of Winkelhaken", () => {
-    const result = matchSpecs(
-      "h 6 5 9 3 9 7; h 4 5 1 3 1 7",
-      "h 4 5 1 3 1 7; h 6 5 9 3 9 7",
+    const result = match(
+      sample(winkelhaken(0.6, 0.5, 0, 0.3), winkelhaken(0.4, 0.5, 180, 0.3)),
+      sample(winkelhaken(0.4, 0.5, 180, 0.3), winkelhaken(0.6, 0.5, 0, 0.3)),
     )
     expect(result?.score).toBe(0)
     expect(result?.pairs).toEqual([
@@ -65,27 +89,27 @@ describe("match", () => {
 
   it("charges a Winkelhaken opening a different way by how far it turns", () => {
     // Opening downwards rather than rightwards: a quarter turn.
-    const result = matchSpecs(
-      `${FRAME}; h 5 4 3 7 7 7`,
-      `${FRAME}; h 5 4 8 2 8 6`,
+    const result = match(
+      sample(winkelhaken(0.5, 0.4, 90, 0.3)),
+      sample(winkelhaken(0.5, 0.4, 0, 0.3)),
     )
-    expect(result?.pairs).toContainEqual([2, 2])
-    expect(result?.score).toBeCloseTo(winkelhakenOpening / 3)
+    expect(result?.pairs).toEqual([[0, 0]])
+    expect(result?.score).toBeCloseTo(winkelhakenOpening)
   })
 
   it("charges a Winkelhaken of a different size by the ratio of sizes", () => {
-    const result = matchSpecs(
-      `${FRAME}; h 5 4 6.5 3 6.5 5`,
-      `${FRAME}; h 5 4 8 2 8 6`,
+    const result = match(
+      sample(winkelhaken(0.5, 0.4, 0, 0.15)),
+      sample(winkelhaken(0.5, 0.4, 0, 0.3)),
     )
-    expect(result?.pairs).toContainEqual([2, 2])
-    expect(result?.score).toBeCloseTo((winkelhakenSize * Math.log(2)) / 3)
+    expect(result?.pairs).toEqual([[0, 0]])
+    expect(result?.score).toBeCloseTo(winkelhakenSize * Math.log(2))
   })
 
   it("leaves an extra drawn stroke unpaired", () => {
-    const result = matchSpecs(
-      "w 0 0 10 0; w 0 5 10 5; w 0 10 10 10",
-      "w 0 0 10 0; w 0 10 10 10",
+    const result = match(
+      sample(wedge(0.5, 0, 0, 1), wedge(0.5, 0.5, 0, 1), wedge(0.5, 1, 0, 1)),
+      sample(wedge(0.5, 0, 0, 1), wedge(0.5, 1, 0, 1)),
     )
     expect(result?.pairs).toEqual([
       [0, 0],
@@ -95,9 +119,9 @@ describe("match", () => {
   })
 
   it("charges a missing stroke as unpaired", () => {
-    const result = matchSpecs(
-      "w 0 0 10 0; w 0 10 10 10",
-      "w 0 0 10 0; w 0 5 10 5; w 0 10 10 10",
+    const result = match(
+      sample(wedge(0.5, 0, 0, 1), wedge(0.5, 1, 0, 1)),
+      sample(wedge(0.5, 0, 0, 1), wedge(0.5, 0.5, 0, 1), wedge(0.5, 1, 0, 1)),
     )
     expect(result?.pairs).toEqual([
       [0, 0],
@@ -107,26 +131,29 @@ describe("match", () => {
   })
 
   it("pairs a wedge with a Winkelhaken in the same place", () => {
-    const result = matchSpecs(`${FRAME}; w 0 5 4 5`, `${FRAME}; h 2 5 8 2 8 8`)
-    expect(result?.pairs).toContainEqual([2, 2])
-    expect(result?.score).toBeCloseTo(kindMismatch / 3)
+    const result = match(
+      sample(wedge(0.2, 0.5, 0, 0.4)),
+      sample(winkelhaken(0.2, 0.5, 0, 0.6)),
+    )
+    expect(result?.pairs).toEqual([[0, 0]])
+    expect(result?.score).toBeCloseTo(kindMismatch)
   })
 
   it("leaves a wedge and a Winkelhaken unpaired when they are far apart", () => {
     // Pairing them would cost more than leaving both unpaired.
-    const result = matchSpecs(`${FRAME}; w 8 5 10 5`, `${FRAME}; h 0 5 3 3 3 7`)
-    expect(result?.pairs).toEqual([
-      [0, 0],
-      [1, 1],
-    ])
-    expect(result?.score).toBeCloseTo((2 * unmatched) / 3)
+    const result = match(
+      sample(wedge(0.9, 0.5, 0, 0.2)),
+      sample(winkelhaken(0, 0.5, 0, 0.3)),
+    )
+    expect(result?.pairs).toEqual([])
+    expect(result?.score).toBeCloseTo(2 * unmatched)
   })
 
   it("gives up only when the score would be above the cutoff", () => {
-    const drawn = "w 5 0 5 10; h 2 5 8 2 8 8"
-    const skeleton = "w 0 3 10 3; w 0 7 10 7"
-    const full = matchSpecs(drawn, skeleton)
-    expect(matchSpecs(drawn, skeleton, full?.score)).toEqual(full)
-    expect(matchSpecs(drawn, skeleton, 0.1)).toBeNull()
+    const drawn = sample(wedge(0.5, 0.5, 90, 1), winkelhaken(0.2, 0.5, 0, 0.6))
+    const skeleton = sample(wedge(0.5, 0.3, 0, 1), wedge(0.5, 0.7, 0, 1))
+    const full = match(drawn, skeleton)
+    expect(match(drawn, skeleton, defaultWeights, full?.score)).toEqual(full)
+    expect(match(drawn, skeleton, defaultWeights, 0.1)).toBeNull()
   })
 })

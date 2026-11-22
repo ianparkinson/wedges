@@ -56,10 +56,13 @@ const osl: OslData = {
   ],
 }
 
-const skeletons = (...chars: string[]): SkeletonFile => ({
-  version: 1,
-  style: "test-style",
-  skeletons: chars.map((char) => ({ char, spec: "w 5 0 5 10" })),
+const skeletons = (...texts: string[]): SkeletonFile => ({
+  version: 2,
+  font: { family: "Test Font", version: "1.0", unitsPerEm: 1000 },
+  wedges: "tapered",
+  headLean: 0,
+  winkelhakenAngle: 90,
+  skeletons: texts.map((text) => ({ text, shapes: ["w 50 100 270 100 15"] })),
 })
 
 describe("SignDatabase", () => {
@@ -72,6 +75,16 @@ describe("SignDatabase", () => {
   it("collects every sample of a sign", () => {
     expect(db.sign("𒀭")?.samples).toHaveLength(2)
     expect(db.sign("𒀀")?.samples).toEqual([])
+  })
+
+  it("leaves out entries with no shapes", () => {
+    const file: SkeletonFile = {
+      ...skeletons("𒁹"),
+      skeletons: [{ text: "𒀀", comments: "Not drawable" }],
+    }
+    const withEmpty = new SignDatabase([file, skeletons("𒁹")], osl)
+    expect(withEmpty.drawable.map((s) => s.name)).toEqual(["DIŠ"])
+    expect(withEmpty.sign("𒀀")?.samples).toEqual([])
   })
 
   it("tells signs and sequences apart by kind", () => {

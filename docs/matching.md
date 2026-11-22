@@ -4,8 +4,8 @@ How a set of drawn strokes is compared with sign skeletons to produce a ranked l
 
 | File           | What it does                                                                   |
 | -------------- | ------------------------------------------------------------------------------ |
-| `normalize.ts` | puts strokes into a standard frame                                             |
-| `features.ts`  | reduces each stroke to a few numbers                                           |
+| `normalize.ts` | puts features into a standard frame                                            |
+| `features.ts`  | reduces each drawn stroke to a few numbers                                     |
 | `pairCost.ts`  | the cost of pairing one drawn stroke with one skeleton stroke, and the weights |
 | `match.ts`     | scores a drawing against one sample                                            |
 | `rank.ts`      | ranks signs, skipping those that can't reach the top results                   |
@@ -29,7 +29,9 @@ How a set of drawn strokes is compared with sign skeletons to produce a ranked l
 
 Collect the key points of every stroke: both ends of each wedge; the vertex and both leg ends of each Winkelhaken. Take their bounding box, move its centre to the origin, and divide by the longer side. A sign then fits in a box whose longer side is 1, keeping its proportions.
 
-This removes position and scale on the canvas, so a sign can be drawn anywhere and at any size. It keeps the aspect ratio, so a tall sign stays tall. The drawing and the skeletons go through the same function, `normalize()`, so they're directly comparable. Skeletons are normalised once, by `prepareSample()`, when the sign database is built.
+This removes position and scale on the canvas, so a sign can be drawn anywhere and at any size. It keeps the aspect ratio, so a tall sign stays tall. The drawing and the skeletons go through the same function, `normalize()`, so they're directly comparable.
+
+A drawing is prepared by `prepareDrawing()` after every stroke. Skeletons are prepared once, by `prepareSkeleton()` in [`src/core/skeleton.ts`](../src/core/skeleton.ts), when the sign database is built: it computes each shape's features and key points straight from the skeleton file's numbers, flipping y to point down as on screen.
 
 **Weakness:** one stray stroke far from the rest shrinks and shifts everything else. Proportions also vary between users; someone who draws a sign squashed sideways will have every position slightly off.
 

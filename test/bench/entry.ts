@@ -4,6 +4,7 @@
  */
 import { osl } from "virtual:osl"
 
+import { prepareDrawing } from "@/core/matcher/match"
 import { rank } from "@/core/matcher/rank"
 
 import { signDatabase, skeletonDrawings } from "../signDatabase"
@@ -29,7 +30,7 @@ export function timeRanking(strokeCounts: number[]): Record<number, number> {
       const drawing = synthesizeDrawing(strokes, NOISE, random).slice(0, count)
 
       const start = performance.now()
-      rank(drawing, db.drawable, { limit: CANDIDATES })
+      rank(prepareDrawing(drawing), db.drawable, { limit: CANDIDATES })
       times.push(performance.now() - start)
     }
 

@@ -1,40 +1,79 @@
 import { describe, expect, it } from "vitest"
 
-import { parseSpec } from "@/core/spec"
-
-import { prepareSample } from "./match"
+import type { StrokeFeature } from "./features"
+import type { PreparedSample } from "./match"
 import { rank } from "./rank"
 
-const signs = [
-  { name: "one", spec: "w 0 5 10 5" },
-  { name: "two", spec: "w 0 3 10 3; w 0 7 10 7" },
-  { name: "cross", spec: "w 0 5 10 5; w 5 0 5 10" },
-  { name: "hook", spec: "h 2 5 8 2 8 8" },
-  { name: "three", spec: "w 0 2 10 2; w 0 5 10 5; w 0 8 10 8" },
-].map((s) => ({ ...s, samples: [prepareSample(parseSpec(s.spec))] }))
+const DEGREES = Math.PI / 180
+
+/** A wedge's features: its midpoint, direction in degrees (y down), and length. */
+function wedge(
+  x: number,
+  y: number,
+  direction: number,
+  length: number,
+): StrokeFeature {
+  return {
+    kind: "wedge",
+    position: { x, y },
+    angle: direction * DEGREES,
+    logLength: Math.log(length),
+  }
+}
+
+/** A Winkelhaken's features: its vertex, opening direction in degrees, and leg length. */
+function winkelhaken(
+  x: number,
+  y: number,
+  opening: number,
+  size: number,
+): StrokeFeature {
+  return {
+    kind: "winkelhaken",
+    position: { x, y },
+    logSize: Math.log(size),
+    opening: opening * DEGREES,
+  }
+}
+
+/** Features already in the normalised frame, where a sign is 1 across. */
+function sample(...features: StrokeFeature[]): PreparedSample {
+  return { features, wedges: features.filter((f) => f.kind === "wedge").length }
+}
+
+const forms = {
+  one: sample(wedge(0, 0, 0, 1)),
+  two: sample(wedge(0, -0.2, 0, 1), wedge(0, 0.2, 0, 1)),
+  cross: sample(wedge(0, 0, 0, 1), wedge(0, 0, 90, 1)),
+  hook: sample(winkelhaken(-0.5, 0, 0, 1.1)),
+  three: sample(wedge(0, -0.3, 0, 1), wedge(0, 0, 0, 1), wedge(0, 0.3, 0, 1)),
+}
+const signs = Object.entries(forms).map(([name, form]) => ({
+  name,
+  samples: [form],
+}))
 
 describe("rank", () => {
   it("returns nothing for an empty drawing", () => {
-    expect(rank([], signs)).toEqual([])
+    expect(rank(sample(), signs)).toEqual([])
   })
 
   it("puts the sign that was drawn first", () => {
-    const [best] = rank(parseSpec("w 5 0 5 10; w 0 5 10 5"), signs)
+    const [best] = rank(sample(wedge(0, 0, 90, 1), wedge(0, 0, 0, 1)), signs)
     expect(best?.sign.name).toBe("cross")
     expect(best?.score).toBe(0)
   })
 
   it("gives the same top results with a limit as without", () => {
-    for (const sign of signs) {
-      const drawing = parseSpec(sign.spec)
-      const full = rank(drawing, signs).map((r) => r.sign.name)
-      const limited = rank(drawing, signs, { limit: 2 }).map((r) => r.sign.name)
+    for (const form of Object.values(forms)) {
+      const full = rank(form, signs).map((r) => r.sign.name)
+      const limited = rank(form, signs, { limit: 2 }).map((r) => r.sign.name)
       expect(limited).toEqual(full.slice(0, 2))
     }
   })
 
   it("ranks only the signs the filter keeps", () => {
-    const results = rank(parseSpec("w 0 5 10 5"), signs, {
+    const results = rank(forms.one, signs, {
       filter: (sign) => sign.name !== "one",
     })
     expect(results.map((r) => r.sign.name)).not.toContain("one")
@@ -42,15 +81,9 @@ describe("rank", () => {
   })
 
   it("scores a sign by its best sample", () => {
-    const twoForms = {
-      name: "either",
-      samples: [
-        prepareSample(parseSpec("h 2 5 8 2 8 8")),
-        prepareSample(parseSpec("w 0 5 10 5")),
-      ],
-    }
-    const [best] = rank(parseSpec("w 0 5 10 5"), [twoForms])
+    const twoForms = { name: "either", samples: [forms.hook, forms.one] }
+    const [best] = rank(forms.one, [twoForms])
     expect(best?.score).toBe(0)
-    expect(best?.sample).toBe(twoForms.samples[1])
+    expect(best?.sample).toBe(forms.one)
   })
 })

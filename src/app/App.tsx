@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react"
 
+import { prepareDrawing } from "@/core/matcher/match"
 import { rank } from "@/core/matcher/rank"
 import type { Sign, SignListEntry } from "@/core/signs"
 import type { Stroke } from "@/core/strokes"
@@ -48,9 +49,9 @@ export function App() {
   const candidates = useMemo(
     () =>
       database
-        ? rank(strokes, database.drawable, { limit: CANDIDATE_COUNT }).map(
-            (ranked) => ranked.sign,
-          )
+        ? rank(prepareDrawing(strokes), database.drawable, {
+            limit: CANDIDATE_COUNT,
+          }).map((ranked) => ranked.sign)
         : [],
     [database, strokes],
   )
