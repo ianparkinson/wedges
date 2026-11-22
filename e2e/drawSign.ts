@@ -1,12 +1,9 @@
 import type { Locator, Page } from "@playwright/test"
 
 import noto from "../data/skeletons/noto.json" with { type: "json" }
-import { parseSpec } from "../src/core/spec"
 import type { Stroke } from "../src/core/strokes"
 import type { Point } from "../src/lib/geometry"
-
-/** Skeletons span 0 to 10 in each direction. */
-const SKELETON_SIZE = 10
+import { skeletonStrokes } from "../test/skeletonStrokes"
 
 /** The sign is drawn inside this fraction of the pad, centred. */
 const DRAWING_FRACTION = 0.8
@@ -21,19 +18,19 @@ const STEPS = 12
  * the strokes are drawn with the mouse, which the pad handles in the same way.
  */
 export async function drawSign(page: Page, pad: Locator, char: string) {
-  const skeleton = noto.skeletons.find((s) => s.char === char)
+  const skeleton = noto.skeletons.find((s) => s.text === char)
   if (!skeleton) throw new Error(`No Noto skeleton for ${char}`)
+  const strokes = skeletonStrokes(skeleton.shapes, noto.winkelhakenAngle)
 
   const box = await pad.boundingBox()
   if (!box) throw new Error("The drawing pad isn't visible")
-  const scale =
-    (DRAWING_FRACTION * Math.min(box.width, box.height)) / SKELETON_SIZE
+  const scale = DRAWING_FRACTION * Math.min(box.width, box.height)
   const toPage = ({ x, y }: Point) => ({
-    x: box.x + box.width / 2 + (x - SKELETON_SIZE / 2) * scale,
-    y: box.y + box.height / 2 + (y - SKELETON_SIZE / 2) * scale,
+    x: box.x + box.width / 2 + x * scale,
+    y: box.y + box.height / 2 + y * scale,
   })
 
-  for (const stroke of parseSpec(skeleton.spec)) {
+  for (const stroke of strokes) {
     await drawPath(page, strokePath(stroke).map(toPage))
   }
 }

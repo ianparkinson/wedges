@@ -1,80 +1,179 @@
 # Skeleton format
 
-A **skeleton** is a sign's strokes as a font draws them, with no stroke weight: where each wedge starts and ends, and where each Winkelhaken's vertex and legs are, in a standard frame. The skeletons in `data/skeletons/` are written in a compact text form called the **spec** notation. This document defines that notation and the files that hold the skeletons.
+A _skeleton_ describes the strokes of one sign as a particular font draws it: where each wedge starts, which way it points, and how long it is, and where each Winkelhaken's vertex is and which way it opens. The matcher compares a user's drawing with these skeletons. This document defines the skeleton files in `data/skeletons/` and the shapes they contain.
+
+Skeleton files describe the glyphs themselves, not a sample of someone drawing them, so that you can check a skeleton against its font and review or edit a file by hand.
+
+## Shapes in a font
+
+The format assumes that a font draws cuneiform from two kinds of shape.
+
+A _wedge_ has a triangular _head_ and a straight _tail_:
+
+- The head's _aspect_, its depth divided by the width of its back edge, is roughly constant throughout a font.
+- In some fonts, the head's back edge isn't square to the tail, but leans by a roughly constant angle.
+- Some fonts have no distinct head: their wedges taper over their whole length. These fonts are called _tapered_; the others are _headed_.
+- A wedge can be a bare head, with no tail.
+- A _headless line_ is a straight line with no head, which some glyphs contain.
+
+A _Winkelhaken_ is a chevron: two legs of equal length that meet at a vertex. The angle between the legs is roughly constant throughout a font, but differs from one font to another.
+
+A Winkelhaken can look like a wedge head with no tail. In fonts built from separate wedges, the two have quite different angles, but in some fonts they look alike.
+
+Fonts often draw a sign with different strokes, so each font needs its own skeletons. You can't derive them from another font's skeletons.
+
+The format doesn't cover curved strokes, which a few signs have.
 
 ## Coordinate frame
 
-- Coordinates are on a **0–10 grid**, x to the right and **y downward** (as on screen).
-- A sign is usually placed so that the longer side of the bounding box of its key points (wedge ends, Winkelhaken vertices and leg ends) runs from 0 to 10, and the shorter side is centred around 5. For example, a sign twice as wide as it is tall spans x 0–10 and y 2.5–7.5.
-- Only relative positions matter: the matcher normalises every skeleton again when it loads it ([matching.md](matching.md)), so a skeleton may use any placement within the grid.
-- Two decimal places are plenty. Most coordinates have one, which is 1% of the sign's size.
+Coordinates are in the font's own frame, scaled so that 1 em is 100 units:
 
-## Spec notation
+- The origin (0, 0) is on the baseline, at the glyph's origin: the left of its advance, as the font defines it.
+- The x axis points right, and the y axis points up. Parts of a glyph below the baseline have negative y.
+- Positions and lengths are normally whole numbers, a step of 1% of the em. Use decimals only where whole numbers aren't precise enough.
+- Angles are in degrees, at least 0 and less than 360, measured anticlockwise from the positive x axis: 0 points right, and 90 points up. They're normally whole numbers, but can have decimals where necessary.
+- A skeleton isn't limited to a box: it can extend outside 0–100 in either direction.
 
-A spec is a list of strokes separated by semicolons. Each stroke is an op followed by numbers, separated by spaces:
+Because skeletons are in the font's frame, a glyph rendered at a font size of 1 em lines up with its skeleton drawn at 100 units to the em.
 
-```
-spec   = stroke *( ";" [space] stroke )
-stroke = op 1*( space number )
-number = decimal, optionally negative, e.g. 3 | 0.5 | 10 | -0.2
-```
+## Shape strings
 
-Whitespace around semicolons is ignored. Empty items are skipped.
+Each shape is a string: an op, then its numbers, separated by single spaces.
 
-| Op  | Stroke      | Arguments         | Meaning                                                                                         |
-| --- | ----------- | ----------------- | ----------------------------------------------------------------------------------------------- |
-| `w` | wedge       | x1 y1 x2 y2       | head (the wide end, where the finger lands) at (x1, y1), tail at (x2, y2)                       |
-| `h` | Winkelhaken | vx vy ax ay bx by | vertex (the point of the angle) at (vx, vy), and the ends of its two legs at (ax, ay), (bx, by) |
-
-These two ops write out exactly the points that matching uses ([stroke-recognition.md](stroke-recognition.md#output)), so there is nothing to convert.
-
-### Example
-
-AN: a vertical, a horizontal, and two diagonals crossing at the centre.
+### Wedge
 
 ```
-w 5.1 0.1 5.1 10; w 0 4.7 10 4.7; w 1.4 1.1 8.7 8.1; w 1.4 8 8.8 0.9
+w x y dir length head
 ```
 
-### Parsing
+| Value    | Meaning                                                                                         |
+| -------- | ----------------------------------------------------------------------------------------------- |
+| `x y`    | The start: the midpoint of the head's back edge, the edge furthest from the tail.               |
+| `dir`    | The direction from the start towards the end of the tail.                                       |
+| `length` | The distance from the start to the end of the tail, including the head.                         |
+| `head`   | The head size: the width of its back edge. Leave out any flare at the extreme tips of the edge. |
 
-`parseSpec()` in [`src/core/spec.ts`](../src/core/spec.ts) turns a spec into strokes; it throws on an unknown op or the wrong count of numbers.
+The file's per-font values describe the rest of the wedge:
 
-### History
+- In a headed font, the head's depth is `headAspect × head`. A wedge whose `length` equals its head depth is a bare head. A `length` less than the head depth isn't valid.
+- In a tapered font, the wedge narrows from `head` at the start to a point at the end of the tail.
+- The head's back edge runs at `dir + 90 + headLean` degrees.
 
-During early prototyping the notation had different ops, including shorthand for horizontal, vertical and diagonal wedges given by a head and a length, and for a Winkelhaken opening to the right with legs at 0.7 × its size. Those Winkelhaken leg ends are why some coordinates have two decimal places.
+### Headless line
+
+A headless line is a wedge with a `head` of 0:
+
+```
+w x y dir length 0
+```
+
+Either end could be the start, so the format fixes which one to use, following the direction that wedges most often run:
+
+- For a vertical line, the start is the top end, the one with the larger y. So `dir` is 270.
+- For any other line, the start is the left end, the one with the smaller x.
+
+### Winkelhaken
+
+```
+k x y dir leg
+```
+
+| Value | Meaning                                                                                                   |
+| ----- | --------------------------------------------------------------------------------------------------------- |
+| `x y` | The vertex: where the centre lines of the two legs meet, inside the elbow.                                |
+| `dir` | The opening direction, from the vertex towards the open side, halfway between the legs. A `<` opens at 0. |
+| `leg` | The length of each leg, along its centre line from the vertex to its tip.                                 |
+
+The legs' tips are at `dir ± winkelhakenAngle / 2`, where `winkelhakenAngle` is the file's per-font value.
+
+Measuring a Winkelhaken along its centre lines, rather than from its outer point, means that equal legs fit even where a font's Winkelhaken look lopsided from the outside.
+
+### Examples
+
+AN: a horizontal wedge, two diagonal wedges, and a vertical wedge, all the same length and crossing at the centre:
+
+```json
+["w 13 33 0 78 15", "w 24 5 45 78 15", "w 24 61 315 78 15", "w 52 72 270 78 15"]
+```
+
+IGI: a Winkelhaken opening to the right, then a vertical wedge, and a short horizontal wedge to its right:
+
+```json
+["k 18 31 0 31", "w 50 70 270 77 15", "w 60 32 0 37 15"]
+```
 
 ## Skeleton files
 
-`data/skeletons/noto.json` holds the 832 skeletons traced by hand over Noto Sans Cuneiform in October 2026. There is one file per script style or font. Their schema is `data/schemas/skeletons.schema.json`, and `test/data/skeletons.test.ts` checks every file in `data/skeletons/` against it.
+There's one file for each font, named after it, such as `data/skeletons/noto.json`. The file name is the font's id in the app. Each file is formatted by Prettier, like the rest of the repo.
 
 ```json
 {
-  "version": 1,
-  "style": "noto",
-  "comments": "Traced by hand over Noto Sans Cuneiform during prototyping, October 2026.",
+  "version": 2,
+  "font": {
+    "family": "Example Cuneiform",
+    "version": "1.000",
+    "unitsPerEm": 1000
+  },
+  "credit": "Font by A. N. Author",
+  "comments": "Traced over Example Cuneiform 1.000.",
+  "wedges": "headed",
+  "headAspect": 0.84,
+  "headLean": 0,
+  "winkelhakenAngle": 100,
   "skeletons": [
+    { "text": "𒀸", "shapes": ["w 3 34 0 70 30"] },
+    { "text": "𒌋", "shapes": ["k 10 35 0 29"] },
+    { "text": "𒋰", "shapes": ["w 3 26 0 70 28", "w 4 45 0 69 30"] },
     {
-      "char": "𒀭",
-      "spec": "w 5.1 0.1 5.1 10; …"
+      "text": "𒊹",
+      "comments": "Curved in this font, which the format can't describe."
     }
   ]
 }
 ```
 
-| Field                  | Meaning                                                                              |
-| ---------------------- | ------------------------------------------------------------------------------------ |
-| `style`                | the script style or font the file follows; `noto` for now                            |
-| `comments`             | optional notes on the file: who or what made it, and when                            |
-| `skeletons[].char`     | the Unicode character, a single code point in the cuneiform blocks (U+12000–U+1254F) |
-| `skeletons[].spec`     | the strokes, in spec notation                                                        |
-| `skeletons[].comments` | optional notes on one entry                                                          |
+| Field                  | Meaning                                                                                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`              | Always 2.                                                                                                                                   |
+| `font`                 | The font the skeletons were traced over: its family name, version, and units per em. A font update can move glyphs, so the version matters. |
+| `credit`               | Optional. The attribution that the app must show when it uses this file, if the font's licence asks for one.                                |
+| `comments`             | Optional. Notes on the file, such as who or what made it, and when.                                                                         |
+| `wedges`               | `"headed"` or `"tapered"`.                                                                                                                  |
+| `headAspect`           | A wedge head's depth divided by its size. Required in a headed font, and not allowed in a tapered one.                                      |
+| `headLean`             | The angle of a wedge head's back edge from square to its tail, in degrees, anticlockwise. Usually 0.                                        |
+| `winkelhakenAngle`     | The angle between a Winkelhaken's legs, in degrees.                                                                                         |
+| `skeletons[].text`     | The characters that the font draws as this glyph. See [Text](#text).                                                                        |
+| `skeletons[].shapes`   | Optional. The shapes, one string each. Leave it out for a sign that the file deliberately doesn't describe, and say why in `comments`.      |
+| `skeletons[].comments` | Optional. Notes on this entry. Required when there are no `shapes`.                                                                         |
 
-The file is formatted by Prettier, like the rest of the repo. It has one skeleton per character for now, but a file may have several for a character, for example for variant forms.
+The matcher uses only `winkelhakenAngle` of the per-font values. The others are for drawing skeletons and checking them against the font. The file doesn't record stroke thicknesses: a tool that draws skeletons over a font can keep its own.
 
-Names, values and links for each character come from the Oracc Sign List data, not from the skeletons.
+### Text
 
-## Ideas for later
+An entry's `text` is the code point or code points that identify the glyph: one or more code points, each either in the cuneiform blocks, U+12000–U+1254F, or private-use. More than one code point is a ligature: a sequence that the font draws as a single glyph.
 
-- **Script styles:** skeletons in another style or font, such as Neo-Assyrian, would go in their own file with their own `style`, so they can be told apart, filtered and credited.
-- **Snapping:** when the skeletons were first traced, wedges within 8° of horizontal or vertical were snapped straight, and Winkelhaken opening within 30° of rightwards were made symmetrical. A tool for making skeletons could snap in the same way, so that skeletons are always tidy, and the matcher could snap drawn strokes to match. The accuracy benchmark can tell whether snapping drawn strokes helps.
+A font can use private-use code points, U+E000–U+F8FF or in planes 15 and 16, for variant forms or groups of signs. A private-use code point means something only in its own font. In other text, it shows as a blank box or as another font's glyph.
+
+Where a font draws the same glyph in more than one way, such as for a ligature and for a private-use code point, the file has an entry for each. The app decides which to offer.
+
+A file can have several entries with the same `text`, for example for variant forms. The matcher treats each one as a separate sample of the sign.
+
+The file doesn't record glyph names. Fonts don't have to include them, and many name each glyph only after its code point.
+
+### Order
+
+The order of entries and shapes doesn't affect matching, but it's fixed, so that a tool rewriting a file changes only what it must:
+
+- Entries are in order of `text`, compared one code point at a time, so a sign comes before the ligatures that start with it. Entries with the same `text` keep their order in the file. Compare code points, not UTF-16 code units: JavaScript's default string sort puts U+12000 before U+E000.
+- Within an entry, shapes are in order of `x`, then `y`, smallest first, then the rest of the string, one token at a time: the op as text, and the numbers as numbers.
+
+In JSON, write `text` as literal characters, except private-use code points: write those as `\u` escapes, as UTF-16 surrogate pairs above U+FFFF, because editors and diff tools show them as blank boxes.
+
+### Validation
+
+The schema is `data/schemas/skeletons.schema.json`. The tests in `test/data/skeletons.test.ts` check each file in `data/skeletons/` against it, and also check the following:
+
+- Entries and shapes are in order.
+- Every direction is at least 0 and less than 360.
+- Every `length` and `leg` is greater than 0, every `head` is at least 0, and every wedge is at least as long as its head is deep.
+- Every headless line starts at the end that this document specifies.

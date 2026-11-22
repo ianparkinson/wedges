@@ -6,18 +6,36 @@
 
 /** data/skeletons/*.json */
 export interface SkeletonFile {
-  readonly version: 1
-  /** The script style or font the file follows. */
-  readonly style: string
+  readonly version: 2
+  /** The font the skeletons were traced over. */
+  readonly font: {
+    readonly family: string
+    readonly version: string
+    readonly unitsPerEm: number
+  }
+  /** The attribution the app must show when it uses this file. */
+  readonly credit?: string
   readonly comments?: string
+  /** Whether the font's wedges have a head then a tail, or taper to a point. */
+  readonly wedges: "headed" | "tapered"
+  /** A wedge head's depth divided by its size, in a headed font. */
+  readonly headAspect?: number
+  /** The angle of a wedge head's back edge from square to its tail, in degrees, anticlockwise. */
+  readonly headLean: number
+  /** The angle between a Winkelhaken's legs, in degrees. */
+  readonly winkelhakenAngle: number
   readonly skeletons: readonly SkeletonEntry[]
 }
 
-/** One skeleton: the strokes of a sign as one style or font draws it. */
+/**
+ * One skeleton: the shapes of a sign as one font draws it. `text` is the
+ * characters the font draws as one glyph. An entry with no shapes records a
+ * sign the file leaves out on purpose, with `comments` saying why.
+ */
 export interface SkeletonEntry {
-  readonly char: string
-  /** The strokes, in spec notation. */
-  readonly spec: string
+  readonly text: string
+  /** The shapes, such as "w 21 69 270 77 15". */
+  readonly shapes?: readonly string[]
   readonly comments?: string
 }
 

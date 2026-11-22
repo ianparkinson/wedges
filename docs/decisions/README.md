@@ -19,3 +19,4 @@ One short file per decision that someone might later want to revisit: what was d
 | [0013](0013-goatcounter-analytics.md)  | Count visits with GoatCounter                    | accepted |
 | [0014](0014-update-osl.md)             | A pull request with each new `osl.asl`           | accepted |
 | [0015](0015-usage-data.md)             | Value usage counted from Oracc's glossaries      | accepted |
+| [0016](0016-skeleton-format-v2.md)     | Skeletons describe glyphs in the font's frame    | accepted |

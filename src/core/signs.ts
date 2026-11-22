@@ -4,8 +4,8 @@
  */
 import { groupBy } from "@/lib/collections"
 
-import { prepareSample, type PreparedSample } from "./matcher/match"
-import { parseSpec } from "./spec"
+import type { PreparedSample } from "./matcher/match"
+import { parseShape, prepareSkeleton } from "./skeleton"
 import {
   COMPOUND_OPERATORS,
   VARIANT_MODIFIERS,
@@ -87,8 +87,8 @@ export class SignDatabase {
   /**
    * Joins skeleton files with the Oracc data, and with each sign's and
    * sequence's common values by language, keyed by characters. Skeletons for
-   * a character the Oracc data doesn't list are left out; the data tests
-   * check there are none.
+   * characters the Oracc data doesn't list, and entries with no shapes, are
+   * left out; the data tests check that every skeleton's characters are listed.
    */
   constructor(
     skeletonFiles: readonly SkeletonFile[],
@@ -97,10 +97,14 @@ export class SignDatabase {
   ) {
     const samples = new Map<string, PreparedSample[]>()
     for (const file of skeletonFiles) {
-      for (const { char, spec } of file.skeletons) {
-        const list = samples.get(char) ?? []
-        list.push(prepareSample(parseSpec(spec)))
-        samples.set(char, list)
+      for (const { text, shapes } of file.skeletons) {
+        if (shapes) {
+          const sample = prepareSkeleton(
+            shapes.map(parseShape),
+            file.winkelhakenAngle,
+          )
+          samples.set(text, [...(samples.get(text) ?? []), sample])
+        }
       }
     }
 

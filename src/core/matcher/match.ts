@@ -4,7 +4,8 @@
  */
 import { munkres } from "munkres"
 
-import type { Stroke } from "@/core/strokes"
+import { keyPoints, type Stroke } from "@/core/strokes"
+import type { Point } from "@/lib/geometry"
 
 import { strokeFeature, type StrokeFeature } from "./features"
 import { normalize } from "./normalize"
@@ -17,11 +18,23 @@ export interface PreparedSample {
   readonly wedges: number
 }
 
-/** Normalises a drawing or skeleton and reduces it to features, ready for {@link match}. */
-export function prepareSample(strokes: readonly Stroke[]): PreparedSample {
-  const features = normalize(strokes).map(strokeFeature)
-  const wedges = features.filter((f) => f.kind === "wedge").length
-  return { features, wedges }
+/**
+ * Normalises the features of a drawing or skeleton, ready for {@link match}.
+ * `keyPoints` are the strokes' ends, vertices and leg tips, which set the
+ * frame; see {@link normalize}.
+ */
+export function prepareSample(
+  features: readonly StrokeFeature[],
+  keyPoints: readonly Point[],
+): PreparedSample {
+  const normalized = normalize(features, keyPoints)
+  const wedges = normalized.filter((f) => f.kind === "wedge").length
+  return { features: normalized, wedges }
+}
+
+/** Reduces drawn strokes to normalised features, ready for {@link match}. */
+export function prepareDrawing(strokes: readonly Stroke[]): PreparedSample {
+  return prepareSample(strokes.map(strokeFeature), strokes.flatMap(keyPoints))
 }
 
 /** How well a drawing matches a sample, and which strokes were paired. */

@@ -6,6 +6,7 @@
 import { osl } from "virtual:osl"
 import { describe, expect, it } from "vitest"
 
+import { prepareDrawing } from "@/core/matcher/match"
 import { rank } from "@/core/matcher/rank"
 
 import { signDatabase, skeletonDrawings } from "./signDatabase"
@@ -25,7 +26,9 @@ describe("rank on clean drawings of every skeleton", () => {
   }))
 
   it.each(cases)("shows $char among the candidates", ({ char, drawing }) => {
-    const results = rank(drawing, db.drawable, { limit: CANDIDATES })
+    const results = rank(prepareDrawing(drawing), db.drawable, {
+      limit: CANDIDATES,
+    })
     expect(results.map((r) => r.sign.char)).toContain(char)
   })
 })
