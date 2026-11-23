@@ -58,6 +58,8 @@ The first time you run e2e tests, install the browsers with `npx playwright inst
 
 Follow the [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html). Prettier decides formatting, so its config wins over the guide on layout and quotes. The rest of this file wins where it differs from the guide, and adds rules the guide doesn't have.
 
+Write new documentation, in `docs/` and elsewhere, following the [Google developer documentation style guide](https://developers.google.com/style).
+
 Where we differ from the guide:
 
 - **File names** are camelCase (`pairCost.ts`), not snake_case. Component files are PascalCase, named after the component they export (`Link/Link.tsx`), as is usual in React projects.
