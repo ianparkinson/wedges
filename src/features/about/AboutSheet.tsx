@@ -13,7 +13,7 @@ const DISCUSSIONS_URL = `${REPO_URL}/discussions/new/choose`
 const LICENSE_URL = `${REPO_URL}/blob/main/LICENSE`
 const OSL_URL = "https://oracc.museum.upenn.edu/osl/"
 const ORACC_URL = "https://oracc.museum.upenn.edu/"
-const NOTO_URL = "https://fonts.google.com/noto/specimen/Noto+Sans+Cuneiform"
+const NOTO_URL = "https://github.com/notofonts/cuneiform"
 const OFL_URL = "https://openfontlicense.org/"
 const GOATCOUNTER_URL = "https://www.goatcounter.com/"
 

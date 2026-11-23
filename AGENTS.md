@@ -109,13 +109,13 @@ Write for an experienced software engineer who is new to this project and to cun
 
 - `docs/`: how the algorithms work, beside the code they describe (each `src/core` module's header comment links to its section), and [prior art](docs/prior-art.md): related projects, data sources and licences.
 - `docs/decisions/`: decision records.
-- `data/`: sign skeletons and their JSON Schema, a copy of the Oracc Sign List's `osl.asl`, and value usage counted from Oracc's glossaries ([skeleton-format.md](docs/skeleton-format.md), [sign-data.md](docs/sign-data.md), [usage-data.md](docs/usage-data.md)).
+- `data/`: sign skeletons and their JSON Schema, the fonts they were traced over (`data/fonts/`, unmodified, each with its licence), a copy of the Oracc Sign List's `osl.asl`, and value usage counted from Oracc's glossaries ([skeleton-format.md](docs/skeleton-format.md), [sign-data.md](docs/sign-data.md), [usage-data.md](docs/usage-data.md)).
 - `e2e/`: Playwright specs.
 - `test/`: test setup, and tests that use seeded synthetic drawings from `synthetic/`.
 - `scripts/`: Node scripts, run with `tsx`.
 - `public/`: files served as they are, such as the favicon. The build renders the home-screen icon from the favicon (`scripts/touchIcon/`).
-- `.github/workflows/`: `ci.yml` (every PR and push to `main`), `deploy.yml` (deploys `main` to GitHub Pages after CI passes), `accuracy-benchmark.yml`, `update-osl.yml` (a PR with the latest `osl.asl` when it changes upstream) and `update-usage.yml` (a monthly PR with value usage rebuilt from Oracc's glossaries).
+- `.github/workflows/`: `ci.yml` (every PR and push to `main`), `deploy.yml` (deploys `main` to GitHub Pages after CI passes), `accuracy-benchmark.yml`, `update-osl.yml` (a PR with the latest `osl.asl` when it changes upstream), `check-fonts.yml` (an issue for each font in `data/fonts/` that changes upstream) and `update-usage.yml` (a monthly PR with value usage rebuilt from Oracc's glossaries).
 
 ## Data and licences
 
-Code and skeletons are MIT. The Oracc Sign List and Oracc's glossaries, which the usage data is counted from, are CC0. Skeletons are traced over Noto Sans Cuneiform (SIL Open Font License), which the app also bundles to show signs. Check a font's licence before using it as a tracing reference; see [prior-art.md](docs/prior-art.md).
+Code and skeletons are MIT. The Oracc Sign List and Oracc's glossaries, which the usage data is counted from, are CC0. Skeletons are traced over Noto Sans Cuneiform (SIL Open Font License), which the repo vendors in `data/fonts/noto/` and the app serves, unmodified, to show signs. Check a font's licence before using it as a tracing reference; see [prior-art.md](docs/prior-art.md).

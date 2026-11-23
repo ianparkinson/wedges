@@ -42,4 +42,4 @@ Wedges is released under the [MIT licence](LICENSE), code and skeletons alike.
 
 - Sign names, values and ids come from the [Oracc Sign List](https://oracc.museum.upenn.edu/osl/), released under CC0.
 - How often each value is used, and the words it writes, are counted from the glossaries of [Oracc](https://oracc.museum.upenn.edu/)'s public projects, released under CC0.
-- The sign skeletons were traced over [Noto Sans Cuneiform](https://fonts.google.com/noto/specimen/Noto+Sans+Cuneiform), which is licensed under the SIL Open Font License 1.1. The app shows signs in the same font, bundled from [Fontsource](https://fontsource.org/fonts/noto-sans-cuneiform).
+- The sign skeletons were traced over [Noto Sans Cuneiform](https://fonts.google.com/noto/specimen/Noto+Sans+Cuneiform), which is licensed under the SIL Open Font License 1.1. The app shows signs in the same font, a copy of the release from [notofonts/cuneiform](https://github.com/notofonts/cuneiform).

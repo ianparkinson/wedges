@@ -1,0 +1,13 @@
+/*
+ * The cuneiform font, vendored unmodified in data/fonts/noto/. The browser fetches
+ * it only when a cuneiform character is on the page.
+ */
+@font-face {
+  font-family: "Noto Sans Cuneiform";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../data/fonts/noto/NotoSansCuneiform-Regular.ttf")
+    format("truetype");
+  unicode-range: U+12000-1254F;
+}

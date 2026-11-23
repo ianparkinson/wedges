@@ -12,6 +12,8 @@ export interface SkeletonFile {
     readonly family: string
     readonly version: string
     readonly unitsPerEm: number
+    /** The SHA-256 hash of the font file, in lowercase hex. */
+    readonly sha256: string
   }
   /** The attribution the app must show when it uses this file. */
   readonly credit?: string
