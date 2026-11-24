@@ -31,6 +31,10 @@ describe("parseShape", () => {
     })
   })
 
+  it("reads a Winkelhaken's own angle between its legs", () => {
+    expect(parseShape("k 14 32 0 44.5 95")).toMatchObject({ angle: 95 })
+  })
+
   it("ignores extra whitespace", () => {
     expect(parseShape("  w  0 0   0 10 5 ")).toMatchObject({ length: 10 })
   })
@@ -40,6 +44,7 @@ describe("parseShape", () => {
     "w 0 0 0 10",
     "w 0 0 0 10 5 5",
     "k 0 0 0",
+    "k 0 0 0 10 90 5",
     "w 0 0 0 x 5",
     "",
   ])('rejects "%s"', (shape) => {
@@ -71,6 +76,16 @@ describe("shapeKeyPoints", () => {
         { x: 0, y: 0 },
         { x: leg, y: -leg },
         { x: leg, y: leg },
+      ]),
+    )
+  })
+
+  it("opens a Winkelhaken's legs by its own angle, where it has one", () => {
+    const [vertex, tip] = shapeKeyPoints(parseShape("k 0 0 0 10 120"), 90)
+    expect(rounded([vertex, tip])).toEqual(
+      rounded([
+        { x: 0, y: 0 },
+        { x: 5, y: -10 * Math.sin(Math.PI / 3) },
       ]),
     )
   })

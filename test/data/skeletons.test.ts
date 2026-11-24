@@ -95,6 +95,16 @@ describe.each(entries)("%s", (_, file) => {
     }
   })
 
+  it("gives each Winkelhaken's own angle between 0 and 180", () => {
+    for (const { text, shape } of shapes) {
+      const [op, , , , , angle] = tokens(shape)
+      if (op === "k" && angle !== undefined) {
+        expect(angle, `${text}: ${shape}`).toBeGreaterThan(0)
+        expect(angle, `${text}: ${shape}`).toBeLessThan(180)
+      }
+    }
+  })
+
   it("starts each headless line at its top end if vertical, else its left end", () => {
     for (const { text, shape } of shapes) {
       const [op, , , direction = 0, , head] = tokens(shape)
