@@ -1,0 +1,26 @@
+name: Check fonts
+
+# Opens an issue, or updates the open one, for each font in data/fonts/ that
+# has changed upstream.
+on:
+  schedule:
+    # Weekly, on Mondays at 06:00 UTC.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    name: Check fonts
+    # Not in forks, where the issues would land in the fork.
+    if: github.repository == 'ianparkinson/wedges'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - run: scripts/checkFonts.sh
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -1,7 +1,7 @@
 {
   // Everything that runs in Node: config files, Playwright specs, the Vite
-  // plugin that builds the sign data, scripts run with tsx, and the test
-  // helpers the scripts share with Vitest.
+  // plugin that builds the sign data, scripts run with tsx, the test
+  // helpers the scripts share with Vitest, and tests that read files.
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
@@ -22,6 +22,7 @@
     "src/core",
     "src/lib",
     "src/virtual.d.ts",
+    "test/data/fonts.test.ts",
     "test/synthetic",
     "test/signDatabase.ts",
     "test/skeletonStrokes.ts",

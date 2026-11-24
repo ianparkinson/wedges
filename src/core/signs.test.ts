@@ -58,7 +58,12 @@ const osl: OslData = {
 
 const skeletons = (...texts: string[]): SkeletonFile => ({
   version: 2,
-  font: { family: "Test Font", version: "1.0", unitsPerEm: 1000 },
+  font: {
+    family: "Test Font",
+    version: "1.0",
+    unitsPerEm: 1000,
+    sha256: "0".repeat(64),
+  },
   wedges: "tapered",
   headLean: 0,
   winkelhakenAngle: 90,

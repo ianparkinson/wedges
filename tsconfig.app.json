@@ -11,5 +11,7 @@
       "@test/*": ["./test/*"]
     }
   },
-  "include": ["src", "test"]
+  "include": ["src", "test"],
+  // Reads files with Node's fs, so it's checked in tsconfig.node.json.
+  "exclude": ["test/data/fonts.test.ts"]
 }

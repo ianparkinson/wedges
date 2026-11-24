@@ -112,7 +112,8 @@ There's one file for each font, named after it, such as `data/skeletons/noto.jso
   "font": {
     "family": "Example Cuneiform",
     "version": "1.000",
-    "unitsPerEm": 1000
+    "unitsPerEm": 1000,
+    "sha256": "4c5e1f0a9b2d3e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f"
   },
   "credit": "Font by A. N. Author",
   "comments": "Traced over Example Cuneiform 1.000.",
@@ -132,21 +133,29 @@ There's one file for each font, named after it, such as `data/skeletons/noto.jso
 }
 ```
 
-| Field                  | Meaning                                                                                                                                     |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `version`              | Always 2.                                                                                                                                   |
-| `font`                 | The font the skeletons were traced over: its family name, version, and units per em. A font update can move glyphs, so the version matters. |
-| `credit`               | Optional. The attribution that the app must show when it uses this file, if the font's licence asks for one.                                |
-| `comments`             | Optional. Notes on the file, such as who or what made it, and when.                                                                         |
-| `wedges`               | `"headed"` or `"tapered"`.                                                                                                                  |
-| `headAspect`           | A wedge head's depth divided by its size. Required in a headed font, and not allowed in a tapered one.                                      |
-| `headLean`             | The angle of a wedge head's back edge from square to its tail, in degrees, anticlockwise. Usually 0.                                        |
-| `winkelhakenAngle`     | The angle between a Winkelhaken's legs, in degrees.                                                                                         |
-| `skeletons[].text`     | The characters that the font draws as this glyph. See [Text](#text).                                                                        |
-| `skeletons[].shapes`   | Optional. The shapes, one string each. Leave it out for a sign that the file deliberately doesn't describe, and say why in `comments`.      |
-| `skeletons[].comments` | Optional. Notes on this entry. Required when there are no `shapes`.                                                                         |
+| Field                  | Meaning                                                                                                                                |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`              | Always 2.                                                                                                                              |
+| `font`                 | The font the skeletons were traced over: its family name, version, units per em, and the font file's SHA-256 hash. See [Font](#font).  |
+| `credit`               | Optional. The attribution that the app must show when it uses this file, if the font's licence asks for one.                           |
+| `comments`             | Optional. Notes on the file, such as who or what made it, and when.                                                                    |
+| `wedges`               | `"headed"` or `"tapered"`.                                                                                                             |
+| `headAspect`           | A wedge head's depth divided by its size. Required in a headed font, and not allowed in a tapered one.                                 |
+| `headLean`             | The angle of a wedge head's back edge from square to its tail, in degrees, anticlockwise. Usually 0.                                   |
+| `winkelhakenAngle`     | The angle between a Winkelhaken's legs, in degrees.                                                                                    |
+| `skeletons[].text`     | The characters that the font draws as this glyph. See [Text](#text).                                                                   |
+| `skeletons[].shapes`   | Optional. The shapes, one string each. Leave it out for a sign that the file deliberately doesn't describe, and say why in `comments`. |
+| `skeletons[].comments` | Optional. Notes on this entry. Required when there are no `shapes`.                                                                    |
 
 The matcher uses only `winkelhakenAngle` of the per-font values. The others are for drawing skeletons and checking them against the font. The file doesn't record stroke thicknesses: a tool that draws skeletons over a font can keep its own.
+
+### Font
+
+The `font` block identifies the font file that the skeletons describe. The font itself is in `data/fonts/`, unmodified, with its licence. The skeleton file doesn't name it: `test/data/fonts.test.ts` lists which font file each skeleton file describes. Several skeleton files can describe the same font.
+
+A font update can move glyphs, so `sha256`, the file's SHA-256 hash in lowercase hex, pins the skeletons to one copy of the font. A data test checks that the font file has this hash. When the font changes, the test fails until you check the skeletons against the new font and update `sha256` and `version`.
+
+`version` is the font's version as its name table gives it, such as `2.001`, for people to read. Tests don't check it.
 
 ### Text
 
