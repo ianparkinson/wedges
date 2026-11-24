@@ -49,7 +49,7 @@ export function SkeletonPicture({
     const parsed = (shapes ?? []).map(parseShape)
     const outlines = parsed.map((s) => impression(s, winkelhakenAngle, style))
     const starts = parsed.map((s) => shapeKeyPoints(s, winkelhakenAngle)[0]!)
-    const all = [...boxCorners(glyph?.box), ...outlines.flat(2)]
+    const all = [...boxCorners(glyph?.box), ...outlines.flat()]
     const box = all.length > 0 ? boundingBox(all) : undefined
     const viewBox = box
       ? [
@@ -76,7 +76,7 @@ export function SkeletonPicture({
           <path
             key={i}
             className={astray?.[i] ? styles.astray : styles.shape}
-            d={svgPath(outline)}
+            d={svgPath([outline])}
           />
         ))}
       {numbered &&

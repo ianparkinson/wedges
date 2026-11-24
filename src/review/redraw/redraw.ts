@@ -43,7 +43,7 @@ export function redraw(
     boundingBox([
       { x: glyph.box.left, y: glyph.box.top },
       { x: glyph.box.right, y: glyph.box.bottom },
-      ...impressions.flat(2),
+      ...impressions.flat(),
     ]),
   )
 
@@ -52,7 +52,7 @@ export function redraw(
     // Six decimal places keep the outline to a millionth of a unit.
     context.fill(new Path2D(glyph.path.toPathData(6)))
   })
-  const drawn = canvas.rasterize((context) => fill(context, impressions.flat()))
+  const drawn = canvas.rasterize((context) => fill(context, impressions))
   const both = count(ink, drawn)
   const inkArea = count(ink)
   const drawnArea = count(drawn)
@@ -61,10 +61,10 @@ export function redraw(
     overlap: both / Math.max(1, inkArea + drawnArea - both),
     missed: 1 - both / Math.max(1, inkArea),
     outside: 1 - both / Math.max(1, drawnArea),
-    shapesOutside: impressions.map((polygons) => {
+    shapesOutside: impressions.map((polygon) => {
       const shape = canvas.rasterize(
-        (context) => fill(context, polygons),
-        boundingBox(polygons.flat()),
+        (context) => fill(context, [polygon]),
+        boundingBox(polygon),
       )
       return 1 - count(shape, ink) / Math.max(1, count(shape))
     }),
