@@ -43,12 +43,24 @@ describe("ReviewPage", () => {
   it("shows a tile for each glyph, traced or not, and scores it", async () => {
     render(<ReviewPage />)
     expect(
-      await screen.findByRole("figure", { name: /^DIŠ, 0\.\d\d$/ }),
+      await screen.findByRole("button", { name: /^DIŠ, 0\.\d\d$/ }),
     ).toBeVisible()
     expect(
-      within(screen.getByRole("list")).getAllByRole("figure"),
+      within(screen.getByRole("list")).getAllByRole("button"),
     ).toHaveLength(2)
     expect(screen.getByText(/^2 glyphs, 2 traced/)).toBeVisible()
+  })
+
+  it("opens a sign, and moves to the next", async () => {
+    render(<ReviewPage />)
+    await userEvent.click(screen.getByRole("button", { name: /^DIŠ/ }))
+    expect(screen.getByRole("region", { name: "Sign detail" })).toBeVisible()
+    expect(location.search).toBe(`?sign=${encodeURIComponent("𒁹#0")}`)
+
+    await userEvent.keyboard("{ArrowRight}")
+    expect(location.search).toBe(`?sign=${encodeURIComponent("A#0")}`)
+    await userEvent.keyboard("{Escape}")
+    expect(screen.queryByRole("region", { name: "Sign detail" })).toBeNull()
   })
 
   it("filters by group", async () => {
@@ -58,9 +70,9 @@ describe("ReviewPage", () => {
       "unlisted",
     )
     expect(
-      within(screen.getByRole("list")).getByRole("figure", { name: /^U\+41/ }),
+      within(screen.getByRole("list")).getByRole("button", { name: /^U\+41/ }),
     ).toBeVisible()
-    expect(screen.queryByRole("figure", { name: /^DIŠ/ })).toBeNull()
+    expect(screen.queryByRole("button", { name: /^DIŠ/ })).toBeNull()
     expect(location.search).toBe("?group=unlisted")
   })
 
@@ -70,7 +82,7 @@ describe("ReviewPage", () => {
       screen.getByRole("combobox", { name: "Status" }),
       "untraced",
     )
-    expect(within(screen.getByRole("list")).queryAllByRole("figure")).toEqual(
+    expect(within(screen.getByRole("list")).queryAllByRole("button")).toEqual(
       [],
     )
     expect(location.search).toBe("?status=untraced")

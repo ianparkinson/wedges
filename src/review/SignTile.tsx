@@ -17,11 +17,15 @@ export interface SignTileProps {
   style: StrokeStyle
   /** The file's limits, which pick out shapes too far off the ink. */
   limits?: RedrawLimits
+  isSelected: boolean
+  /** Opens the sign, by its key. */
+  onSelect: (key: string) => void
 }
 
 /**
- * A glyph with its skeleton drawn over it, its name, and its overlap score.
- * It draws again only when its props change, since the page has hundreds.
+ * A glyph with its skeleton drawn over it, its name, and its overlap score,
+ * as a button that opens the sign in detail. It draws again only when its
+ * props change, since the page has hundreds.
  */
 export const SignTile = memo(function SignTile({
   sign,
@@ -29,6 +33,8 @@ export const SignTile = memo(function SignTile({
   winkelhakenAngle,
   style,
   limits,
+  isSelected,
+  onSelect,
 }: SignTileProps) {
   const astray = useMemo(
     () =>
@@ -46,7 +52,13 @@ export const SignTile = memo(function SignTile({
       : "no skeleton"
 
   return (
-    <figure className={styles.tile} aria-label={`${name}, ${status}`}>
+    <button
+      type="button"
+      className={styles.tile}
+      aria-label={`${name}, ${status}`}
+      aria-pressed={isSelected}
+      onClick={() => onSelect(sign.key)}
+    >
       <SkeletonPicture
         text={sign.text}
         shapes={sign.shapes}
@@ -55,8 +67,8 @@ export const SignTile = memo(function SignTile({
         style={style}
         astray={astray}
       />
-      <figcaption className={styles.name}>{name}</figcaption>
+      <span className={styles.name}>{name}</span>
       <span className={styles.score}>{status}</span>
-    </figure>
+    </button>
   )
 })

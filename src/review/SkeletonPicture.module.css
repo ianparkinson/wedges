@@ -20,3 +20,9 @@
   fill: var(--review-shape-astray);
   stroke: var(--review-missed);
 }
+
+.number {
+  fill: var(--color-text);
+  font-family: var(--font-body);
+  font-weight: bold;
+}

@@ -23,6 +23,13 @@
   color: var(--color-text-muted);
 }
 
+.split {
+  display: grid;
+  grid-template-columns: 1fr minmax(20rem, 32rem);
+  align-items: start;
+  gap: var(--space-4);
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
@@ -30,4 +37,9 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.side {
+  position: sticky;
+  top: var(--space-4);
 }

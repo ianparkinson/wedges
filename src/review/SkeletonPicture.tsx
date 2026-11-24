@@ -1,7 +1,7 @@
 import type { Font } from "opentype.js"
 import { useMemo } from "react"
 
-import { parseShape } from "@/core/skeleton"
+import { parseShape, shapeKeyPoints } from "@/core/skeleton"
 import { boundingBox, type Box, type Point } from "@/lib/geometry"
 
 import { glyph as readGlyph } from "./redraw/glyphs"
@@ -18,10 +18,18 @@ export interface SkeletonPictureProps {
   style: StrokeStyle
   /** Which shapes to pick out as too far off the ink, by index. */
   astray?: readonly boolean[]
+  showGlyph?: boolean
+  showSkeleton?: boolean
+  /** Whether to number each shape at its start. */
+  numbered?: boolean
+  className?: string
 }
 
 /** Margin around a glyph, in skeleton units. */
 const MARGIN = 4
+
+/** The height of the shape numbers, in skeleton units. */
+const NUMBER_SIZE = 6
 
 /** A glyph with its skeleton drawn over it, in the font's stroke style. */
 export function SkeletonPicture({
@@ -31,12 +39,16 @@ export function SkeletonPicture({
   winkelhakenAngle,
   style,
   astray,
+  showGlyph = true,
+  showSkeleton = true,
+  numbered = false,
+  className,
 }: SkeletonPictureProps) {
   const picture = useMemo(() => {
     const glyph = glyphOutline(font, text)
-    const outlines = (shapes ?? []).map((s) =>
-      impression(parseShape(s), winkelhakenAngle, style),
-    )
+    const parsed = (shapes ?? []).map(parseShape)
+    const outlines = parsed.map((s) => impression(s, winkelhakenAngle, style))
+    const starts = parsed.map((s) => shapeKeyPoints(s, winkelhakenAngle)[0]!)
     const all = [...boxCorners(glyph?.box), ...outlines.flat(2)]
     const box = all.length > 0 ? boundingBox(all) : undefined
     const viewBox = box
@@ -47,23 +59,39 @@ export function SkeletonPicture({
           box.bottom - box.top + 2 * MARGIN,
         ].join(" ")
       : "0 -100 100 100"
-    return { glyph, outlines, viewBox }
+    return { glyph, outlines, starts, viewBox }
   }, [font, text, shapes, winkelhakenAngle, style])
 
   return (
     <svg
-      className={styles.picture}
+      className={[styles.picture, className].filter(Boolean).join(" ")}
       viewBox={picture.viewBox}
       aria-hidden="true"
     >
-      {picture.glyph && <path className={styles.ink} d={picture.glyph.d} />}
-      {picture.outlines.map((outline, i) => (
-        <path
-          key={i}
-          className={astray?.[i] ? styles.astray : styles.shape}
-          d={svgPath(outline)}
-        />
-      ))}
+      {showGlyph && picture.glyph && (
+        <path className={styles.ink} d={picture.glyph.d} />
+      )}
+      {showSkeleton &&
+        picture.outlines.map((outline, i) => (
+          <path
+            key={i}
+            className={astray?.[i] ? styles.astray : styles.shape}
+            d={svgPath(outline)}
+          />
+        ))}
+      {numbered &&
+        showSkeleton &&
+        picture.starts.map((start, i) => (
+          <text
+            key={i}
+            className={styles.number}
+            x={start.x}
+            y={start.y}
+            fontSize={NUMBER_SIZE}
+          >
+            {i + 1}
+          </text>
+        ))}
     </svg>
   )
 }
