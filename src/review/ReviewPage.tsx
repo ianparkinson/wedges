@@ -14,6 +14,7 @@ import { SignDetail } from "./SignDetail"
 import { hasStatus, isFailing, SORTS, sortSigns, STATUSES } from "./signFilters"
 import { SignTile } from "./SignTile"
 import { Choice } from "./ui/Choice"
+import { useComparison } from "./useComparison"
 import { useReviewed } from "./useReviewed"
 import { useScores } from "./useScores"
 
@@ -66,7 +67,13 @@ function FileReview({ fileId, file, fontPath }: FileReviewProps) {
   const font = useFont(fontPath)
   const osl = useOsl()
   return font && osl ? (
-    <LoadedReview fileId={fileId} file={file} font={font} osl={osl} />
+    <LoadedReview
+      fileId={fileId}
+      file={file}
+      font={font}
+      fontPath={fontPath}
+      osl={osl}
+    />
   ) : (
     <p>Loading the font and sign list…</p>
   )
@@ -90,10 +97,17 @@ interface LoadedReviewProps {
   fileId: string
   file: SkeletonFile
   font: Font
+  fontPath: string
   osl: OslData
 }
 
-function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
+function LoadedReview({
+  fileId,
+  file,
+  font,
+  fontPath,
+  osl,
+}: LoadedReviewProps) {
   const { style } = skeletonFonts[fileId]!
   const limits = redrawLimits[fileId]
   const reviewed = useReviewed(fileId)
@@ -102,10 +116,17 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
   const [status, setStatus] = useUrlState("status", "all", STATUSES)
   const [sort, setSort] = useUrlState("sort", "file", SORTS)
   const [selectedKey, setSelectedKey] = useUrlState("sign", "")
+  const [compareId, setCompareId] = useUrlState("compare", "")
+  const [ref, setRef] = useUrlState("ref", "")
 
   const current = useMemo(() => reviewSigns(file, font, osl), [file, font, osl])
+  const {
+    signs: compared,
+    comparedWith,
+    status: comparing,
+  } = useComparison(current, font, fontPath, osl, compareId, ref)
   const { signs, pending } = useScores(
-    current,
+    compared,
     font,
     file.winkelhakenAngle,
     style,
@@ -125,7 +146,7 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
   )
   const revealed = useRevealed(
     shown.length,
-    [group, block, status, sort].join("|"),
+    [group, block, status, sort, compareId, ref].join("|"),
   )
   const grid = shown.slice(0, revealed)
 
@@ -207,6 +228,14 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
           onChange={setStatus}
         />
         <Choice label="Sort" value={sort} options={SORTS} onChange={setSort} />
+        <Choice
+          label="Compare with"
+          value={compareId}
+          options={["", ...Object.keys(skeletonFiles)]}
+          onChange={setCompareId}
+        />
+        <RefField value={ref} onChange={setRef} />
+        {comparing && <p className={styles.counts}>{comparing}</p>}
         <p className={styles.counts}>
           {counts.glyphs} glyphs, {counts.traced} traced, {counts.reviewed}{" "}
           reviewed, {counts.failing} failing the data test. Showing{" "}
@@ -223,6 +252,7 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
                 winkelhakenAngle={file.winkelhakenAngle}
                 style={style}
                 limits={limits}
+                comparedWith={comparedWith}
                 isReviewed={
                   sign.shapes !== undefined &&
                   reviewed.isReviewed(sign.text, sign.shapes)
@@ -241,6 +271,7 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
               winkelhakenAngle={file.winkelhakenAngle}
               style={style}
               limits={limits}
+              comparedWith={comparedWith}
               isReviewed={
                 selected.shapes !== undefined &&
                 reviewed.isReviewed(selected.text, selected.shapes)
@@ -254,6 +285,33 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
         )}
       </div>
     </>
+  )
+}
+
+interface RefFieldProps {
+  value: string
+  onChange: (value: string) => void
+}
+
+/**
+ * A git ref to compare with, such as main or HEAD~1, applied on Enter or
+ * when the field loses focus. Empty compares with the files as they are now.
+ */
+function RefField({ value, onChange }: RefFieldProps) {
+  return (
+    <label>
+      At ref{" "}
+      <input
+        key={value}
+        className={styles.ref}
+        defaultValue={value}
+        placeholder="now"
+        onBlur={(e) => onChange(e.target.value.trim())}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") onChange(e.currentTarget.value.trim())
+        }}
+      />
+    </label>
   )
 }
 

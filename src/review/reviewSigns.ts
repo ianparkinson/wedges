@@ -39,6 +39,16 @@ export interface ReviewSign {
    * worked out: null if the font has no glyph to score against.
    */
   readonly score?: RedrawScore | null
+  /** The sign in the version compared with, when the page is comparing. */
+  readonly before?: Before
+}
+
+/** A sign as it was in the version compared with. */
+export interface Before {
+  /** The skeleton's shapes, or undefined when that version had no entry. */
+  readonly shapes?: readonly string[]
+  /** Whether that version's font drew the glyph differently. */
+  readonly glyphChanged: boolean
 }
 
 /**
@@ -77,8 +87,8 @@ export function reviewSigns(
   })
 
   const described = new Set(file.skeletons.map((e) => e.text))
-  const missing = fontCharacters(font)
-    .filter((c) => isCuneiform(c) && !described.has(c))
+  const missing = cuneiformCharacters(font)
+    .filter((c) => !described.has(c))
     .map((c) => sign(c, signKey(c, 0)))
 
   return [...entries, ...missing]
@@ -99,4 +109,9 @@ export function signGroup(name: string | undefined): SignGroup {
   if (name.includes("|")) return "compound"
   if (/[@~]/.test(name)) return "modified"
   return "simple"
+}
+
+/** The characters the font has a cuneiform glyph for, in code point order. */
+export function cuneiformCharacters(font: Font): string[] {
+  return fontCharacters(font).filter(isCuneiform)
 }

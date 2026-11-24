@@ -31,3 +31,7 @@
 .reviewed {
   color: var(--review-reviewed);
 }
+
+.changed {
+  color: var(--review-before);
+}

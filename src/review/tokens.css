@@ -8,6 +8,7 @@
   --review-shape-astray: rgb(214 40 40 / 0.3);
   --review-missed: #d62828;
   --review-reviewed: #2e7d32;
+  --review-before: #c26a00;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -18,5 +19,6 @@
     --review-shape-astray: rgb(255 107 107 / 0.3);
     --review-missed: #ff6b6b;
     --review-reviewed: #81c784;
+    --review-before: #ffb74d;
   }
 }

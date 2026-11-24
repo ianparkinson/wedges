@@ -1,6 +1,7 @@
 /**
  * Filtering and sorting the review page's signs.
  */
+import { isChanged } from "./compare"
 import type { RedrawLimits } from "./redraw/limits"
 import type { ReviewSign } from "./reviewSigns"
 import type { ReviewedMarks } from "./useReviewed"
@@ -13,6 +14,7 @@ export const STATUSES = [
   "unreviewed",
   "reviewed",
   "failing",
+  "changed",
 ] as const
 
 /** A status the page can filter by. */
@@ -24,7 +26,10 @@ export const SORTS = ["file", "overlap", "shape outside"] as const
 /** An order the page can sort by. */
 export type Sort = (typeof SORTS)[number]
 
-/** Whether a sign has one of the {@link STATUSES}. */
+/**
+ * Whether a sign has one of the {@link STATUSES}: "changed" means changed
+ * from the version compared with.
+ */
 export function hasStatus(
   sign: ReviewSign,
   status: Status,
@@ -47,6 +52,8 @@ export function hasStatus(
       )
     case "failing":
       return isFailing(sign, limits)
+    case "changed":
+      return isChanged(sign)
     case "all":
       return true
   }

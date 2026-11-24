@@ -6,7 +6,7 @@ import type { OslData, SkeletonFile } from "@/core/types"
 
 import { ReviewPage } from "./ReviewPage"
 
-const { file, osl } = vi.hoisted(() => {
+const { file, before, osl } = vi.hoisted(() => {
   const file: SkeletonFile = {
     version: 2,
     font: { family: "Test", version: "1", unitsPerEm: 1000, sha256: "" },
@@ -22,7 +22,14 @@ const { file, osl } = vi.hoisted(() => {
     signs: [{ char: "𒁹", name: "DIŠ", oslId: "1", values: ["diš"] }],
     sequences: [],
   }
-  return { file, osl }
+  const before: SkeletonFile = {
+    ...file,
+    skeletons: [
+      { text: "𒁹", shapes: ["w 22 70 270 60 4"] },
+      { text: "A", shapes: ["w 10 25 0 50 50"] },
+    ],
+  }
+  return { file, before, osl }
 })
 
 vi.mock("./reviewData", async () => {
@@ -30,7 +37,9 @@ vi.mock("./reviewData", async () => {
   const font = testFont()
   return {
     skeletonFiles: { "noto-next": file },
-    useFont: () => font,
+    useFont: (path: string) => (path ? font : undefined),
+    useSkeletonFile: (id: string, ref: string) =>
+      ref === "main" ? before : id === "noto-next" ? file : null,
     useOsl: () => osl,
   }
 })
@@ -98,5 +107,41 @@ describe("ReviewPage", () => {
       [],
     )
     expect(location.search).toBe("?status=untraced")
+  })
+
+  it("compares with a file at a git ref, and finds the signs that changed", async () => {
+    render(<ReviewPage />)
+    await userEvent.selectOptions(
+      screen.getByRole("combobox", { name: "Compare with" }),
+      "noto-next",
+    )
+    await userEvent.type(
+      screen.getByRole("textbox", { name: "At ref" }),
+      "main{Enter}",
+    )
+    await userEvent.selectOptions(
+      screen.getByRole("combobox", { name: "Status" }),
+      "changed",
+    )
+    const tile = screen.getByRole("button", { name: /^DIŠ, .*, changed$/ })
+    await userEvent.click(tile)
+    expect(screen.getByRole("heading", { name: "Before" })).toBeVisible()
+    expect(screen.getByText("removed")).toBeVisible()
+    expect(screen.getByText("new")).toBeVisible()
+  })
+
+  it("compares a file with itself as nothing changed", async () => {
+    render(<ReviewPage />)
+    await userEvent.selectOptions(
+      screen.getByRole("combobox", { name: "Compare with" }),
+      "noto-next",
+    )
+    await userEvent.selectOptions(
+      screen.getByRole("combobox", { name: "Status" }),
+      "changed",
+    )
+    expect(within(screen.getByRole("list")).queryAllByRole("button")).toEqual(
+      [],
+    )
   })
 })

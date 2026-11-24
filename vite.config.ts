@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vitest/config"
 
 import { oslPlugin } from "./scripts/osl/vitePlugin.ts"
+import { reviewPlugin } from "./scripts/review/vitePlugin.ts"
 import { touchIconPlugin } from "./scripts/touchIcon/vitePlugin.ts"
 import { usagePlugin } from "./scripts/usage/vitePlugin.ts"
 
@@ -12,7 +13,13 @@ const base = "/wedges/"
 
 export default defineConfig({
   base,
-  plugins: [react(), oslPlugin(), usagePlugin(), touchIconPlugin()],
+  plugins: [
+    react(),
+    oslPlugin(),
+    usagePlugin(),
+    touchIconPlugin(),
+    reviewPlugin(),
+  ],
   build: {
     rollupOptions: {
       // Only the app. The dev server also serves review.html, the skeleton
