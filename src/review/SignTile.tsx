@@ -17,6 +17,7 @@ export interface SignTileProps {
   style: StrokeStyle
   /** The file's limits, which pick out shapes too far off the ink. */
   limits?: RedrawLimits
+  isReviewed: boolean
   isSelected: boolean
   /** Opens the sign, by its key. */
   onSelect: (key: string) => void
@@ -33,6 +34,7 @@ export const SignTile = memo(function SignTile({
   winkelhakenAngle,
   style,
   limits,
+  isReviewed,
   isSelected,
   onSelect,
 }: SignTileProps) {
@@ -55,7 +57,9 @@ export const SignTile = memo(function SignTile({
     <button
       type="button"
       className={styles.tile}
-      aria-label={`${name}, ${status}`}
+      aria-label={[name, status, ...(isReviewed ? ["reviewed"] : [])].join(
+        ", ",
+      )}
       aria-pressed={isSelected}
       onClick={() => onSelect(sign.key)}
     >
@@ -68,7 +72,10 @@ export const SignTile = memo(function SignTile({
         astray={astray}
       />
       <span className={styles.name}>{name}</span>
-      <span className={styles.score}>{status}</span>
+      <span className={styles.score}>
+        {status}
+        {isReviewed && <span className={styles.reviewed}> ✓</span>}
+      </span>
     </button>
   )
 })

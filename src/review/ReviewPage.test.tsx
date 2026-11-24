@@ -37,6 +37,7 @@ vi.mock("./reviewData", async () => {
 
 describe("ReviewPage", () => {
   beforeEach(() => {
+    localStorage.clear()
     history.replaceState(null, "", "/review.html")
   })
 
@@ -48,7 +49,7 @@ describe("ReviewPage", () => {
     expect(
       within(screen.getByRole("list")).getAllByRole("button"),
     ).toHaveLength(2)
-    expect(screen.getByText(/^2 glyphs, 2 traced/)).toBeVisible()
+    expect(screen.getByText(/^2 glyphs, 2 traced, 0 reviewed/)).toBeVisible()
   })
 
   it("opens a sign, and moves to the next", async () => {
@@ -61,6 +62,17 @@ describe("ReviewPage", () => {
     expect(location.search).toBe(`?sign=${encodeURIComponent("A#0")}`)
     await userEvent.keyboard("{Escape}")
     expect(screen.queryByRole("region", { name: "Sign detail" })).toBeNull()
+  })
+
+  it("marks a sign reviewed with R, and moves to the next", async () => {
+    render(<ReviewPage />)
+    await userEvent.click(screen.getByRole("button", { name: /^DIŠ/ }))
+    await userEvent.keyboard("r")
+    expect(location.search).toBe(`?sign=${encodeURIComponent("A#0")}`)
+    expect(
+      screen.getByRole("button", { name: /^DIŠ, .*reviewed$/ }),
+    ).toBeVisible()
+    expect(screen.getByText(/^2 glyphs, 2 traced, 1 reviewed/)).toBeVisible()
   })
 
   it("filters by group", async () => {

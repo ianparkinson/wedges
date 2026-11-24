@@ -19,6 +19,7 @@ const sign: ReviewSign = {
 
 function renderDetail(props: Partial<Parameters<typeof SignDetail>[0]> = {}) {
   const handlers = {
+    onReviewedChange: vi.fn(),
     onPrevious: vi.fn(),
     onNext: vi.fn(),
     onClose: vi.fn(),
@@ -30,6 +31,7 @@ function renderDetail(props: Partial<Parameters<typeof SignDetail>[0]> = {}) {
       winkelhakenAngle={100}
       style={style}
       limits={{ overlap: 0.75, shapeOutside: 0.3 }}
+      isReviewed={false}
       {...handlers}
       {...props}
     />,
@@ -62,6 +64,14 @@ describe("SignDetail", () => {
     expect(paths()).toBe(0)
   })
 
+  it("marks the sign reviewed", async () => {
+    const { onReviewedChange } = renderDetail()
+    await userEvent.click(
+      screen.getByRole("checkbox", { name: "Reviewed (R)" }),
+    )
+    expect(onReviewedChange).toHaveBeenCalledWith(true)
+  })
+
   it("moves to the previous and next signs", async () => {
     const { onPrevious, onNext } = renderDetail()
     await userEvent.click(screen.getByRole("button", { name: "Previous (←)" }))
@@ -73,5 +83,6 @@ describe("SignDetail", () => {
   it("says when there's no skeleton", () => {
     renderDetail({ sign: { ...sign, shapes: undefined } })
     expect(screen.getByText("No skeleton.")).toBeVisible()
+    expect(screen.queryByRole("checkbox", { name: "Reviewed (R)" })).toBeNull()
   })
 })

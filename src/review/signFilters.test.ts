@@ -19,6 +19,11 @@ function sign(key: string, overlap?: number, shapesOutside = [0]): ReviewSign {
   }
 }
 
+const reviewed = {
+  isReviewed: (text: string) => text === "a",
+  setReviewed: () => {},
+}
+
 describe("isFailing", () => {
   it("fails a sign under the overlap limit, or with a shape too far off the ink", () => {
     expect(isFailing(sign("a", 0.9), limits)).toBe(false)
@@ -33,13 +38,17 @@ describe("isFailing", () => {
 })
 
 describe("hasStatus", () => {
-  it("tells traced, untraced and failing signs apart", () => {
+  it("tells traced, untraced, reviewed, unreviewed and failing signs apart", () => {
     const signs = [sign("a", 0.9), sign("b", 0.5), sign("c")]
     const keys = (status: Status) =>
-      signs.filter((r) => hasStatus(r, status, limits)).map((r) => r.key)
+      signs
+        .filter((r) => hasStatus(r, status, reviewed, limits))
+        .map((r) => r.key)
     expect(keys("all")).toEqual(["a", "b", "c"])
     expect(keys("traced")).toEqual(["a", "b"])
     expect(keys("untraced")).toEqual(["c"])
+    expect(keys("reviewed")).toEqual(["a"])
+    expect(keys("unreviewed")).toEqual(["b"])
     expect(keys("failing")).toEqual(["b"])
   })
 })
