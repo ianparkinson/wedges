@@ -26,6 +26,7 @@ function renderTile(props: Partial<Parameters<typeof SignTile>[0]> = {}) {
       font={testFont()}
       winkelhakenAngle={100}
       style={style}
+      isReviewed={false}
       isSelected={false}
       onSelect={onSelect}
       {...props}
@@ -39,6 +40,13 @@ describe("SignTile", () => {
     const onSelect = renderTile()
     await userEvent.click(screen.getByRole("button", { name: "DIŠ, 0.91" }))
     expect(onSelect).toHaveBeenCalledWith("𒁹#0")
+  })
+
+  it("ticks a reviewed sign", () => {
+    renderTile({ isReviewed: true })
+    expect(
+      screen.getByRole("button", { name: "DIŠ, 0.91, reviewed" }),
+    ).toBeVisible()
   })
 
   it("says when a sign is still being scored", () => {

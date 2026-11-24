@@ -3,9 +3,17 @@
  */
 import type { RedrawLimits } from "./redraw/limits"
 import type { ReviewSign } from "./reviewSigns"
+import type { ReviewedMarks } from "./useReviewed"
 
 /** The statuses the page can filter by. */
-export const STATUSES = ["all", "traced", "untraced", "failing"] as const
+export const STATUSES = [
+  "all",
+  "traced",
+  "untraced",
+  "unreviewed",
+  "reviewed",
+  "failing",
+] as const
 
 /** A status the page can filter by. */
 export type Status = (typeof STATUSES)[number]
@@ -20,6 +28,7 @@ export type Sort = (typeof SORTS)[number]
 export function hasStatus(
   sign: ReviewSign,
   status: Status,
+  reviewed: ReviewedMarks,
   limits: RedrawLimits | undefined,
 ): boolean {
   switch (status) {
@@ -27,6 +36,15 @@ export function hasStatus(
       return sign.shapes !== undefined
     case "untraced":
       return sign.shapes === undefined
+    case "reviewed":
+      return (
+        sign.shapes !== undefined && reviewed.isReviewed(sign.text, sign.shapes)
+      )
+    case "unreviewed":
+      return (
+        sign.shapes !== undefined &&
+        !reviewed.isReviewed(sign.text, sign.shapes)
+      )
     case "failing":
       return isFailing(sign, limits)
     case "all":

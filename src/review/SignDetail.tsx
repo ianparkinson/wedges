@@ -17,6 +17,8 @@ export interface SignDetailProps {
   winkelhakenAngle: number
   style: StrokeStyle
   limits?: RedrawLimits
+  isReviewed: boolean
+  onReviewedChange: (reviewed: boolean) => void
   onPrevious: () => void
   onNext: () => void
   onClose: () => void
@@ -29,6 +31,8 @@ export function SignDetail({
   winkelhakenAngle,
   style,
   limits,
+  isReviewed,
+  onReviewedChange,
   onPrevious,
   onNext,
   onClose,
@@ -78,6 +82,16 @@ export function SignDetail({
       {sign.comments && <p>{sign.comments}</p>}
 
       <div className={styles.actions}>
+        {sign.shapes && (
+          <label>
+            <input
+              type="checkbox"
+              checked={isReviewed}
+              onChange={(e) => onReviewedChange(e.target.checked)}
+            />{" "}
+            Reviewed (R)
+          </label>
+        )}
         <Button onPress={onPrevious}>Previous (←)</Button>
         <Button onPress={onNext}>Next (→)</Button>
         <Button onPress={onClose}>Close (Esc)</Button>

@@ -33,9 +33,10 @@ To open it, run `npm run dev` and go to http://localhost:5173/wedges/review.html
 
 - **File.** Choose a skeleton file from `data/skeletons/`. The page opens `noto-next.json` by default.
 - **Tiles.** Each tile shows the glyph in grey with the skeleton's shapes over it, the sign's OSL name, and its overlap score. A shape outside the data test's limit is red. Glyphs with no skeleton have tiles too, so you can see what's left to trace. The page scores the signs a few at a time after it opens, so the scores, and any sort or filter by them, fill in over the first few seconds.
-- **Filters.** Show one group of signs by OSL name (simple, modified, compound, or not in OSL), one Unicode block, or one status: traced, untraced, or failing the data test.
+- **Filters.** Show one group of signs by OSL name (simple, modified, compound, or not in OSL), one Unicode block, or one status: traced, untraced, reviewed, unreviewed, or failing the data test.
 - **Sort.** In file order, by overlap with the worst first, or by each sign's worst shape.
 - **Detail.** Select a tile to see it larger, with each shape numbered at its start and listed with how much of it lies outside the ink. Clear **Glyph** or **Skeleton** to hide either.
+- **Reviewed marks.** Select **Reviewed**, or press R, to mark a sign and move on to the next. The mark records the sign's shapes, so editing the skeleton clears it. Marks are kept in your browser's local storage, not in the repo.
 - **Keys.** With a sign open, press the Left and Right arrow keys to move through the signs shown, and Esc to close it.
 
 The page keeps its choices in its URL, and updates as soon as you save a skeleton file, so you can edit the JSON beside it and see the result.

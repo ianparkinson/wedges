@@ -9,18 +9,19 @@ import { skeletonFonts } from "./redraw/fonts"
 import { redrawLimits } from "./redraw/limits"
 import { skeletonFiles, useFont, useOsl } from "./reviewData"
 import styles from "./ReviewPage.module.css"
-import { reviewSigns, type SignGroup } from "./reviewSigns"
+import { reviewSigns, type ReviewSign, type SignGroup } from "./reviewSigns"
 import { SignDetail } from "./SignDetail"
 import { hasStatus, isFailing, SORTS, sortSigns, STATUSES } from "./signFilters"
 import { SignTile } from "./SignTile"
 import { Choice } from "./ui/Choice"
+import { useReviewed } from "./useReviewed"
 import { useScores } from "./useScores"
 
 const DEFAULT_FILE = "noto-next"
 
 /**
  * The review page: every glyph in a skeleton file's font with its skeleton
- * drawn over it, to sort and filter by how well they match. See
+ * drawn over it, to sort, filter, and mark as reviewed. See
  * docs/review-tooling.md.
  */
 export function ReviewPage() {
@@ -95,6 +96,7 @@ interface LoadedReviewProps {
 function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
   const { style } = skeletonFonts[fileId]!
   const limits = redrawLimits[fileId]
+  const reviewed = useReviewed(fileId)
   const [group, setGroup] = useUrlState("group", "all", GROUPS)
   const [block, setBlock] = useUrlState("block", "all", BLOCKS)
   const [status, setStatus] = useUrlState("status", "all", STATUSES)
@@ -115,11 +117,11 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
           (sign) =>
             (group === "all" || sign.group === group) &&
             (block === "all" || sign.block === block) &&
-            hasStatus(sign, status, limits),
+            hasStatus(sign, status, reviewed, limits),
         ),
         sort,
       ),
-    [signs, group, block, status, sort, limits],
+    [signs, group, block, status, sort, reviewed, limits],
   )
   const revealed = useRevealed(
     shown.length,
@@ -132,6 +134,14 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
   const step = (by: number) => {
     const next = shown[selectedIndex + by]
     if (next) setSelectedKey(next.key)
+  }
+  /** Marks a sign reviewed and moves on to the next, or unmarks it. */
+  const markReviewed = (sign: ReviewSign, value: boolean) => {
+    if (!sign.shapes) return
+    // Found before marking, since marking can filter the sign out.
+    const next = shown[selectedIndex + 1]
+    reviewed.setReviewed(sign.text, sign.shapes, value)
+    if (value && next) setSelectedKey(next.key)
   }
 
   useEffect(() => {
@@ -151,6 +161,12 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
         case "ArrowRight":
           step(1)
           break
+        case "r":
+          markReviewed(
+            selected,
+            !reviewed.isReviewed(selected.text, selected.shapes ?? []),
+          )
+          break
         case "Escape":
           setSelectedKey("")
           break
@@ -160,9 +176,12 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
     return () => window.removeEventListener("keydown", onKey)
   })
 
+  const traced = current.filter((sign) => sign.shapes)
   const counts = {
     glyphs: current.length,
-    traced: current.filter((sign) => sign.shapes).length,
+    traced: traced.length,
+    reviewed: traced.filter((r) => reviewed.isReviewed(r.text, r.shapes!))
+      .length,
     failing: signs.filter((r) => isFailing(r, limits)).length,
   }
 
@@ -189,9 +208,9 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
         />
         <Choice label="Sort" value={sort} options={SORTS} onChange={setSort} />
         <p className={styles.counts}>
-          {counts.glyphs} glyphs, {counts.traced} traced, {counts.failing}{" "}
-          failing the data test. Showing {shown.length}.
-          {pending > 0 && ` Scoring ${pending} more…`}
+          {counts.glyphs} glyphs, {counts.traced} traced, {counts.reviewed}{" "}
+          reviewed, {counts.failing} failing the data test. Showing{" "}
+          {shown.length}.{pending > 0 && ` Scoring ${pending} more…`}
         </p>
       </div>
       <div className={selected ? styles.split : undefined}>
@@ -204,6 +223,10 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
                 winkelhakenAngle={file.winkelhakenAngle}
                 style={style}
                 limits={limits}
+                isReviewed={
+                  sign.shapes !== undefined &&
+                  reviewed.isReviewed(sign.text, sign.shapes)
+                }
                 isSelected={sign.key === selectedKey}
                 onSelect={setSelectedKey}
               />
@@ -218,6 +241,11 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
               winkelhakenAngle={file.winkelhakenAngle}
               style={style}
               limits={limits}
+              isReviewed={
+                selected.shapes !== undefined &&
+                reviewed.isReviewed(selected.text, selected.shapes)
+              }
+              onReviewedChange={(value) => markReviewed(selected, value)}
               onPrevious={() => step(-1)}
               onNext={() => step(1)}
               onClose={() => setSelectedKey("")}
