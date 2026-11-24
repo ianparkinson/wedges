@@ -1,6 +1,6 @@
 /*
- * The cuneiform font, vendored unmodified in data/fonts/noto/. The browser fetches
- * it only when a cuneiform character is on the page.
+ * The cuneiform font, vendored unmodified in data/fonts/noto/. index.html
+ * preloads it, so it arrives before the first sign is drawn.
  */
 @font-face {
   font-family: "Noto Sans Cuneiform";

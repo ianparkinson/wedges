@@ -11,7 +11,7 @@ The skeletons are traced over the same font, so a candidate looks like what was 
 
 ## Decision
 
-Vendor Noto Sans Cuneiform's unhinted TTF, unmodified, in `data/fonts/noto/`, with its licence (SIL Open Font License 1.1), and serve that file. The `@font-face` rule in `src/app/fonts.css` has a `unicode-range` covering the cuneiform blocks, so the browser fetches the font only when a cuneiform character is on the page, and draws text in the system font meanwhile (`font-display: swap`).
+Vendor Noto Sans Cuneiform's unhinted TTF, unmodified, in `data/fonts/noto/`, with its licence (SIL Open Font License 1.1), and serve that file. The `@font-face` rule in `src/app/fonts.css` uses the font for the cuneiform blocks only (`unicode-range`). On its own, that rule would make the browser wait for a cuneiform character before fetching the font, but the app shows signs as soon as someone draws, so `index.html` preloads the font with the page. Until it arrives, text is drawn in the system font (`font-display: swap`).
 
 - **The skeletons are pinned to the font they were traced over.** Each skeleton file's `font` block gives the SHA-256 hash of the font it describes, and a data test checks the hash. The test lists which font file in `data/fonts/` each skeleton file describes, so skeleton files describe the font, not how the repo stores it, and several can share a font. A new font therefore fails the test until someone checks the skeletons against it and updates the hash.
 - **Other fonts arrive the same way.** Some fonts' terms forbid distributing modified copies, so fonts are served as they are, not converted to WOFF2 or subset. The same files serve as tracing references for their skeletons.
