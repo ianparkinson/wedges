@@ -10,6 +10,7 @@ import { redrawLimits } from "./redraw/limits"
 import { skeletonFiles, useFont, useOsl } from "./reviewData"
 import styles from "./ReviewPage.module.css"
 import { reviewSigns, type SignGroup } from "./reviewSigns"
+import { SignDetail } from "./SignDetail"
 import { hasStatus, isFailing, SORTS, sortSigns, STATUSES } from "./signFilters"
 import { SignTile } from "./SignTile"
 import { Choice } from "./ui/Choice"
@@ -98,6 +99,7 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
   const [block, setBlock] = useUrlState("block", "all", BLOCKS)
   const [status, setStatus] = useUrlState("status", "all", STATUSES)
   const [sort, setSort] = useUrlState("sort", "file", SORTS)
+  const [selectedKey, setSelectedKey] = useUrlState("sign", "")
 
   const current = useMemo(() => reviewSigns(file, font, osl), [file, font, osl])
   const { signs, pending } = useScores(
@@ -124,6 +126,39 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
     [group, block, status, sort].join("|"),
   )
   const grid = shown.slice(0, revealed)
+
+  const selectedIndex = shown.findIndex((sign) => sign.key === selectedKey)
+  const selected = shown[selectedIndex]
+  const step = (by: number) => {
+    const next = shown[selectedIndex + by]
+    if (next) setSelectedKey(next.key)
+  }
+
+  useEffect(() => {
+    if (!selected) return
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target
+      if (
+        target instanceof HTMLSelectElement ||
+        target instanceof HTMLInputElement
+      ) {
+        return
+      }
+      switch (event.key) {
+        case "ArrowLeft":
+          step(-1)
+          break
+        case "ArrowRight":
+          step(1)
+          break
+        case "Escape":
+          setSelectedKey("")
+          break
+      }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  })
 
   const counts = {
     glyphs: current.length,
@@ -159,19 +194,37 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
           {pending > 0 && ` Scoring ${pending} more…`}
         </p>
       </div>
-      <ul className={styles.grid}>
-        {grid.map((sign) => (
-          <li key={sign.key}>
-            <SignTile
-              sign={sign}
+      <div className={selected ? styles.split : undefined}>
+        <ul className={styles.grid}>
+          {grid.map((sign) => (
+            <li key={sign.key}>
+              <SignTile
+                sign={sign}
+                font={font}
+                winkelhakenAngle={file.winkelhakenAngle}
+                style={style}
+                limits={limits}
+                isSelected={sign.key === selectedKey}
+                onSelect={setSelectedKey}
+              />
+            </li>
+          ))}
+        </ul>
+        {selected && (
+          <div className={styles.side}>
+            <SignDetail
+              sign={selected}
               font={font}
               winkelhakenAngle={file.winkelhakenAngle}
               style={style}
               limits={limits}
+              onPrevious={() => step(-1)}
+              onNext={() => step(1)}
+              onClose={() => setSelectedKey("")}
             />
-          </li>
-        ))}
-      </ul>
+          </div>
+        )}
+      </div>
     </>
   )
 }

@@ -18,4 +18,11 @@ describe("SkeletonPicture", () => {
     const { container } = render(<SkeletonPicture {...props} />)
     expect(container.querySelectorAll("path")).toHaveLength(3)
   })
+
+  it("numbers each shape when asked", () => {
+    const { container } = render(<SkeletonPicture {...props} numbered />)
+    expect(
+      [...container.querySelectorAll("text")].map((t) => t.textContent),
+    ).toEqual(["1", "2"])
+  })
 })

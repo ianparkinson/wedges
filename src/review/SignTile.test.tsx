@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react"
-import { describe, expect, it } from "vitest"
+import userEvent from "@testing-library/user-event"
+import { describe, expect, it, vi } from "vitest"
 
 import { testFont } from "@test/testFont"
 
@@ -18,26 +19,31 @@ const sign: ReviewSign = {
 }
 
 function renderTile(props: Partial<Parameters<typeof SignTile>[0]> = {}) {
+  const onSelect = vi.fn()
   render(
     <SignTile
       sign={sign}
       font={testFont()}
       winkelhakenAngle={100}
       style={style}
+      isSelected={false}
+      onSelect={onSelect}
       {...props}
     />,
   )
+  return onSelect
 }
 
 describe("SignTile", () => {
-  it("shows the sign's name and overlap", () => {
-    renderTile()
-    expect(screen.getByRole("figure", { name: "DIŠ, 0.91" })).toBeVisible()
+  it("shows the sign's name and overlap, and opens it when pressed", async () => {
+    const onSelect = renderTile()
+    await userEvent.click(screen.getByRole("button", { name: "DIŠ, 0.91" }))
+    expect(onSelect).toHaveBeenCalledWith("𒁹#0")
   })
 
   it("says when a sign is still being scored", () => {
     renderTile({ sign: { ...sign, score: undefined } })
-    expect(screen.getByRole("figure", { name: "DIŠ, scoring…" })).toBeVisible()
+    expect(screen.getByRole("button", { name: "DIŠ, scoring…" })).toBeVisible()
   })
 
   it("names a glyph with no skeleton by its code point", () => {
@@ -45,7 +51,12 @@ describe("SignTile", () => {
       sign: { ...sign, name: undefined, shapes: undefined, score: undefined },
     })
     expect(
-      screen.getByRole("figure", { name: "U+12079, no skeleton" }),
+      screen.getByRole("button", { name: "U+12079, no skeleton" }),
     ).toBeVisible()
+  })
+
+  it("shows which tile is selected", () => {
+    renderTile({ isSelected: true })
+    expect(screen.getByRole("button", { pressed: true })).toBeVisible()
   })
 })
