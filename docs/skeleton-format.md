@@ -109,6 +109,8 @@ IGI: a Winkelhaken opening to the right, then a vertical wedge, and a short hori
 
 There's one file for each font, named after it, such as `data/skeletons/noto.json`. The file name is the font's id in the app. Each file is formatted by Prettier, like the rest of the repo.
 
+While a font's skeletons are being replaced, the new ones build up in a second file, such as `data/skeletons/noto-next.json`, which the app doesn't load. See [Review tooling](review-tooling.md).
+
 ```json
 {
   "version": 2,
@@ -154,7 +156,7 @@ The matcher uses only `winkelhakenAngle` of the per-font values. The others are 
 
 ### Font
 
-The `font` block identifies the font file that the skeletons describe. The font itself is in `data/fonts/`, unmodified, with its licence. The skeleton file doesn't name it: `test/data/fonts.test.ts` lists which font file each skeleton file describes. Several skeleton files can describe the same font.
+The `font` block identifies the font file that the skeletons describe. The font itself is in `data/fonts/`, unmodified, with its licence. The skeleton file doesn't name it: `src/review/redraw/fonts.ts` lists which font file each skeleton file describes. Several skeleton files can describe the same font.
 
 A font update can move glyphs, so `sha256`, the file's SHA-256 hash in lowercase hex, pins the skeletons to one copy of the font. A data test checks that the font file has this hash. When the font changes, the test fails until you check the skeletons against the new font and update `sha256` and `version`.
 

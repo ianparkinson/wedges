@@ -26,6 +26,7 @@ src/
   ui/        thin wrappers over React Aria Components, styled with CSS Modules
   features/  the app's panels: drawing, candidates, sequence, sign info, lookup, about
   app/       the app shell, layout, providers and tokens.css
+  review/    development-only tools for reviewing skeletons, never shipped
 ```
 
 Dependencies point one way only:
@@ -35,6 +36,7 @@ Dependencies point one way only:
 - `ui` imports neither `core` nor `features`. It takes data as props.
 - `features` use `ui` and `core`.
 - `app` puts the features together.
+- `review` may use anything, and nothing imports it.
 - **Only `src/ui` imports `react-aria-components`.** Everything else imports our wrappers, such as `@/ui/Link/Link`, so the library can be swapped by changing one folder.
 
 ## Commands
@@ -111,6 +113,7 @@ Write for an experienced software engineer who is new to this project and to cun
 
 - `docs/`: how the algorithms work, beside the code they describe (each `src/core` module's header comment links to its section), and [prior art](docs/prior-art.md): related projects, data sources and licences.
 - `docs/decisions/`: decision records.
+- [review-tooling.md](docs/review-tooling.md): the redraw check, which draws skeletons back over their fonts.
 - `data/`: sign skeletons and their JSON Schema, the fonts they were traced over (`data/fonts/`, unmodified, each with its licence), a copy of the Oracc Sign List's `osl.asl`, and value usage counted from Oracc's glossaries ([skeleton-format.md](docs/skeleton-format.md), [sign-data.md](docs/sign-data.md), [usage-data.md](docs/usage-data.md)).
 - `e2e/`: Playwright specs.
 - `test/`: test setup, and tests that use seeded synthetic drawings from `synthetic/`.
