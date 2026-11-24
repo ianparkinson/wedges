@@ -23,7 +23,7 @@ function glyphOf(shapes: readonly string[]): Glyph {
 }
 
 function score(glyph: readonly string[], skeleton: readonly string[]) {
-  return redraw(glyphOf(glyph), skeleton.map(parseShape), 100, style).score
+  return redraw(glyphOf(glyph), skeleton.map(parseShape), 100, style)
 }
 
 const CROSS = ["w 13 33 0 78 15", "w 52 72 270 78 15"]

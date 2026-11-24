@@ -32,7 +32,8 @@ The review page shows every glyph in a skeleton file's font, with its skeleton d
 To open it, run `npm run dev` and go to http://localhost:5173/wedges/review.html.
 
 - **File.** Choose a skeleton file from `data/skeletons/`. The page opens `noto-next.json` by default.
-- **Tiles.** Each tile shows the glyph in grey with the skeleton's shapes over it, and the sign's OSL name. Glyphs with no skeleton have tiles too, so you can see what's left to trace.
-- **Filters.** Show one group of signs by OSL name (simple, modified, compound, or not in OSL), or one Unicode block.
+- **Tiles.** Each tile shows the glyph in grey with the skeleton's shapes over it, the sign's OSL name, and its overlap score. A shape outside the data test's limit is red. Glyphs with no skeleton have tiles too, so you can see what's left to trace. The page scores the signs a few at a time after it opens, so the scores, and any sort or filter by them, fill in over the first few seconds.
+- **Filters.** Show one group of signs by OSL name (simple, modified, compound, or not in OSL), one Unicode block, or one status: traced, untraced, or failing the data test.
+- **Sort.** In file order, by overlap with the worst first, or by each sign's worst shape.
 
 The page keeps its choices in its URL, and updates as soon as you save a skeleton file, so you can edit the JSON beside it and see the result.

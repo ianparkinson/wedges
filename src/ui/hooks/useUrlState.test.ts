@@ -24,4 +24,11 @@ describe("useUrlState", () => {
     act(() => result.current[1]("file"))
     expect(location.search).toBe("")
   })
+
+  it("reads a value that isn't one of the options as the default", () => {
+    history.replaceState(null, "", "/page.html?sort=nonsense")
+    const sorts = ["file", "overlap"] as const
+    const { result } = renderHook(() => useUrlState("sort", "file", sorts))
+    expect(result.current[0]).toBe("file")
+  })
 })

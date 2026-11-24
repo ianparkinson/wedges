@@ -5,6 +5,8 @@
   --review-ink: rgb(43 33 24 / 0.35);
   --review-shape: rgb(31 95 191 / 0.2);
   --review-shape-line: rgb(31 95 191 / 0.9);
+  --review-shape-astray: rgb(214 40 40 / 0.3);
+  --review-missed: #d62828;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -12,5 +14,7 @@
     --review-ink: rgb(239 230 218 / 0.35);
     --review-shape: rgb(127 176 255 / 0.2);
     --review-shape-line: rgb(127 176 255 / 0.9);
+    --review-shape-astray: rgb(255 107 107 / 0.3);
+    --review-missed: #ff6b6b;
   }
 }

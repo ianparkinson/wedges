@@ -40,13 +40,14 @@ describe("ReviewPage", () => {
     history.replaceState(null, "", "/review.html")
   })
 
-  it("shows a tile for each glyph, traced or not", () => {
+  it("shows a tile for each glyph, traced or not, and scores it", async () => {
     render(<ReviewPage />)
     expect(
-      within(screen.getByRole("list"))
-        .getAllByRole("figure")
-        .map((tile) => tile.getAttribute("aria-label")),
-    ).toEqual(["DIŠ", "U+41"])
+      await screen.findByRole("figure", { name: /^DIŠ, 0\.\d\d$/ }),
+    ).toBeVisible()
+    expect(
+      within(screen.getByRole("list")).getAllByRole("figure"),
+    ).toHaveLength(2)
     expect(screen.getByText(/^2 glyphs, 2 traced/)).toBeVisible()
   })
 
@@ -57,9 +58,21 @@ describe("ReviewPage", () => {
       "unlisted",
     )
     expect(
-      within(screen.getByRole("list")).getByRole("figure", { name: "U+41" }),
+      within(screen.getByRole("list")).getByRole("figure", { name: /^U\+41/ }),
     ).toBeVisible()
-    expect(screen.queryByRole("figure", { name: "DIŠ" })).toBeNull()
+    expect(screen.queryByRole("figure", { name: /^DIŠ/ })).toBeNull()
     expect(location.search).toBe("?group=unlisted")
+  })
+
+  it("filters by status", async () => {
+    render(<ReviewPage />)
+    await userEvent.selectOptions(
+      screen.getByRole("combobox", { name: "Status" }),
+      "untraced",
+    )
+    expect(within(screen.getByRole("list")).queryAllByRole("figure")).toEqual(
+      [],
+    )
+    expect(location.search).toBe("?status=untraced")
   })
 })

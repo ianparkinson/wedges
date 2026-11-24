@@ -39,7 +39,7 @@ describe.each(Object.entries(limits))("data/skeletons/%s.json", (id, limit) => {
   const scores = file.skeletons
     .filter((entry) => entry.shapes)
     .map(({ text, shapes = [] }) => {
-      const { score } = redraw(
+      const score = redraw(
         glyph(font, text)!,
         shapes.map(parseShape),
         file.winkelhakenAngle,

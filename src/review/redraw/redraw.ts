@@ -8,7 +8,7 @@ import { boundingBox, type Box, type Polygon } from "@/lib/geometry"
 import type { Glyph } from "./glyphs"
 import { impression, type StrokeStyle } from "./impression"
 
-/** Pixels per skeleton unit: 3 makes a glyph about 300 pixels across. */
+/** Pixels per skeleton unit: 2 makes a glyph about 200 pixels across. */
 const SCALE = 2
 
 /** A pixel counts as covered when it's at least half filled. */
@@ -27,27 +27,7 @@ export interface RedrawScore {
 }
 
 /**
- * Pixels over a box in skeleton units, `SCALE` to the unit, row by row from
- * the top: 1 where covered, 0 elsewhere.
- */
-export interface Raster {
-  readonly box: Box
-  readonly width: number
-  readonly height: number
-  readonly pixels: Uint8Array
-}
-
-/** A redraw check's score, with the rasters it compared, for display. */
-export interface Redraw {
-  readonly score: RedrawScore
-  /** The glyph's ink. */
-  readonly ink: Raster
-  /** Every shape drawn together, on the same grid as the ink. */
-  readonly drawn: Raster
-}
-
-/**
- * Draws `shapes` in `style`, and compares them with `glyph`. Drawing uses
+ * Draws `shapes` in `style`, and scores them against `glyph`. Drawing uses
  * `OffscreenCanvas`, which tests provide in Node: see test/setup.ts.
  */
 export function redraw(
@@ -55,7 +35,7 @@ export function redraw(
   shapes: readonly Shape[],
   winkelhakenAngle: number,
   style: StrokeStyle,
-): Redraw {
+): RedrawScore {
   const impressions = shapes.map((shape) =>
     impression(shape, winkelhakenAngle, style),
   )
@@ -78,24 +58,31 @@ export function redraw(
   const drawnArea = count(drawn)
 
   return {
-    score: {
-      overlap: both / Math.max(1, inkArea + drawnArea - both),
-      missed: 1 - both / Math.max(1, inkArea),
-      outside: 1 - both / Math.max(1, drawnArea),
-      shapesOutside: impressions.map((polygons) => {
-        const shape = canvas.rasterize(
-          (context) => fill(context, polygons),
-          boundingBox(polygons.flat()),
-        )
-        return 1 - count(shape, ink) / Math.max(1, count(shape))
-      }),
-    },
-    ink,
-    drawn,
+    overlap: both / Math.max(1, inkArea + drawnArea - both),
+    missed: 1 - both / Math.max(1, inkArea),
+    outside: 1 - both / Math.max(1, drawnArea),
+    shapesOutside: impressions.map((polygons) => {
+      const shape = canvas.rasterize(
+        (context) => fill(context, polygons),
+        boundingBox(polygons.flat()),
+      )
+      return 1 - count(shape, ink) / Math.max(1, count(shape))
+    }),
   }
 }
 
-/** What drawing needs from a context, onscreen or offscreen. */
+/**
+ * Pixels over a box in skeleton units, `SCALE` to the unit, row by row from
+ * the top, as a canvas gives them: four bytes to a pixel, the last of them
+ * how much of it is filled.
+ */
+interface Raster {
+  readonly box: Box
+  readonly width: number
+  readonly height: number
+  readonly rgba: Uint8ClampedArray
+}
+
 type Context = CanvasPath & CanvasDrawPath
 
 /** One canvas over a box in skeleton units, drawn on again and again. */
@@ -109,6 +96,9 @@ class Canvas {
     this.height = Math.ceil((box.bottom - box.top) * SCALE)
     this.context = new OffscreenCanvas(this.width, this.height).getContext(
       "2d",
+      {
+        willReadFrequently: true,
+      },
     )!
     this.context.fillStyle = "black"
   }
@@ -145,11 +135,6 @@ class Canvas {
     const width = right - left
     const height = bottom - top
 
-    const rgba = context.getImageData(left, top, width, height).data
-    const pixels = new Uint8Array(width * height)
-    for (let i = 0; i < pixels.length; i++) {
-      pixels[i] = rgba[4 * i + 3]! >= COVERED ? 1 : 0
-    }
     return {
       box: {
         left: box.left + left / SCALE,
@@ -159,7 +144,7 @@ class Canvas {
       },
       width,
       height,
-      pixels,
+      rgba: context.getImageData(left, top, width, height).data,
     }
   }
 }
@@ -185,9 +170,11 @@ function count(a: Raster, b?: Raster): number {
   const dy = b ? Math.round((a.box.top - b.box.top) * SCALE) : 0
   let total = 0
   for (let y = 0; y < a.height; y++) {
-    for (let x = 0; x < a.width; x++) {
-      const covered = a.pixels[y * a.width + x]!
-      total += b ? covered & b.pixels[(y + dy) * b.width + x + dx]! : covered
+    // The alpha bytes of the row's first pixel in `a`, and below it in `b`.
+    let i = 4 * y * a.width + 3
+    let j = b ? 4 * ((y + dy) * b.width + dx) + 3 : 0
+    for (let x = 0; x < a.width; x++, i += 4, j += 4) {
+      if (a.rgba[i]! >= COVERED && (!b || b.rgba[j]! >= COVERED)) total++
     }
   }
   return total

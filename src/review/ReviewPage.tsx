@@ -1,21 +1,26 @@
 import type { Font } from "opentype.js"
 import { useEffect, useMemo, useState } from "react"
 
+import type { CuneiformBlock } from "@/core/cuneiform"
 import type { OslData, SkeletonFile } from "@/core/types"
 import { useUrlState } from "@/ui/hooks/useUrlState"
 
 import { skeletonFonts } from "./redraw/fonts"
+import { redrawLimits } from "./redraw/limits"
 import { skeletonFiles, useFont, useOsl } from "./reviewData"
 import styles from "./ReviewPage.module.css"
-import { reviewSigns } from "./reviewSigns"
+import { reviewSigns, type SignGroup } from "./reviewSigns"
+import { hasStatus, isFailing, SORTS, sortSigns, STATUSES } from "./signFilters"
 import { SignTile } from "./SignTile"
 import { Choice } from "./ui/Choice"
+import { useScores } from "./useScores"
 
 const DEFAULT_FILE = "noto-next"
 
 /**
  * The review page: every glyph in a skeleton file's font with its skeleton
- * drawn over it. See docs/review-tooling.md.
+ * drawn over it, to sort and filter by how well they match. See
+ * docs/review-tooling.md.
  */
 export function ReviewPage() {
   const [fileId, setFileId] = useUrlState("file", DEFAULT_FILE)
@@ -65,8 +70,19 @@ function FileReview({ fileId, file, fontPath }: FileReviewProps) {
   )
 }
 
-const GROUPS = ["all", "simple", "modified", "compound", "unlisted"]
-const BLOCKS = ["all", "main", "numbers", "earlyDynastic"]
+const GROUPS = [
+  "all",
+  "simple",
+  "modified",
+  "compound",
+  "unlisted",
+] as const satisfies readonly ("all" | SignGroup)[]
+const BLOCKS = [
+  "all",
+  "main",
+  "numbers",
+  "earlyDynastic",
+] as const satisfies readonly ("all" | CuneiformBlock)[]
 
 interface LoadedReviewProps {
   fileId: string
@@ -77,25 +93,42 @@ interface LoadedReviewProps {
 
 function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
   const { style } = skeletonFonts[fileId]!
-  const [group, setGroup] = useUrlState("group", "all")
-  const [block, setBlock] = useUrlState("block", "all")
+  const limits = redrawLimits[fileId]
+  const [group, setGroup] = useUrlState("group", "all", GROUPS)
+  const [block, setBlock] = useUrlState("block", "all", BLOCKS)
+  const [status, setStatus] = useUrlState("status", "all", STATUSES)
+  const [sort, setSort] = useUrlState("sort", "file", SORTS)
 
-  const signs = useMemo(() => reviewSigns(file, font, osl), [file, font, osl])
+  const current = useMemo(() => reviewSigns(file, font, osl), [file, font, osl])
+  const { signs, pending } = useScores(
+    current,
+    font,
+    file.winkelhakenAngle,
+    style,
+  )
   const shown = useMemo(
     () =>
-      signs.filter(
-        (sign) =>
-          (group === "all" || sign.group === group) &&
-          (block === "all" || sign.block === block),
+      sortSigns(
+        signs.filter(
+          (sign) =>
+            (group === "all" || sign.group === group) &&
+            (block === "all" || sign.block === block) &&
+            hasStatus(sign, status, limits),
+        ),
+        sort,
       ),
-    [signs, group, block],
+    [signs, group, block, status, sort, limits],
   )
-  const revealed = useRevealed(shown.length, [group, block].join("|"))
+  const revealed = useRevealed(
+    shown.length,
+    [group, block, status, sort].join("|"),
+  )
   const grid = shown.slice(0, revealed)
 
   const counts = {
-    glyphs: signs.length,
-    traced: signs.filter((sign) => sign.shapes).length,
+    glyphs: current.length,
+    traced: current.filter((sign) => sign.shapes).length,
+    failing: signs.filter((r) => isFailing(r, limits)).length,
   }
 
   return (
@@ -113,9 +146,17 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
           options={BLOCKS}
           onChange={setBlock}
         />
+        <Choice
+          label="Status"
+          value={status}
+          options={STATUSES}
+          onChange={setStatus}
+        />
+        <Choice label="Sort" value={sort} options={SORTS} onChange={setSort} />
         <p className={styles.counts}>
-          {counts.glyphs} glyphs, {counts.traced} traced. Showing {shown.length}
-          .
+          {counts.glyphs} glyphs, {counts.traced} traced, {counts.failing}{" "}
+          failing the data test. Showing {shown.length}.
+          {pending > 0 && ` Scoring ${pending} more…`}
         </p>
       </div>
       <ul className={styles.grid}>
@@ -126,6 +167,7 @@ function LoadedReview({ fileId, file, font, osl }: LoadedReviewProps) {
               font={font}
               winkelhakenAngle={file.winkelhakenAngle}
               style={style}
+              limits={limits}
             />
           </li>
         ))}
