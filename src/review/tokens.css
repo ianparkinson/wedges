@@ -1,0 +1,16 @@
+/*
+ * Colours for the review page, on top of the app's tokens.css.
+ */
+:root {
+  --review-ink: rgb(43 33 24 / 0.35);
+  --review-shape: rgb(31 95 191 / 0.2);
+  --review-shape-line: rgb(31 95 191 / 0.9);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --review-ink: rgb(239 230 218 / 0.35);
+    --review-shape: rgb(127 176 255 / 0.2);
+    --review-shape-line: rgb(127 176 255 / 0.9);
+  }
+}

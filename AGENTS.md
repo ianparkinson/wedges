@@ -23,10 +23,10 @@ A mobile-first web app for entering cuneiform. You draw a sign one wedge at a ti
 src/
   lib/       pure TypeScript helpers that know nothing of the app: geometry, collections, numbers
   core/      pure TypeScript: recognition, matching, lookup, sequence editing
-  ui/        thin wrappers over React Aria Components, styled with CSS Modules
+  ui/        thin wrappers over React Aria Components, styled with CSS Modules, and general-purpose hooks in ui/hooks
   features/  the app's panels: drawing, candidates, sequence, sign info, lookup, about
   app/       the app shell, layout, providers and tokens.css
-  review/    development-only tools for reviewing skeletons, never shipped
+  review/    development-only tools for reviewing skeletons, never shipped; reusable controls in review/ui
 ```
 
 Dependencies point one way only:
@@ -41,18 +41,18 @@ Dependencies point one way only:
 
 ## Commands
 
-| Command                           | What it does                                                                                         |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `npm run dev`                     | dev server at http://localhost:5173/wedges/, also on the local network for testing on a phone        |
-| `npm run check`                   | type checks, lint, format check, unit and component tests                                            |
-| `npm run e2e`                     | Playwright tests on emulated Pixel 7 (Chromium) and iPhone 14 (WebKit), against the production build |
-| `npm run format`                  | rewrite files with Prettier                                                                          |
-| `npm run build`                   | production build into `dist/`                                                                        |
-| `npm run bench:accuracy`          | accuracy benchmark: every skeleton drawn 40 times with noise (a few minutes)                         |
-| `npm run bench:performance`       | ranking time in headless Chromium with the CPU throttled 4×                                          |
-| `npm run osl-summary`             | count what the sign data built from `data/osl.asl` holds                                             |
-| `npm run build-usage -- <zips>`   | rebuild `data/usage/` from Oracc project zips; `scripts/updateUsage.sh` downloads them first         |
-| `npm test` / `npm run test:watch` | Vitest only                                                                                          |
+| Command                           | What it does                                                                                                                                        |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`                     | dev server at http://localhost:5173/wedges/, also on the local network for testing on a phone; the skeleton review page is at `/wedges/review.html` |
+| `npm run check`                   | type checks, lint, format check, unit and component tests                                                                                           |
+| `npm run e2e`                     | Playwright tests on emulated Pixel 7 (Chromium) and iPhone 14 (WebKit), against the production build                                                |
+| `npm run format`                  | rewrite files with Prettier                                                                                                                         |
+| `npm run build`                   | production build into `dist/`                                                                                                                       |
+| `npm run bench:accuracy`          | accuracy benchmark: every skeleton drawn 40 times with noise (a few minutes)                                                                        |
+| `npm run bench:performance`       | ranking time in headless Chromium with the CPU throttled 4×                                                                                         |
+| `npm run osl-summary`             | count what the sign data built from `data/osl.asl` holds                                                                                            |
+| `npm run build-usage -- <zips>`   | rebuild `data/usage/` from Oracc project zips; `scripts/updateUsage.sh` downloads them first                                                        |
+| `npm test` / `npm run test:watch` | Vitest only                                                                                                                                         |
 
 The first time you run e2e tests, install the browsers with `npx playwright install chromium webkit`.
 
@@ -113,7 +113,7 @@ Write for an experienced software engineer who is new to this project and to cun
 
 - `docs/`: how the algorithms work, beside the code they describe (each `src/core` module's header comment links to its section), and [prior art](docs/prior-art.md): related projects, data sources and licences.
 - `docs/decisions/`: decision records.
-- [review-tooling.md](docs/review-tooling.md): the redraw check, which draws skeletons back over their fonts.
+- [review-tooling.md](docs/review-tooling.md): the redraw check, which draws skeletons back over their fonts, and the review page.
 - `data/`: sign skeletons and their JSON Schema, the fonts they were traced over (`data/fonts/`, unmodified, each with its licence), a copy of the Oracc Sign List's `osl.asl`, and value usage counted from Oracc's glossaries ([skeleton-format.md](docs/skeleton-format.md), [sign-data.md](docs/sign-data.md), [usage-data.md](docs/usage-data.md)).
 - `e2e/`: Playwright specs.
 - `test/`: test setup, and tests that use seeded synthetic drawings from `synthetic/`.
