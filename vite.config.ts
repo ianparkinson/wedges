@@ -13,6 +13,13 @@ const base = "/wedges/"
 export default defineConfig({
   base,
   plugins: [react(), oslPlugin(), usagePlugin(), touchIconPlugin()],
+  build: {
+    rollupOptions: {
+      // Only the app. The dev server also serves review.html, the skeleton
+      // review page, which is for development only and never deployed.
+      input: "index.html",
+    },
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

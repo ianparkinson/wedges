@@ -29,6 +29,7 @@
     "test/synthetic",
     "test/signDatabase.ts",
     "test/skeletonStrokes.ts",
+    "test/testFont.ts",
     "test/bench"
   ]
 }

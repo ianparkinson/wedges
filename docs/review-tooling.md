@@ -1,6 +1,6 @@
 # Review tooling
 
-Skeletons are traced over a font's glyphs, so the way to check one is to draw it back and lay it over the glyph. This document describes the tools that do that.
+Skeletons are traced over a font's glyphs, so the way to check one is to draw it back and lay it over the glyph. This document describes the tools that do that: the redraw check, which scores a skeleton, and the review page, where you look through a file's skeletons.
 
 ## Redraw check
 
@@ -24,3 +24,15 @@ A good skeleton doesn't reach an overlap of 1, because a font's strokes don't fo
 ### Data test
 
 `test/data/redraw.test.ts` runs the check on every sign in the skeleton files that have limits in `src/review/redraw/limits.ts`, and fails with the sign's characters and code points when one falls outside them: an overlap too low, or a shape too far outside the ink. The limits catch a stroke that is missing or in the wrong place, not one slightly off.
+
+## Review page
+
+The review page shows every glyph in a skeleton file's font, with its skeleton drawn over it. It's for development only: the production build leaves it out.
+
+To open it, run `npm run dev` and go to http://localhost:5173/wedges/review.html.
+
+- **File.** Choose a skeleton file from `data/skeletons/`. The page opens `noto-next.json` by default.
+- **Tiles.** Each tile shows the glyph in grey with the skeleton's shapes over it, and the sign's OSL name. Glyphs with no skeleton have tiles too, so you can see what's left to trace.
+- **Filters.** Show one group of signs by OSL name (simple, modified, compound, or not in OSL), or one Unicode block.
+
+The page keeps its choices in its URL, and updates as soon as you save a skeleton file, so you can edit the JSON beside it and see the result.

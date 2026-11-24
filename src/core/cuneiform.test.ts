@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest"
 
-import { cuneiformChars, isCuneiform } from "./cuneiform"
+import {
+  codePoints,
+  cuneiformBlock,
+  cuneiformChars,
+  isCuneiform,
+} from "./cuneiform"
 
 describe("isCuneiform", () => {
   it.each([
@@ -20,6 +25,15 @@ describe("isCuneiform", () => {
   })
 })
 
+describe("cuneiformBlock", () => {
+  it("finds the block of the first character", () => {
+    expect(cuneiformBlock("𒀀𒐀")).toBe("main")
+    expect(cuneiformBlock("𒐀")).toBe("numbers")
+    expect(cuneiformBlock("𒒀")).toBe("earlyDynastic")
+    expect(cuneiformBlock("A")).toBeUndefined()
+  })
+})
+
 describe("cuneiformChars", () => {
   it("keeps the cuneiform characters in order, as whole characters", () => {
     expect(cuneiformChars("𒀭 an 𒊭𒀭")).toEqual(["𒀭", "𒊭", "𒀭"])
@@ -27,5 +41,11 @@ describe("cuneiformChars", () => {
 
   it("finds none in plain text", () => {
     expect(cuneiformChars("dingir")).toEqual([])
+  })
+})
+
+describe("codePoints", () => {
+  it("names each code point", () => {
+    expect(codePoints("𒀀𒀭")).toBe("U+12000 U+1202D")
   })
 })
