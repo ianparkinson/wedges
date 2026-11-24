@@ -110,7 +110,22 @@ export function wrapAngle(angle: number): number {
   return Math.atan2(Math.sin(angle), Math.cos(angle))
 }
 
+/** A closed polygon: its last point joins back to its first. */
+export type Polygon = readonly Point[]
+
 /** The absolute difference between two angles, in [0, π]. */
 export function angleDifference(a: number, b: number): number {
   return Math.abs(wrapAngle(a - b))
+}
+
+/** The smallest upright rectangle that holds every point. */
+export function boundingBox(points: readonly Point[]): Box {
+  const xs = points.map((p) => p.x)
+  const ys = points.map((p) => p.y)
+  return {
+    left: Math.min(...xs),
+    right: Math.max(...xs),
+    top: Math.min(...ys),
+    bottom: Math.max(...ys),
+  }
 }

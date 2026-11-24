@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "font": {
+    "family": "Noto Sans Cuneiform",
+    "version": "2.001",
+    "unitsPerEm": 1000,
+    "sha256": "e287671738e7f686d4f5ad2166a03d66ee4f6eb6c087aa47778fe2039f84f2cc"
+  },
+  "comments": "New skeletons for Noto Sans Cuneiform, added in batches, which replace noto.json when every glyph has one. The app doesn't load this file, except in development when asked to.",
+  "wedges": "tapered",
+  "headLean": 0,
+  "winkelhakenAngle": 105,
+  "skeletons": []
+}

@@ -8,6 +8,7 @@ import tseslint from "typescript-eslint"
 /**
  * Layer rule (see docs/decisions/0004-layers.md):
  *   features -> ui, core, lib;  ui -> lib;  core -> lib;  lib -> nothing of ours.
+ *   review, the development-only review page -> anything;  nothing imports it.
  * Only src/ui may import react-aria-components, so swapping the primitive
  * library touches one folder.
  */
@@ -80,6 +81,7 @@ export default defineConfig([
             layer("ui", "src/core must not depend on src/ui."),
             layer("features", "src/core must not depend on src/features."),
             layer("app", "src/core must not depend on src/app."),
+            layer("review", "src/core must not depend on src/review."),
           ],
         },
       ],
@@ -103,6 +105,7 @@ export default defineConfig([
             layer("ui", "src/lib must not depend on src/ui."),
             layer("features", "src/lib must not depend on src/features."),
             layer("app", "src/lib must not depend on src/app."),
+            layer("review", "src/lib must not depend on src/review."),
           ],
         },
       ],
@@ -122,6 +125,7 @@ export default defineConfig([
             ),
             layer("features", "src/ui must not depend on src/features."),
             layer("app", "src/ui must not depend on src/app."),
+            layer("review", "src/ui must not depend on src/review."),
           ],
         },
       ],
@@ -137,6 +141,22 @@ export default defineConfig([
           patterns: [
             parentFolder,
             layer("app", "src/features must not depend on src/app."),
+            layer("review", "src/features must not depend on src/review."),
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/app/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [reactAria],
+          patterns: [
+            parentFolder,
+            layer("review", "The review page is for development only."),
           ],
         },
       ],

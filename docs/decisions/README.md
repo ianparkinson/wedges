@@ -2,21 +2,22 @@
 
 One short file per decision that someone might later want to revisit: what was decided, why, and when to look at it again. Number them in order. When a decision changes, update its record in place and give the date of the change; git history keeps the earlier version.
 
-| #                                      | Decision                                         | Status   |
-| -------------------------------------- | ------------------------------------------------ | -------- |
-| [0001](0001-stack.md)                  | TypeScript, Vite, React and CSS Modules          | accepted |
-| [0002](0002-react-aria.md)             | React Aria Components behind our own `ui/` layer | accepted |
-| [0003](0003-json-data.md)              | Sign data as versioned JSON, not code            | accepted |
-| [0004](0004-layers.md)                 | Layers with one-way dependencies                 | accepted |
-| [0005](0005-hosting-ci.md)             | GitHub Pages hosting; accuracy benchmark in CI   | accepted |
-| [0006](0006-ranking-on-main-thread.md) | Rank on the main thread, without a Web Worker    | accepted |
-| [0007](0007-bundled-cuneiform-font.md) | Bundle Noto Sans Cuneiform                       | accepted |
-| [0008](0008-session-storage.md)        | Keep the text in session storage only            | accepted |
-| [0009](0009-vm-threads-pool.md)        | Run unit tests in Vitest's `vmThreads` pool      | accepted |
-| [0010](0010-lib-layer.md)              | Generic helpers in `src/lib`, apart from `core`  | accepted |
-| [0011](0011-back-closes-sheets.md)     | Back closes the open sheet                       | accepted |
-| [0012](0012-touch-icon-at-build.md)    | Render the home-screen icon at build time        | accepted |
-| [0013](0013-goatcounter-analytics.md)  | Count visits with GoatCounter                    | accepted |
-| [0014](0014-update-osl.md)             | A pull request with each new `osl.asl`           | accepted |
-| [0015](0015-usage-data.md)             | Value usage counted from Oracc's glossaries      | accepted |
-| [0016](0016-skeleton-format-v2.md)     | Skeletons describe glyphs in the font's frame    | accepted |
+| #                                      | Decision                                               | Status   |
+| -------------------------------------- | ------------------------------------------------------ | -------- |
+| [0001](0001-stack.md)                  | TypeScript, Vite, React and CSS Modules                | accepted |
+| [0002](0002-react-aria.md)             | React Aria Components behind our own `ui/` layer       | accepted |
+| [0003](0003-json-data.md)              | Sign data as versioned JSON, not code                  | accepted |
+| [0004](0004-layers.md)                 | Layers with one-way dependencies                       | accepted |
+| [0005](0005-hosting-ci.md)             | GitHub Pages hosting; accuracy benchmark in CI         | accepted |
+| [0006](0006-ranking-on-main-thread.md) | Rank on the main thread, without a Web Worker          | accepted |
+| [0007](0007-bundled-cuneiform-font.md) | Bundle Noto Sans Cuneiform                             | accepted |
+| [0008](0008-session-storage.md)        | Keep the text in session storage only                  | accepted |
+| [0009](0009-vm-threads-pool.md)        | Run unit tests in Vitest's `vmThreads` pool            | accepted |
+| [0010](0010-lib-layer.md)              | Generic helpers in `src/lib`, apart from `core`        | accepted |
+| [0011](0011-back-closes-sheets.md)     | Back closes the open sheet                             | accepted |
+| [0012](0012-touch-icon-at-build.md)    | Render the home-screen icon at build time              | accepted |
+| [0013](0013-goatcounter-analytics.md)  | Count visits with GoatCounter                          | accepted |
+| [0014](0014-update-osl.md)             | A pull request with each new `osl.asl`                 | accepted |
+| [0015](0015-usage-data.md)             | Value usage counted from Oracc's glossaries            | accepted |
+| [0016](0016-skeleton-format-v2.md)     | Skeletons describe glyphs in the font's frame          | accepted |
+| [0017](0017-review-tooling.md)         | Review skeletons by drawing them back over their fonts | accepted |

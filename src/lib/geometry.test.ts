@@ -4,6 +4,7 @@ import {
   angleAt,
   angleDifference,
   bisector,
+  boundingBox,
   direction,
   distance,
   midpoint,
@@ -191,5 +192,21 @@ describe("angleDifference", () => {
   it("wraps around", () => {
     expect(angleDifference(0.1, 2 * Math.PI - 0.1)).toBeCloseTo(0.2)
     expect(angleDifference(-Math.PI, Math.PI)).toBeCloseTo(0)
+  })
+})
+
+describe("boundingBox", () => {
+  it("holds every point", () => {
+    const points = [
+      { x: 1, y: 2 },
+      { x: -1, y: 6 },
+      { x: 3, y: 4 },
+    ]
+    expect(boundingBox(points)).toEqual({
+      left: -1,
+      right: 3,
+      top: 2,
+      bottom: 6,
+    })
   })
 })
