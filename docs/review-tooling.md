@@ -41,3 +41,7 @@ To open it, run `npm run dev` and go to http://localhost:5173/wedges/review.html
 - **Compare.** Choose a skeleton file under **Compare with**, and optionally a git ref, such as `main` or `HEAD~1`, under **At ref**. With no ref, the page compares with the file as it is now, for example `noto.json` against `noto-next.json`. At a ref, it reads the font from that ref too. A sign has changed when its shapes differ or its font draws its glyph differently, and the **changed** status shows only those. Their tiles draw the earlier shapes, and any earlier glyph outline, dashed, and the detail shows the earlier version below the current one, with new and removed shapes marked.
 
 The page keeps its choices in its URL, and updates as soon as you save a skeleton file, so you can edit the JSON beside it and see the result.
+
+## Trying skeletons in the app
+
+The accuracy benchmark draws its test signs from the skeletons it tests, so it can't show whether new skeletons match what people draw. To try them by hand, open the app in development with the skeleton file named in the URL, such as http://localhost:5173/wedges/?skeletons=noto-next, or follow **Draw with these skeletons** on the review page. The app then matches against that file instead of `noto.json`. The production build ignores the parameter.
