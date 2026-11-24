@@ -144,4 +144,11 @@ describe("ReviewPage", () => {
       [],
     )
   })
+
+  it("links to the app, matching against the open file", () => {
+    render(<ReviewPage />)
+    expect(
+      screen.getByRole("link", { name: "Draw with these skeletons" }),
+    ).toHaveAttribute("href", "/?skeletons=noto-next")
+  })
 })

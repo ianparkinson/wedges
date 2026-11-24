@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import type { CuneiformBlock } from "@/core/cuneiform"
 import type { OslData, SkeletonFile } from "@/core/types"
 import { useUrlState } from "@/ui/hooks/useUrlState"
+import { Link } from "@/ui/Link/Link"
 
 import { skeletonFonts } from "./redraw/fonts"
 import { redrawLimits } from "./redraw/limits"
@@ -42,6 +43,9 @@ export function ReviewPage() {
             ))}
           </select>
         </label>
+        <Link href={`${import.meta.env.BASE_URL}?skeletons=${fileId}`}>
+          Draw with these skeletons
+        </Link>
       </header>
       {file && font ? (
         <FileReview

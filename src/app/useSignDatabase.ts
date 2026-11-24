@@ -28,10 +28,29 @@ export function useSignDatabase(): SignDatabase | undefined {
 }
 
 async function loadSignDatabase(): Promise<SignDatabase> {
-  const [{ osl }, { usage }, { default: noto }] = await Promise.all([
+  const [{ osl }, { usage }, skeletons] = await Promise.all([
     import("virtual:osl"),
     import("virtual:usage"),
-    import("../../data/skeletons/noto.json"),
+    loadSkeletons(),
   ])
-  return new SignDatabase([noto as SkeletonFile], osl, usage)
+  return new SignDatabase([skeletons], osl, usage)
+}
+
+/**
+ * The skeletons to match against: noto.json or, in development, the file
+ * the URL names, as in `?skeletons=noto-next`, to try out new skeletons.
+ */
+async function loadSkeletons(): Promise<SkeletonFile> {
+  const id = new URLSearchParams(location.search).get("skeletons")
+  if (import.meta.env.DEV && id) {
+    const files = import.meta.glob<SkeletonFile>(
+      "../../data/skeletons/*.json",
+      { import: "default" },
+    )
+    const load = files[`../../data/skeletons/${id}.json`]
+    if (load) return load()
+  }
+
+  const { default: noto } = await import("../../data/skeletons/noto.json")
+  return noto as SkeletonFile
 }
