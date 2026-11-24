@@ -16,6 +16,8 @@ export interface SkeletonPictureProps {
   font: Font
   winkelhakenAngle: number
   style: StrokeStyle
+  /** Which shapes to pick out as too far off the ink, by index. */
+  astray?: readonly boolean[]
 }
 
 /** Margin around a glyph, in skeleton units. */
@@ -28,6 +30,7 @@ export function SkeletonPicture({
   font,
   winkelhakenAngle,
   style,
+  astray,
 }: SkeletonPictureProps) {
   const picture = useMemo(() => {
     const glyph = glyphOutline(font, text)
@@ -55,7 +58,11 @@ export function SkeletonPicture({
     >
       {picture.glyph && <path className={styles.ink} d={picture.glyph.d} />}
       {picture.outlines.map((outline, i) => (
-        <path key={i} className={styles.shape} d={svgPath(outline)} />
+        <path
+          key={i}
+          className={astray?.[i] ? styles.astray : styles.shape}
+          d={svgPath(outline)}
+        />
       ))}
     </svg>
   )

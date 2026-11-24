@@ -12,6 +12,7 @@ import {
 import type { OslData, SkeletonFile } from "@/core/types"
 
 import { fontCharacters } from "./redraw/glyphs"
+import type { RedrawScore } from "./redraw/redraw"
 
 /** How a sign is made, from its OSL name: see {@link signGroup}. */
 export type SignGroup = "simple" | "modified" | "compound" | "unlisted"
@@ -33,11 +34,16 @@ export interface ReviewSign {
   /** The skeleton's shapes, or undefined when the file has no entry. */
   readonly shapes?: readonly string[]
   readonly comments?: string
+  /**
+   * The redraw check's score, for an entry with shapes, once it has been
+   * worked out: null if the font has no glyph to score against.
+   */
+  readonly score?: RedrawScore | null
 }
 
 /**
  * Builds the signs for a skeleton file over its font, in file order, then the
- * glyphs with no entry in code point order.
+ * glyphs with no entry in code point order, all as yet unscored.
  */
 export function reviewSigns(
   file: SkeletonFile,
