@@ -21,6 +21,14 @@
   stroke: var(--review-missed);
 }
 
+.before {
+  fill: none;
+  stroke: var(--review-before);
+  stroke-width: 1.5px;
+  stroke-dasharray: 4 3;
+  vector-effect: non-scaling-stroke;
+}
+
 .number {
   fill: var(--color-text);
   font-family: var(--font-body);

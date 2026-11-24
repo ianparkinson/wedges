@@ -5,9 +5,9 @@ import { Font, Glyph, Path } from "opentype.js"
 
 /**
  * A font of 1000 units to the em with a square for A, a bowl for B, and a
- * vertical bar for 𒁹 (DIŠ, U+12079).
+ * vertical bar for 𒁹 (DIŠ, U+12079), `barWidth` units wide.
  */
-export function testFont(): Font {
+export function testFont(barWidth = 40): Font {
   const square = new Path()
   square.moveTo(100, 0)
   square.lineTo(100, 500)
@@ -23,8 +23,8 @@ export function testFont(): Font {
   const bar = new Path()
   bar.moveTo(200, 0)
   bar.lineTo(200, 700)
-  bar.lineTo(240, 700)
-  bar.lineTo(240, 0)
+  bar.lineTo(200 + barWidth, 700)
+  bar.lineTo(200 + barWidth, 0)
   bar.close()
 
   const glyph = (name: string, unicode: number, path: Path) =>

@@ -18,6 +18,12 @@ export interface RedrawViewProps {
   winkelhakenAngle: number
   style: StrokeStyle
   limits?: RedrawLimits
+  /**
+   * Shapes to compare with: any of `shapes` not among them is marked with
+   * `unmatched`, such as "new".
+   */
+  others?: readonly string[]
+  unmatched?: string
   showGlyph?: boolean
   showSkeleton?: boolean
 }
@@ -33,6 +39,8 @@ export function RedrawView({
   winkelhakenAngle,
   style,
   limits,
+  others,
+  unmatched,
   showGlyph,
   showSkeleton,
 }: RedrawViewProps) {
@@ -81,11 +89,15 @@ export function RedrawView({
           {shapes.map((shape, i) => {
             const outside = score.shapesOutside[i] ?? 0
             const astray = limits !== undefined && outside > limits.shapeOutside
+            const isUnmatched = others !== undefined && !others.includes(shape)
             return (
               <tr key={i} className={astray ? styles.astray : undefined}>
                 <td>{i + 1}</td>
                 <td>
                   <code>{shape}</code>
+                  {isUnmatched && (
+                    <span className={styles.unmatched}> {unmatched}</span>
+                  )}
                 </td>
                 <td>{percent(outside)}</td>
               </tr>

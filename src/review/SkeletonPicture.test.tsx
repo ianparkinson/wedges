@@ -25,4 +25,19 @@ describe("SkeletonPicture", () => {
       [...container.querySelectorAll("text")].map((t) => t.textContent),
     ).toEqual(["1", "2"])
   })
+
+  it("draws a version to compare with over the top", () => {
+    const { container } = render(
+      <SkeletonPicture
+        {...props}
+        before={{
+          shapes: ["w 22 70 270 60 4"],
+          winkelhakenAngle: 100,
+          style: props.style,
+          font: testFont(80),
+        }}
+      />,
+    )
+    expect(container.querySelectorAll("path")).toHaveLength(5)
+  })
 })

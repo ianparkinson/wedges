@@ -27,7 +27,7 @@ A good skeleton doesn't reach an overlap of 1, because a font's strokes don't fo
 
 ## Review page
 
-The review page shows every glyph in a skeleton file's font, with its skeleton drawn over it. It's for development only: the production build leaves it out.
+The review page shows every glyph in a skeleton file's font, with its skeleton drawn over it. It's for development only: the production build leaves it out, and only the development server can read files from git history for it (`scripts/review/vitePlugin.ts`).
 
 To open it, run `npm run dev` and go to http://localhost:5173/wedges/review.html.
 
@@ -38,5 +38,6 @@ To open it, run `npm run dev` and go to http://localhost:5173/wedges/review.html
 - **Detail.** Select a tile to see it larger, with each shape numbered at its start and listed with how much of it lies outside the ink. Clear **Glyph** or **Skeleton** to hide either.
 - **Reviewed marks.** Select **Reviewed**, or press R, to mark a sign and move on to the next. The mark records the sign's shapes, so editing the skeleton clears it. Marks are kept in your browser's local storage, not in the repo.
 - **Keys.** With a sign open, press the Left and Right arrow keys to move through the signs shown, and Esc to close it.
+- **Compare.** Choose a skeleton file under **Compare with**, and optionally a git ref, such as `main` or `HEAD~1`, under **At ref**. With no ref, the page compares with the file as it is now, for example `noto.json` against `noto-next.json`. At a ref, it reads the font from that ref too. A sign has changed when its shapes differ or its font draws its glyph differently, and the **changed** status shows only those. Their tiles draw the earlier shapes, and any earlier glyph outline, dashed, and the detail shows the earlier version below the current one, with new and removed shapes marked.
 
 The page keeps its choices in its URL, and updates as soon as you save a skeleton file, so you can edit the JSON beside it and see the result.

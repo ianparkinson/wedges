@@ -9,6 +9,15 @@ import { impression, type StrokeStyle } from "./redraw/impression"
 import styles from "./SkeletonPicture.module.css"
 import { svgPath } from "./svgPath"
 
+/** A version of a sign to draw dashed over it, to show what has changed. */
+export interface PictureBefore {
+  readonly shapes: readonly string[]
+  readonly winkelhakenAngle: number
+  readonly style: StrokeStyle
+  /** The font to draw the glyph from, when it was drawn differently. */
+  readonly font?: Font
+}
+
 /** Props for {@link SkeletonPicture}. */
 export interface SkeletonPictureProps {
   text: string
@@ -18,6 +27,7 @@ export interface SkeletonPictureProps {
   style: StrokeStyle
   /** Which shapes to pick out as too far off the ink, by index. */
   astray?: readonly boolean[]
+  before?: PictureBefore
   showGlyph?: boolean
   showSkeleton?: boolean
   /** Whether to number each shape at its start. */
@@ -39,6 +49,7 @@ export function SkeletonPicture({
   winkelhakenAngle,
   style,
   astray,
+  before,
   showGlyph = true,
   showSkeleton = true,
   numbered = false,
@@ -49,7 +60,16 @@ export function SkeletonPicture({
     const parsed = (shapes ?? []).map(parseShape)
     const outlines = parsed.map((s) => impression(s, winkelhakenAngle, style))
     const starts = parsed.map((s) => shapeKeyPoints(s, winkelhakenAngle)[0]!)
-    const all = [...boxCorners(glyph?.box), ...outlines.flat()]
+    const beforeGlyph = before?.font && glyphOutline(before.font, text)
+    const beforeOutlines = (before?.shapes ?? []).map((s) =>
+      impression(parseShape(s), before!.winkelhakenAngle, before!.style),
+    )
+    const all = [
+      ...boxCorners(glyph?.box),
+      ...boxCorners(beforeGlyph?.box),
+      ...outlines.flat(),
+      ...beforeOutlines.flat(),
+    ]
     const box = all.length > 0 ? boundingBox(all) : undefined
     const viewBox = box
       ? [
@@ -59,8 +79,8 @@ export function SkeletonPicture({
           box.bottom - box.top + 2 * MARGIN,
         ].join(" ")
       : "0 -100 100 100"
-    return { glyph, outlines, starts, viewBox }
-  }, [font, text, shapes, winkelhakenAngle, style])
+    return { glyph, outlines, starts, beforeGlyph, beforeOutlines, viewBox }
+  }, [font, text, shapes, winkelhakenAngle, style, before])
 
   return (
     <svg
@@ -79,6 +99,12 @@ export function SkeletonPicture({
             d={svgPath([outline])}
           />
         ))}
+      {picture.beforeGlyph && (
+        <path className={styles.before} d={picture.beforeGlyph.d} />
+      )}
+      {picture.beforeOutlines.map((outline, i) => (
+        <path key={i} className={styles.before} d={svgPath([outline])} />
+      ))}
       {numbered &&
         showSkeleton &&
         picture.starts.map((start, i) => (

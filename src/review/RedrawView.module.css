@@ -20,3 +20,7 @@
 .astray {
   color: var(--review-missed);
 }
+
+.unmatched {
+  color: var(--review-before);
+}
