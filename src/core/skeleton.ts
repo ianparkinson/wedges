@@ -32,6 +32,11 @@ export interface WinkelhakenShape {
   readonly direction: number
   /** The length of each leg. */
   readonly leg: number
+  /**
+   * The angle between the legs, in degrees, where this Winkelhaken differs
+   * from the file's `winkelhakenAngle`.
+   */
+  readonly angle?: number
 }
 
 /** One shape in a skeleton. */
@@ -40,7 +45,9 @@ export type Shape = WedgeShape | WinkelhakenShape
 const WEDGE_OP = "w"
 const WINKELHAKEN_OP = "k"
 const WEDGE_NUMBERS = 5
-const WINKELHAKEN_NUMBERS = 4
+/** A Winkelhaken has four numbers, or five with its own angle. */
+const WINKELHAKEN_NUMBERS = [4, 5]
+const WINKELHAKEN_ANGLE = 4
 const DEGREES = Math.PI / 180
 
 /** Reads one shape string. Throws on an unknown op, or the wrong count of numbers. */
@@ -55,8 +62,15 @@ export function parseShape(text: string): Shape {
   if (op === WEDGE_OP && numbers.length === WEDGE_NUMBERS) {
     return { kind: "wedge", start: { x, y }, direction, length: size, head }
   }
-  if (op === WINKELHAKEN_OP && numbers.length === WINKELHAKEN_NUMBERS) {
-    return { kind: "winkelhaken", vertex: { x, y }, direction, leg: size }
+  if (op === WINKELHAKEN_OP && WINKELHAKEN_NUMBERS.includes(numbers.length)) {
+    const shape: WinkelhakenShape = {
+      kind: "winkelhaken",
+      vertex: { x, y },
+      direction,
+      leg: size,
+    }
+    const angle = numbers[WINKELHAKEN_ANGLE]
+    return angle === undefined ? shape : { ...shape, angle }
   }
 
   throw new Error(`Bad shape "${text}"`)
@@ -66,7 +80,7 @@ export function parseShape(text: string): Shape {
  * A shape's key points in the frame strokes are drawn in, where y points
  * down: a wedge's start and the end of its tail, or a Winkelhaken's vertex
  * and the tips of its legs. `winkelhakenAngle` is the file's angle between a
- * Winkelhaken's legs, in degrees.
+ * Winkelhaken's legs, in degrees, which a Winkelhaken's own `angle` overrides.
  */
 export function shapeKeyPoints(
   shape: Shape,
@@ -80,7 +94,7 @@ export function shapeKeyPoints(
     case "winkelhaken": {
       const vertex = flip(shape.vertex)
       const opening = angle(shape.direction)
-      const half = (winkelhakenAngle / 2) * DEGREES
+      const half = ((shape.angle ?? winkelhakenAngle) / 2) * DEGREES
       return [
         vertex,
         pointAt(vertex, opening - half, shape.leg),

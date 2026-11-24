@@ -75,18 +75,21 @@ Either end could be the start, so the format fixes which one to use, following t
 ### Winkelhaken
 
 ```
-k x y dir leg
+k x y dir leg [angle]
 ```
 
-| Value | Meaning                                                                                                   |
-| ----- | --------------------------------------------------------------------------------------------------------- |
-| `x y` | The vertex: where the centre lines of the two legs meet, inside the elbow.                                |
-| `dir` | The opening direction, from the vertex towards the open side, halfway between the legs. A `<` opens at 0. |
-| `leg` | The length of each leg, along its centre line from the vertex to its tip.                                 |
+| Value   | Meaning                                                                                                   |
+| ------- | --------------------------------------------------------------------------------------------------------- |
+| `x y`   | The vertex: where the centre lines of the two legs meet, inside the elbow.                                |
+| `dir`   | The opening direction, from the vertex towards the open side, halfway between the legs. A `<` opens at 0. |
+| `leg`   | The length of each leg, along its centre line from the vertex to its tip.                                 |
+| `angle` | Optional. The angle between the legs, for a Winkelhaken that differs from the file's `winkelhakenAngle`.  |
 
-The legs' tips are at `dir ± winkelhakenAngle / 2`, where `winkelhakenAngle` is the file's per-font value.
+The legs' tips are at `dir ± angle / 2`. Without `angle`, they're at `dir ± winkelhakenAngle / 2`, where `winkelhakenAngle` is the file's per-font value.
 
 Measuring a Winkelhaken along its centre lines, rather than from its outer point, means that equal legs fit even where a font's Winkelhaken look lopsided from the outside.
+
+Give `angle` rarely: only where a glyph's Winkelhaken opens noticeably wider or narrower than the font's usual angle, by more than about 8°. Small differences are within the variation between one Winkelhaken and the next, and recording them makes the file harder to review.
 
 ### Examples
 
@@ -147,7 +150,7 @@ There's one file for each font, named after it, such as `data/skeletons/noto.jso
 | `skeletons[].shapes`   | Optional. The shapes, one string each. Leave it out for a sign that the file deliberately doesn't describe, and say why in `comments`. |
 | `skeletons[].comments` | Optional. Notes on this entry. Required when there are no `shapes`.                                                                    |
 
-The matcher uses only `winkelhakenAngle` of the per-font values. The others are for drawing skeletons and checking them against the font. The file doesn't record stroke thicknesses: a tool that draws skeletons over a font can keep its own.
+The matcher uses only `winkelhakenAngle` of the per-font values. The others are for drawing skeletons and checking them against the font. The matcher uses `winkelhakenAngle`, and any Winkelhaken's own `angle`, only to place the tips of the legs when it measures a skeleton's size: it doesn't compare the angle between a drawn Winkelhaken's legs with a skeleton's. The file doesn't record stroke thicknesses: a tool that draws skeletons over a font can keep its own.
 
 ### Font
 
@@ -185,4 +188,5 @@ The schema is `data/schemas/skeletons.schema.json`. The tests in `test/data/skel
 - Entries and shapes are in order.
 - Every direction is at least 0 and less than 360.
 - Every `length` and `leg` is greater than 0, every `head` is at least 0, and every wedge is at least as long as its head is deep.
+- Every Winkelhaken's own `angle` is greater than 0 and less than 180.
 - Every headless line starts at the end that this document specifies.
