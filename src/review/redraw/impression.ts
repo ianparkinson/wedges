@@ -24,28 +24,24 @@ export interface StrokeStyle {
   readonly legWidth: number
 }
 
-/** How far a Winkelhaken's legs reach back past the vertex, as a fraction of their half width there, to fill the elbow. */
-const ELBOW_FILL = 0.8
-
 /** Points along each side of a wedge, which make its curved sides. */
 const WEDGE_STEPS = 16
 
 /**
  * The outline of a shape as the font draws it, in the frame strokes are
- * drawn in, where y points down: one polygon for a wedge, one for each leg
- * of a Winkelhaken.
+ * drawn in, where y points down.
  */
 export function impression(
   shape: Shape,
   winkelhakenAngle: number,
   style: StrokeStyle,
-): Polygon[] {
+): Polygon {
   const [start, ...ends] = shapeKeyPoints(shape, winkelhakenAngle)
   switch (shape.kind) {
     case "wedge":
-      return [wedgeOutline(start!, ends[0]!, shape.head, style)]
+      return wedgeOutline(start!, ends[0]!, shape.head, style)
     case "winkelhaken":
-      return ends.map((tip) => legOutline(start!, tip, style))
+      return winkelhakenOutline(start!, ends[0]!, ends[1]!, style)
   }
 }
 
@@ -76,23 +72,69 @@ function wedgeOutline(
   ]
 }
 
-function legOutline(
+/**
+ * A Winkelhaken as one outline of six points: each leg's two tip corners,
+ * and the elbow's outer and inner corners, where the legs' outer sides meet
+ * and where their inner sides meet.
+ */
+function winkelhakenOutline(
   vertex: Point,
   tip: Point,
-  { tailEnd, legWidth }: StrokeStyle,
+  otherTip: Point,
+  style: StrokeStyle,
 ): Polygon {
+  const leg = legSides(vertex, tip, otherTip, style)
+  const other = legSides(vertex, otherTip, tip, style)
+  return [
+    leg.outer[1],
+    meeting(leg.outer, other.outer) ?? vertex,
+    other.outer[1],
+    other.inner[1],
+    meeting(leg.inner, other.inner) ?? vertex,
+    leg.inner[1],
+  ]
+}
+
+/** A leg's two sides, each from the vertex out to the tip. */
+interface LegSides {
+  /** The side facing the other leg. */
+  readonly inner: readonly [Point, Point]
+  readonly outer: readonly [Point, Point]
+}
+
+function legSides(
+  vertex: Point,
+  tip: Point,
+  otherTip: Point,
+  { tailEnd, legWidth }: StrokeStyle,
+): LegSides {
   const leg = distance(vertex, tip)
   const along = { x: (tip.x - vertex.x) / leg, y: (tip.y - vertex.y) / leg }
-  const across = { x: -along.y, y: along.x }
   const vertexHalf = Math.max(legWidth * leg, tailEnd / 2)
   const tipHalf = tailEnd / 2
-  const back = offset(vertex, along, -ELBOW_FILL * vertexHalf)
-  return [
-    offset(back, across, vertexHalf),
-    offset(tip, across, tipHalf),
-    offset(tip, across, -tipHalf),
-    offset(back, across, -vertexHalf),
-  ]
+  // Across the leg, towards the other one.
+  const towards =
+    (otherTip.x - vertex.x) * -along.y + (otherTip.y - vertex.y) * along.x > 0
+      ? 1
+      : -1
+  const across = { x: -along.y * towards, y: along.x * towards }
+  return {
+    inner: [offset(vertex, across, vertexHalf), offset(tip, across, tipHalf)],
+    outer: [offset(vertex, across, -vertexHalf), offset(tip, across, -tipHalf)],
+  }
+}
+
+/** Where the lines through two sides meet, or undefined if they're parallel. */
+function meeting(
+  [p, p2]: readonly [Point, Point],
+  [q, q2]: readonly [Point, Point],
+): Point | undefined {
+  const r = { x: p2.x - p.x, y: p2.y - p.y }
+  const s = { x: q2.x - q.x, y: q2.y - q.y }
+  const denominator = r.x * s.y - r.y * s.x
+  if (denominator === 0) return undefined
+  const t = ((q.x - p.x) * s.y - (q.y - p.y) * s.x) / denominator
+  return offset(p, r, t)
 }
 
 function offset(p: Point, direction: Point, amount: number): Point {

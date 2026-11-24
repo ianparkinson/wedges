@@ -12,7 +12,7 @@ const style: StrokeStyle = { tailEnd: 2, taper: 2, legWidth: 0.2 }
 
 /** A glyph drawn exactly as the font style draws these shapes. */
 function glyphOf(shapes: readonly string[]): Glyph {
-  const polygons = shapes.flatMap((s) => impression(parseShape(s), 100, style))
+  const polygons = shapes.map((s) => impression(parseShape(s), 100, style))
   const path = new Path()
   for (const [first, ...rest] of polygons) {
     path.moveTo(first!.x, first!.y)
