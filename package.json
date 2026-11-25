@@ -23,6 +23,7 @@
     "bench:performance": "tsx --tsconfig tsconfig.node.json scripts/benchPerformance.ts",
     "osl-summary": "tsx --tsconfig tsconfig.node.json scripts/osl-summary.ts",
     "build-usage": "tsx --tsconfig tsconfig.node.json scripts/usage/buildUsage.ts",
+    "sort-skeletons": "tsx --tsconfig tsconfig.node.json scripts/sortSkeletons.ts",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test"
   },
   "dependencies": {

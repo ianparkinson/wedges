@@ -40,7 +40,7 @@ To open it, run `npm run dev` and go to http://localhost:5173/wedges/review.html
 - **Keys.** With a sign open, press the Left and Right arrow keys to move through the signs shown, and Esc to close it.
 - **Compare.** Choose a skeleton file under **Compare with**, and optionally a git ref, such as `main` or `HEAD~1`, under **At ref**. With no ref, the page compares with the file as it is now, for example `noto.json` against `noto-next.json`. At a ref, it reads the font from that ref too. A sign has changed when its shapes differ or its font draws its glyph differently, and the **changed** status shows only those. Their tiles draw the earlier shapes, and any earlier glyph outline, dashed, and the detail shows the earlier version below the current one, with new and removed shapes marked.
 
-The page keeps its choices in its URL, and updates as soon as you save a skeleton file, so you can edit the JSON beside it and see the result.
+The page keeps its choices in its URL, and updates as soon as you save a skeleton file, so you can edit the JSON beside it and see the result. After editing, run `npm run sort-skeletons` to put the files' entries and shapes back in order.
 
 ## Trying skeletons in the app
 
