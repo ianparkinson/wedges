@@ -39,7 +39,10 @@
   list-style: none;
 }
 
+/* The detail stays in view and scrolls on its own when it's taller than the window. */
 .side {
   position: sticky;
   top: var(--space-4);
+  max-height: calc(100dvh - 2 * var(--space-4));
+  overflow-y: auto;
 }
