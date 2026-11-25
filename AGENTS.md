@@ -52,6 +52,7 @@ Dependencies point one way only:
 | `npm run bench:performance`       | ranking time in headless Chromium with the CPU throttled 4×                                                                                         |
 | `npm run osl-summary`             | count what the sign data built from `data/osl.asl` holds                                                                                            |
 | `npm run build-usage -- <zips>`   | rebuild `data/usage/` from Oracc project zips; `scripts/updateUsage.sh` downloads them first                                                        |
+| `npm run sort-skeletons`          | put skeleton files back in order after hand edits: those given after `--`, or all of them                                                           |
 | `npm test` / `npm run test:watch` | Vitest only                                                                                                                                         |
 
 The first time you run e2e tests, install the browsers with `npx playwright install chromium webkit`.

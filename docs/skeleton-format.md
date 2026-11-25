@@ -183,6 +183,8 @@ The order of entries and shapes doesn't affect matching, but it's fixed, so that
 
 In JSON, write `text` as literal characters, except private-use code points: write those as `\u` escapes, as UTF-16 surrogate pairs above U+FFFF, because editors and diff tools show them as blank boxes.
 
+After editing a file by hand, run `npm run sort-skeletons` to put every file in `data/skeletons/` back in this order, with private-use code points escaped.
+
 ### Validation
 
 The schema is `data/schemas/skeletons.schema.json`. The tests in `test/data/skeletons.test.ts` check each file in `data/skeletons/` against it, and also check the following:

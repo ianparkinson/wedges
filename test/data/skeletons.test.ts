@@ -2,6 +2,7 @@ import { Ajv2020 } from "ajv/dist/2020"
 import { describe, expect, it } from "vitest"
 
 import { parseShape } from "@/core/skeleton"
+import { compareShapes, compareTexts } from "@/core/skeletonOrder"
 import type { SkeletonFile } from "@/core/types"
 
 import schema from "../../data/schemas/skeletons.schema.json"
@@ -21,34 +22,6 @@ function tokens(shape: string): [string, ...number[]] {
   return [op, ...numbers.map(Number)]
 }
 
-/**
- * Compares two shapes in the file order: by x, then y, then the rest of the
- * shape token by token, the op as text and the numbers as numbers.
- */
-function compareShapes(a: string, b: string): number {
-  const [opA, ...numbersA] = tokens(a)
-  const [opB, ...numbersB] = tokens(b)
-  const [xA = 0, yA = 0, ...restA] = numbersA
-  const [xB = 0, yB = 0, ...restB] = numbersB
-  return (
-    xA - xB ||
-    yA - yB ||
-    opA.localeCompare(opB) ||
-    compareSequences(restA, restB)
-  )
-}
-
-/** Compares two lists item by item; a list sorts before any that it starts. */
-function compareSequences(a: readonly number[], b: readonly number[]): number {
-  const differs = a.findIndex((n, i) => i < b.length && n !== b[i])
-  return differs >= 0 ? a[differs]! - b[differs]! : a.length - b.length
-}
-
-/** A text's code points, which skeletons are sorted by. */
-function codePoints(text: string): number[] {
-  return [...text].map((c) => c.codePointAt(0)!)
-}
-
 describe.each(entries)("%s", (_, file) => {
   const shapes = file.skeletons.flatMap((e) =>
     (e.shapes ?? []).map((shape) => ({ text: e.text, shape })),
@@ -61,10 +34,7 @@ describe.each(entries)("%s", (_, file) => {
 
   it("lists skeletons in code point order", () => {
     const texts = file.skeletons.map((e) => e.text)
-    const sorted = texts.toSorted((a, b) =>
-      compareSequences(codePoints(a), codePoints(b)),
-    )
-    expect(texts).toEqual(sorted)
+    expect(texts).toEqual(texts.toSorted(compareTexts))
   })
 
   it("lists each skeleton's shapes in order", () => {
