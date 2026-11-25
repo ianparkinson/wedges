@@ -2,7 +2,8 @@ name: Accuracy Benchmark
 
 # The accuracy benchmark, on pull requests that could change recognition. It
 # runs on the PR's base and on the PR, side by side, writes each result to its
-# job's summary, and posts both as a comment on the PR.
+# job's summary, and posts both as a comment on the PR, with a row for each
+# skeleton file.
 on:
   pull_request:
     paths:
@@ -80,9 +81,15 @@ jobs:
           pattern: benchmark-*
       - name: Write comment
         run: |
-          # The benchmark's first line reads "... top-1 96.2%, top-3 98.9% (161 s)".
+          # Each skeleton file's summary line reads
+          # "noto: 832 signs × 40 trials at noise 0.06: top-1 96.2%, top-3 98.9% (161 s)".
+          files() {
+            sed -n 's/^\([^ :]*\): [0-9]* signs .*/\1/p' benchmark-*/benchmark.txt 2>/dev/null | sort -u
+          }
           result() {
-            sed -n "s/.*top-$2 \([0-9.]*%\).*/\1/p" "benchmark-$1/benchmark.txt" 2>/dev/null | head -1
+            local value
+            value=$(sed -n "s/^$2: .*top-$3 \([0-9.]*%\).*/\1/p" "benchmark-$1/benchmark.txt" 2>/dev/null | head -1)
+            echo "${value:-–}"
           }
           output() {
             cat "benchmark-$1/benchmark.txt" 2>/dev/null || echo "No output: the job failed before the benchmark ran."
@@ -90,10 +97,11 @@ jobs:
           {
             echo "### Accuracy benchmark"
             echo
-            echo "|        | top-1 | top-3 |"
-            echo "| ------ | ----- | ----- |"
-            echo "| before | $(result before 1) | $(result before 3) |"
-            echo "| after  | $(result after 1) | $(result after 3) |"
+            echo "| Skeletons | top-1 before | top-1 after | top-3 before | top-3 after |"
+            echo "| --------- | ------------ | ----------- | ------------ | ----------- |"
+            for file in $(files); do
+              echo "| $file | $(result before "$file" 1) | $(result after "$file" 1) | $(result before "$file" 3) | $(result after "$file" 3) |"
+            done
             echo
             echo "<details><summary>Full output</summary>"
             echo
