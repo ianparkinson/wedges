@@ -3,6 +3,7 @@
  * character. It is the one place features ask about signs.
  */
 import { groupBy } from "@/lib/collections"
+import { maxOf } from "@/lib/numbers"
 
 import type { PreparedSample } from "./matcher/match"
 import { parseShape, prepareSkeleton } from "./skeleton"
@@ -124,7 +125,7 @@ export class SignDatabase {
     this.compoundsByParts = compounds
     this.mostCompoundParts = Math.max(
       0,
-      ...this.signs.map((s) => s.compound?.parts.length ?? 0),
+      maxOf(this.signs.map((s) => s.compound?.parts.length ?? 0)),
     )
 
     this.sequences = osl.sequences.map((sequence) => ({
@@ -138,7 +139,7 @@ export class SignDatabase {
     // Spreading splits a string into whole characters, each two UTF-16 units.
     this.longestSequence = Math.max(
       0,
-      ...this.sequences.map((s) => [...s.chars].length),
+      maxOf(this.sequences.map((s) => [...s.chars].length)),
     )
   }
 

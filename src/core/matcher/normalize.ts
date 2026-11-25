@@ -3,6 +3,7 @@
  * docs/matching.md#1-normalisation.
  */
 import type { Point } from "@/lib/geometry"
+import { maxOf, minOf } from "@/lib/numbers"
 
 import type { StrokeFeature } from "./features"
 
@@ -21,8 +22,8 @@ export function normalize(
 ): StrokeFeature[] {
   const xs = keyPoints.map((p) => p.x)
   const ys = keyPoints.map((p) => p.y)
-  const [x0, x1] = [Math.min(...xs), Math.max(...xs)]
-  const [y0, y1] = [Math.min(...ys), Math.max(...ys)]
+  const [x0, x1] = [minOf(xs), maxOf(xs)]
+  const [y0, y1] = [minOf(ys), maxOf(ys)]
 
   const cx = (x0 + x1) / 2
   const cy = (y0 + y1) / 2

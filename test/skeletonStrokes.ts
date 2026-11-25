@@ -5,6 +5,7 @@
 import { parseShape, shapeKeyPoints } from "@/core/skeleton"
 import { wedge, winkelhaken, type Stroke } from "@/core/strokes"
 import type { Point } from "@/lib/geometry"
+import { maxOf, minOf } from "@/lib/numbers"
 
 /**
  * The strokes of a skeleton, y pointing down, centred on the origin and scaled
@@ -20,12 +21,7 @@ export function skeletonStrokes(
   const all = points.flat()
   const xs = all.map((p) => p.x)
   const ys = all.map((p) => p.y)
-  const [x0, x1, y0, y1] = [
-    Math.min(...xs),
-    Math.max(...xs),
-    Math.min(...ys),
-    Math.max(...ys),
-  ]
+  const [x0, x1, y0, y1] = [minOf(xs), maxOf(xs), minOf(ys), maxOf(ys)]
   const scale = Math.max(x1 - x0, y1 - y0)
   const place = ({ x, y }: Point): Point => ({
     x: (x - (x0 + x1) / 2) / scale,
