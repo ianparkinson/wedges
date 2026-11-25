@@ -1,6 +1,8 @@
 /**
  * Ranks signs against a drawing. See docs/matching.md#5-ranking.
  */
+import { minOf } from "@/lib/numbers"
+
 import { match, type Match, type PreparedSample } from "./match"
 import { defaultWeights, type MatchWeights } from "./pairCost"
 
@@ -44,7 +46,7 @@ export function rank<S extends Rankable>(
         sample,
         bound: scoreLowerBound(drawing, sample, weights),
       }))
-      return { sign, samples, bound: Math.min(...samples.map((s) => s.bound)) }
+      return { sign, samples, bound: minOf(samples.map((s) => s.bound)) }
     })
     .sort((a, b) => a.bound - b.bound)
 

@@ -1,7 +1,7 @@
 /**
  * Points, distances and angles in the plane.
  */
-import { clamp } from "./numbers"
+import { clamp, maxOf, minOf } from "./numbers"
 
 /** A point in screen-like coordinates: x to the right, y downward. */
 export interface Point {
@@ -123,9 +123,9 @@ export function boundingBox(points: readonly Point[]): Box {
   const xs = points.map((p) => p.x)
   const ys = points.map((p) => p.y)
   return {
-    left: Math.min(...xs),
-    right: Math.max(...xs),
-    top: Math.min(...ys),
-    bottom: Math.max(...ys),
+    left: minOf(xs),
+    right: maxOf(xs),
+    top: minOf(ys),
+    bottom: maxOf(ys),
   }
 }

@@ -48,6 +48,12 @@ export default defineConfig([
           selector: "ExportDefaultDeclaration",
           message: "Use a named export.",
         },
+        {
+          // Spreading a long array into a call overflows the stack.
+          selector:
+            "CallExpression[callee.object.name='Math'][callee.property.name=/^(min|max)$/] > SpreadElement",
+          message: "Use minOf or maxOf from @/lib/numbers.",
+        },
       ],
       "@typescript-eslint/consistent-type-imports": "error",
     },

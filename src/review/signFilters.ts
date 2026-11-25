@@ -1,6 +1,8 @@
 /**
  * Filtering and sorting the review page's signs.
  */
+import { maxOf } from "@/lib/numbers"
+
 import { isChanged } from "./compare"
 import type { RedrawLimits } from "./redraw/limits"
 import type { ReviewSign } from "./reviewSigns"
@@ -90,5 +92,5 @@ export function sortSigns(
 }
 
 function worstShape(sign: ReviewSign): number {
-  return Math.max(-1, ...(sign.score?.shapesOutside ?? []))
+  return Math.max(-1, maxOf(sign.score?.shapesOutside ?? []))
 }

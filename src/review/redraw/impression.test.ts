@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import { parseShape } from "@/core/skeleton"
 import { boundingBox } from "@/lib/geometry"
+import { maxOf, minOf } from "@/lib/numbers"
 
 import { impression, type StrokeStyle } from "./impression"
 
@@ -18,7 +19,7 @@ describe("impression", () => {
     })
     const widthAt = (x: number) =>
       outline.filter((p) => Math.abs(p.x - x) < 1e-9).map((p) => p.y)
-    expect(Math.max(...widthAt(50)) - Math.min(...widthAt(50))).toBeCloseTo(2)
+    expect(maxOf(widthAt(50)) - minOf(widthAt(50))).toBeCloseTo(2)
   })
 
   it("curves a wedge's sides in, so it is narrow well before the end", () => {
@@ -36,7 +37,7 @@ describe("impression", () => {
 
   it("draws a Winkelhaken's legs out to their tips at the given angle", () => {
     const outline = impression(parseShape("k 0 0 0 20"), 90, style)
-    const reach = Math.max(...outline.map((p) => p.x))
+    const reach = maxOf(outline.map((p) => p.x))
     expect(reach).toBeCloseTo(
       20 * Math.cos(Math.PI / 4) + 1 * Math.sin(Math.PI / 4),
     )
