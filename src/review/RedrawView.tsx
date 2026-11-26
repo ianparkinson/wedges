@@ -3,6 +3,10 @@ import { useMemo } from "react"
 
 import { parseShape } from "@/core/skeleton"
 
+import {
+  EditablePicture,
+  type EditablePictureProps,
+} from "./edit/EditablePicture"
 import { glyph as readGlyph } from "./redraw/glyphs"
 import type { StrokeStyle } from "./redraw/impression"
 import type { RedrawLimits } from "./redraw/limits"
@@ -26,11 +30,20 @@ export interface RedrawViewProps {
   unmatched?: string
   showGlyph?: boolean
   showSkeleton?: boolean
+  /** How to edit the shapes, to draw them so they can be dragged. */
+  edit?: PictureEdit
 }
+
+/** How {@link RedrawView} lets its shapes be edited. */
+export type PictureEdit = Pick<
+  EditablePictureProps,
+  "selected" | "onSelect" | "onEdit" | "onUndo" | "onRedo"
+>
 
 /**
  * A skeleton redrawn over its glyph, with each shape numbered at its start,
- * and the redraw check's scores for it and each of its shapes.
+ * and the redraw check's scores for it and each of its shapes. Given `edit`,
+ * the shapes can be dragged, and selected in the picture or the list.
  */
 export function RedrawView({
   text,
@@ -43,6 +56,7 @@ export function RedrawView({
   unmatched,
   showGlyph,
   showSkeleton,
+  edit,
 }: RedrawViewProps) {
   const parsed = useMemo(() => (shapes ?? []).map(parseShape), [shapes])
   const score = useMemo(() => {
@@ -54,23 +68,37 @@ export function RedrawView({
 
   if (!shapes) return <p>No skeleton.</p>
   if (!score) return <p>The font has no glyph for this sign.</p>
+  const astray =
+    limits && score.shapesOutside.map((o) => o > limits.shapeOutside)
 
   return (
     <>
-      <SkeletonPicture
-        className={styles.picture}
-        text={text}
-        shapes={shapes}
-        font={font}
-        winkelhakenAngle={winkelhakenAngle}
-        style={style}
-        astray={
-          limits && score.shapesOutside.map((o) => o > limits.shapeOutside)
-        }
-        showGlyph={showGlyph}
-        showSkeleton={showSkeleton}
-        numbered
-      />
+      {edit ? (
+        <EditablePicture
+          text={text}
+          shapes={shapes}
+          font={font}
+          winkelhakenAngle={winkelhakenAngle}
+          style={style}
+          astray={astray}
+          showGlyph={showGlyph}
+          showSkeleton={showSkeleton}
+          {...edit}
+        />
+      ) : (
+        <SkeletonPicture
+          className={styles.picture}
+          text={text}
+          shapes={shapes}
+          font={font}
+          winkelhakenAngle={winkelhakenAngle}
+          style={style}
+          astray={astray}
+          showGlyph={showGlyph}
+          showSkeleton={showSkeleton}
+          numbered
+        />
+      )}
 
       <p className={styles.scores}>
         Overlap {score.overlap.toFixed(3)} · missed {percent(score.missed)} ·
@@ -88,10 +116,21 @@ export function RedrawView({
         <tbody>
           {shapes.map((shape, i) => {
             const outside = score.shapesOutside[i] ?? 0
-            const astray = limits !== undefined && outside > limits.shapeOutside
+            const isAstray =
+              limits !== undefined && outside > limits.shapeOutside
             const isUnmatched = others !== undefined && !others.includes(shape)
             return (
-              <tr key={i} className={astray ? styles.astray : undefined}>
+              <tr
+                key={i}
+                className={
+                  i === edit?.selected
+                    ? styles.selected
+                    : isAstray
+                      ? styles.astray
+                      : undefined
+                }
+                onClick={edit && (() => edit.onSelect(i))}
+              >
                 <td>{i + 1}</td>
                 <td>
                   <code>{shape}</code>

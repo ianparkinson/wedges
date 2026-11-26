@@ -1,0 +1,56 @@
+.picture {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  touch-action: none;
+  user-select: none;
+}
+
+.picture:focus-visible {
+  outline: 2px solid var(--review-shape-line);
+}
+
+.ink {
+  fill: var(--review-ink);
+}
+
+.shape,
+.astray,
+.selected {
+  fill: var(--review-shape);
+  stroke: var(--review-shape-line);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+  cursor: move;
+}
+
+.astray {
+  fill: var(--review-shape-astray);
+  stroke: var(--review-missed);
+}
+
+.selected {
+  fill: var(--review-selected);
+  stroke: var(--review-before);
+  stroke-width: 2px;
+}
+
+.number {
+  fill: var(--color-text);
+  font-family: var(--font-body);
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.handle,
+.widthHandle {
+  fill: var(--color-surface);
+  stroke: var(--review-before);
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+  cursor: grab;
+}
+
+.widthHandle {
+  fill: var(--review-before);
+}

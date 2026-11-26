@@ -4,7 +4,7 @@ import { useMemo } from "react"
 import { parseShape, shapeKeyPoints } from "@/core/skeleton"
 import { boundingBox, type Box, type Point } from "@/lib/geometry"
 
-import { glyph as readGlyph } from "./redraw/glyphs"
+import { glyphOutline } from "./glyphOutline"
 import { impression, type StrokeStyle } from "./redraw/impression"
 import styles from "./SkeletonPicture.module.css"
 import { svgPath } from "./svgPath"
@@ -120,31 +120,6 @@ export function SkeletonPicture({
         ))}
     </svg>
   )
-}
-
-/** A glyph's outline as SVG path data, with its box. */
-interface GlyphOutline {
-  readonly d: string
-  readonly box: Box
-}
-
-/**
- * Glyph outlines already worked out, for each font: the page draws each
- * glyph again and again, and turning it into path data takes a while.
- */
-const outlines = new WeakMap<Font, Map<string, GlyphOutline | undefined>>()
-
-function glyphOutline(font: Font, text: string): GlyphOutline | undefined {
-  let forFont = outlines.get(font)
-  if (!forFont) {
-    forFont = new Map()
-    outlines.set(font, forFont)
-  }
-  if (!forFont.has(text)) {
-    const glyph = readGlyph(font, text)
-    forFont.set(text, glyph && { d: glyph.path.toPathData(2), box: glyph.box })
-  }
-  return forFont.get(text)
 }
 
 /** A box's top-left and bottom-right corners, or none for no box. */
