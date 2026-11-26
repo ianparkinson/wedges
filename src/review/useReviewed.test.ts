@@ -30,6 +30,28 @@ describe("useReviewed", () => {
     expect(result.current.isReviewed("𒀀", A)).toBe(false)
   })
 
+  it("marks and unmarks many signs at once, leaving others alone", () => {
+    const B = ["w 10 25 0 50 50"]
+    const { result } = renderHook(() => useReviewed("noto-next"))
+    act(() => result.current.setReviewed("𒀭", B, true))
+    act(() =>
+      result.current.setAllReviewed(
+        [
+          { text: "𒀀", shapes: A },
+          { text: "𒁹", shapes: B },
+        ],
+        true,
+      ),
+    )
+    expect(result.current.isReviewed("𒀀", A)).toBe(true)
+    expect(result.current.isReviewed("𒁹", B)).toBe(true)
+
+    act(() => result.current.setAllReviewed([{ text: "𒀀", shapes: A }], false))
+    expect(result.current.isReviewed("𒀀", A)).toBe(false)
+    expect(result.current.isReviewed("𒁹", B)).toBe(true)
+    expect(result.current.isReviewed("𒀭", B)).toBe(true)
+  })
+
   it("keeps each file's marks apart, and across reloads", () => {
     const first = renderHook(() => useReviewed("noto-next"))
     act(() => first.result.current.setReviewed("𒀀", A, true))

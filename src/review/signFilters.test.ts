@@ -22,6 +22,7 @@ function sign(key: string, overlap?: number, shapesOutside = [0]): ReviewSign {
 const reviewed = {
   isReviewed: (text: string) => text === "a",
   setReviewed: () => {},
+  setAllReviewed: () => {},
 }
 
 describe("isFailing", () => {

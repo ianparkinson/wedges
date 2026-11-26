@@ -37,6 +37,7 @@ To open it, run `npm run dev` and go to http://localhost:5173/wedges/review.html
 - **Sort.** In file order, by overlap with the worst first, or by each sign's worst shape.
 - **Detail.** Select a tile to see it larger, with each shape numbered at its start and listed with how much of it lies outside the ink. Clear **Glyph** or **Skeleton** to hide either.
 - **Reviewed marks.** Select **Reviewed**, or press R, to mark a sign and move on to the next. The mark records the sign's shapes, so editing the skeleton clears it. Marks are kept in your browser's local storage, not in the repo.
+- **Mark shown.** Select **Mark shown reviewed** or **Mark shown unreviewed** to mark or unmark every traced sign the filters show, including tiles not yet drawn. Each asks you to confirm with a second button, which says how many signs it will change.
 - **Keys.** With a sign open, press the Left and Right arrow keys to move through the signs shown, and Esc to close it.
 - **Compare.** Choose a skeleton file under **Compare with**, and optionally a git ref, such as `main` or `HEAD~1`, under **At ref**. With no ref, the page compares with the file as it is now, for example `noto.json` against `noto-next.json`. At a ref, it reads the font from that ref too. A sign has changed when its shapes differ or its font draws its glyph differently, and the **changed** status shows only those. Their tiles draw the earlier shapes, and any earlier glyph outline, dashed, and the detail shows the earlier version below the current one, with new and removed shapes marked.
 

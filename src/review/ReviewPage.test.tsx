@@ -84,6 +84,43 @@ describe("ReviewPage", () => {
     expect(screen.getByText(/^2 glyphs, 2 traced, 1 reviewed/)).toBeVisible()
   })
 
+  it("marks every sign shown reviewed, once confirmed", async () => {
+    render(<ReviewPage />)
+    await userEvent.click(
+      screen.getByRole("button", { name: "Mark shown reviewed" }),
+    )
+    expect(screen.getByText(/^2 glyphs, 2 traced, 0 reviewed/)).toBeVisible()
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Mark 2 signs reviewed" }),
+    )
+    expect(screen.getByText(/^2 glyphs, 2 traced, 2 reviewed/)).toBeVisible()
+  })
+
+  it("unmarks only the signs shown, and can be cancelled", async () => {
+    render(<ReviewPage />)
+    await userEvent.click(screen.getByRole("button", { name: /^DIŠ/ }))
+    await userEvent.keyboard("rr")
+    await userEvent.selectOptions(
+      screen.getByRole("combobox", { name: "Group" }),
+      "unlisted",
+    )
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Mark shown unreviewed" }),
+    )
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }))
+    expect(screen.getByText(/^2 glyphs, 2 traced, 2 reviewed/)).toBeVisible()
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Mark shown unreviewed" }),
+    )
+    await userEvent.click(
+      screen.getByRole("button", { name: "Mark 1 sign unreviewed" }),
+    )
+    expect(screen.getByText(/^2 glyphs, 2 traced, 1 reviewed/)).toBeVisible()
+  })
+
   it("filters by group", async () => {
     render(<ReviewPage />)
     await userEvent.selectOptions(
