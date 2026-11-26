@@ -37,7 +37,7 @@ export interface RedrawViewProps {
 /** How {@link RedrawView} lets its shapes be edited. */
 export type PictureEdit = Pick<
   EditablePictureProps,
-  "selected" | "onSelect" | "onEdit" | "onUndo" | "onRedo"
+  "tool" | "selected" | "onSelect" | "onEdit" | "onUndo" | "onRedo" | "onDrawn"
 >
 
 /**
@@ -59,24 +59,26 @@ export function RedrawView({
   edit,
 }: RedrawViewProps) {
   const parsed = useMemo(() => (shapes ?? []).map(parseShape), [shapes])
-  const score = useMemo(() => {
-    const glyph = readGlyph(font, text)
-    return glyph && parsed.length > 0
-      ? redraw(glyph, parsed, winkelhakenAngle, style)
-      : undefined
-  }, [font, text, parsed, winkelhakenAngle, style])
+  const glyph = useMemo(() => readGlyph(font, text), [font, text])
+  const score = useMemo(
+    () =>
+      glyph && parsed.length > 0
+        ? redraw(glyph, parsed, winkelhakenAngle, style)
+        : undefined,
+    [glyph, parsed, winkelhakenAngle, style],
+  )
 
-  if (!shapes) return <p>No skeleton.</p>
-  if (!score) return <p>The font has no glyph for this sign.</p>
+  if (!shapes && !edit) return <p>No skeleton.</p>
+  if (!glyph) return <p>The font has no glyph for this sign.</p>
   const astray =
-    limits && score.shapesOutside.map((o) => o > limits.shapeOutside)
+    limits && score?.shapesOutside.map((o) => o > limits.shapeOutside)
 
   return (
     <>
       {edit ? (
         <EditablePicture
           text={text}
-          shapes={shapes}
+          shapes={shapes ?? []}
           font={font}
           winkelhakenAngle={winkelhakenAngle}
           style={style}
@@ -100,50 +102,55 @@ export function RedrawView({
         />
       )}
 
-      <p className={styles.scores}>
-        Overlap {score.overlap.toFixed(3)} · missed {percent(score.missed)} ·
-        outside {percent(score.outside)}
-      </p>
+      {score && shapes && (
+        <>
+          <p className={styles.scores}>
+            Overlap {score.overlap.toFixed(3)} · missed {percent(score.missed)}{" "}
+            · outside {percent(score.outside)}
+          </p>
 
-      <table className={styles.shapes}>
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Shape</th>
-            <th scope="col">Outside the ink</th>
-          </tr>
-        </thead>
-        <tbody>
-          {shapes.map((shape, i) => {
-            const outside = score.shapesOutside[i] ?? 0
-            const isAstray =
-              limits !== undefined && outside > limits.shapeOutside
-            const isUnmatched = others !== undefined && !others.includes(shape)
-            return (
-              <tr
-                key={i}
-                className={
-                  i === edit?.selected
-                    ? styles.selected
-                    : isAstray
-                      ? styles.astray
-                      : undefined
-                }
-                onClick={edit && (() => edit.onSelect(i))}
-              >
-                <td>{i + 1}</td>
-                <td>
-                  <code>{shape}</code>
-                  {isUnmatched && (
-                    <span className={styles.unmatched}> {unmatched}</span>
-                  )}
-                </td>
-                <td>{percent(outside)}</td>
+          <table className={styles.shapes}>
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Shape</th>
+                <th scope="col">Outside the ink</th>
               </tr>
-            )
-          })}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {shapes.map((shape, i) => {
+                const outside = score.shapesOutside[i] ?? 0
+                const isAstray =
+                  limits !== undefined && outside > limits.shapeOutside
+                const isUnmatched =
+                  others !== undefined && !others.includes(shape)
+                return (
+                  <tr
+                    key={i}
+                    className={
+                      i === edit?.selected
+                        ? styles.selected
+                        : isAstray
+                          ? styles.astray
+                          : undefined
+                    }
+                    onClick={edit && (() => edit.onSelect(i))}
+                  >
+                    <td>{i + 1}</td>
+                    <td>
+                      <code>{shape}</code>
+                      {isUnmatched && (
+                        <span className={styles.unmatched}> {unmatched}</span>
+                      )}
+                    </td>
+                    <td>{percent(outside)}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </>
+      )}
     </>
   )
 }

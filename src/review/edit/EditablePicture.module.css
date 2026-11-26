@@ -54,3 +54,14 @@
 .widthHandle {
   fill: var(--review-before);
 }
+
+.drawing {
+  composes: picture;
+  cursor: crosshair;
+}
+
+.drawing .shape,
+.drawing .astray,
+.drawing .selected {
+  cursor: crosshair;
+}

@@ -8,24 +8,20 @@ import {
 } from "react"
 
 import { parseShape, shapeKeyPoints, type Shape } from "@/core/skeleton"
-import { boundingBox, type Point } from "@/lib/geometry"
+import { boundingBox, distance, type Point } from "@/lib/geometry"
 import { glyphOutline } from "@/review/glyphOutline"
 import { impression, type StrokeStyle } from "@/review/redraw/impression"
 import { svgPath } from "@/review/svgPath"
 
 import styles from "./EditablePicture.module.css"
-import {
-  formatShape,
-  lengthenShape,
-  moveShape,
-  openWinkelhaken,
-  pointShape,
-  shapeHandles,
-  traceLeg,
-  turnShape,
-  widenHead,
-  type HandleRole,
-} from "./shapeEdits"
+import { dragged, keyed, type DragRole } from "./gestures"
+import { formatShape, shapeHandles } from "./shapeEdits"
+
+/**
+ * What pressing on the picture does: select and drag shapes, or draw a new
+ * wedge or Winkelhaken.
+ */
+export type EditTool = "select" | "wedge" | "winkelhaken"
 
 /** Props for {@link EditablePicture}. */
 export interface EditablePictureProps {
@@ -38,6 +34,7 @@ export interface EditablePictureProps {
   astray?: readonly boolean[]
   showGlyph?: boolean
   showSkeleton?: boolean
+  tool: EditTool
   /** The index of the selected shape. */
   selected?: number
   onSelect: (index: number | undefined) => void
@@ -48,31 +45,43 @@ export interface EditablePictureProps {
   onEdit: (shapes: readonly string[], continuing: boolean) => void
   onUndo: () => void
   onRedo: () => void
+  /** Called when a new shape has been drawn, which is then selected. */
+  onDrawn: () => void
 }
 
 /** Space around the glyph and shapes, in skeleton units, to drag into. */
 const MARGIN = 12
 const NUMBER_SIZE = 6
 const HANDLE_RADIUS = 2
-/** How far the arrow keys move, and the - and = keys lengthen, with Shift. */
-const BIG_STEP = 5
-/** How far [ and ] turn a shape with Shift, in degrees. */
-const BIG_TURN = 15
+/** A new wedge's head width when the sign has no other wedges. */
+const DEFAULT_HEAD = 20
+/** A new Winkelhaken's leg, when it's placed without dragging. */
+const DEFAULT_LEG = 14
+/** The shortest drag that draws a shape: a shorter one is taken as a press. */
+const MIN_NEW_SHAPE = 3
 
-/** A drag under way: what it changes, and the shape as it was when it began. */
+/** A drag under way. */
 interface Drag {
-  readonly role: HandleRole | "move"
-  readonly from: Point
+  readonly role: DragRole
+  /** Which shape the drag changes. */
+  readonly index: number
+  /** The shapes when the drag began, with the one being drawn, if any. */
+  readonly shapes: readonly string[]
   readonly shape: Shape
+  readonly from: Point
+  /** Whether the drag draws a new shape, at `index`. */
+  readonly isNew: boolean
   changed: boolean
 }
 
 /**
  * A glyph with its skeleton drawn over it, whose shapes can be selected and
  * dragged: by the body to move one, or by its handles to point it, widen a
- * wedge's head, or open a Winkelhaken. Directions snap to multiples of 45°
- * unless Alt is held. With a shape selected, the arrow keys move it, [ and ]
- * turn it, and - and = shorten and lengthen it, by more with Shift.
+ * wedge's head, or open a Winkelhaken. With the wedge or Winkelhaken tool,
+ * dragging draws a new one, from a wedge's head to its tail end or from a
+ * Winkelhaken's vertex along one leg (see traceLeg). Directions snap to multiples of
+ * 45° unless Alt is held. With a shape selected, the arrow keys move it, [
+ * and ] turn it, and - and = shorten and lengthen it, by more with Shift.
  */
 export function EditablePicture({
   text,
@@ -83,11 +92,13 @@ export function EditablePicture({
   astray,
   showGlyph = true,
   showSkeleton = true,
+  tool,
   selected,
   onSelect,
   onEdit,
   onUndo,
   onRedo,
+  onDrawn,
 }: EditablePictureProps) {
   const svg = useRef<SVGSVGElement>(null)
   const drag = useRef<Drag | undefined>(undefined)
@@ -115,33 +126,75 @@ export function EditablePicture({
   })
   const current = selected === undefined ? undefined : parsed[selected]
 
-  const replace = (index: number, shape: Shape, continuing: boolean) =>
-    onEdit(shapes.with(index, formatShape(shape)), continuing)
-
   const startDrag = (
     event: PointerEvent,
-    role: Drag["role"],
+    role: DragRole,
     index: number,
+    shape: Shape,
+    isNew = false,
   ) => {
     event.stopPropagation()
     svg.current!.setPointerCapture(event.pointerId)
     onSelect(index)
     drag.current = {
       role,
+      index,
+      shapes,
+      shape,
       from: toSkeleton(svg.current!, event),
-      shape: parsed[index]!,
+      isNew,
       changed: false,
     }
   }
 
+  const startDrawing = (event: PointerEvent) => {
+    const at = roundPoint(toSkeleton(svg.current!, event))
+    const shape: Shape =
+      tool === "wedge"
+        ? {
+            kind: "wedge",
+            start: at,
+            direction: 0,
+            length: 1,
+            head: newHead(parsed),
+          }
+        : { kind: "winkelhaken", vertex: at, direction: 0, leg: DEFAULT_LEG }
+    startDrag(event, "draw", shapes.length, shape, true)
+  }
+
+  const write = (d: Drag, shape: Shape) => {
+    onEdit(
+      d.shapes.toSpliced(d.index, d.isNew ? 0 : 1, formatShape(shape)),
+      d.changed,
+    )
+    d.changed = true
+  }
+
   const onPointerMove = (event: PointerEvent) => {
     const d = drag.current
-    if (!d || selected === undefined) return
+    if (!d) return
     const to = toSkeleton(svg.current!, event)
-    const snap = !event.altKey
-    const shape = dragged(d, to, snap, winkelhakenAngle)
-    replace(selected, shape, d.changed)
-    d.changed = true
+    const shape = dragged(
+      d.role,
+      d.shape,
+      d.from,
+      to,
+      { snap: !event.altKey, mirror: event.shiftKey },
+      winkelhakenAngle,
+    )
+    if (d.isNew && distance(d.from, to) < MIN_NEW_SHAPE) return
+    write(d, shape)
+  }
+
+  const endDrag = () => {
+    const d = drag.current
+    drag.current = undefined
+    if (!d?.isNew) return
+    // A Winkelhaken placed without a drag opens rightwards; a wedge needs a
+    // drag to say where its tail goes.
+    if (!d.changed && d.shape.kind === "winkelhaken") write(d, d.shape)
+    if (d.changed) onDrawn()
+    else onSelect(undefined)
   }
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -151,12 +204,12 @@ export function EditablePicture({
       onRedo()
     } else if (command && key === "z") {
       onUndo()
-    } else if (event.key === "Escape" && current) {
+    } else if (event.key === "Escape" && current && tool === "select") {
       onSelect(undefined)
     } else if (current && selected !== undefined && !command) {
       const shape = keyed(current, event.key, event.shiftKey)
       if (!shape) return
-      replace(selected, shape, false)
+      onEdit(shapes.with(selected, formatShape(shape)), false)
     } else {
       return
     }
@@ -167,15 +220,17 @@ export function EditablePicture({
   return (
     <svg
       ref={svg}
-      className={styles.picture}
+      className={tool === "select" ? styles.picture : styles.drawing}
       viewBox={viewBox}
       tabIndex={0}
       role="application"
       aria-label="Skeleton editor"
-      onPointerDown={() => onSelect(undefined)}
+      onPointerDown={(e) =>
+        tool === "select" ? onSelect(undefined) : startDrawing(e)
+      }
       onPointerMove={onPointerMove}
-      onPointerUp={() => (drag.current = undefined)}
-      onPointerCancel={() => (drag.current = undefined)}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
       onKeyDown={onKeyDown}
     >
       {showGlyph && glyph && <path className={styles.ink} d={glyph.d} />}
@@ -191,7 +246,11 @@ export function EditablePicture({
                   : styles.shape
             }
             d={svgPath([outline])}
-            onPointerDown={(e) => startDrag(e, "move", i)}
+            onPointerDown={
+              tool === "select"
+                ? (e) => startDrag(e, "move", i, parsed[i]!)
+                : undefined
+            }
           />
         ))}
       {showSkeleton &&
@@ -209,7 +268,8 @@ export function EditablePicture({
             </text>
           )
         })}
-      {current &&
+      {tool === "select" &&
+        current &&
         selected !== undefined &&
         shapeHandles(current, winkelhakenAngle).map(({ role, at }) =>
           role === "point" ? (
@@ -220,7 +280,7 @@ export function EditablePicture({
               cx={at.x}
               cy={-at.y}
               r={HANDLE_RADIUS}
-              onPointerDown={(e) => startDrag(e, role, selected)}
+              onPointerDown={(e) => startDrag(e, role, selected, current)}
             />
           ) : (
             // A diamond, for a handle that changes the shape's width or
@@ -234,7 +294,7 @@ export function EditablePicture({
               width={2 * HANDLE_RADIUS}
               height={2 * HANDLE_RADIUS}
               transform={`rotate(45 ${at.x} ${-at.y})`}
-              onPointerDown={(e) => startDrag(e, role, selected)}
+              onPointerDown={(e) => startDrag(e, role, selected, current)}
             />
           ),
         )}
@@ -242,73 +302,19 @@ export function EditablePicture({
   )
 }
 
-/** The shape a drag makes, from the shape as it was when the drag began. */
-function dragged(
-  { role, from, shape }: Drag,
-  to: Point,
-  snap: boolean,
-  winkelhakenAngle: number,
-): Shape {
-  switch (role) {
-    case "move":
-      return moveShape(shape, to.x - from.x, to.y - from.y)
-    case "point":
-      return pointedBy(shape, to, snap, winkelhakenAngle)
-    case "head":
-      return shape.kind === "wedge" ? widenHead(shape, to) : shape
-    case "angle":
-      return shape.kind === "winkelhaken"
-        ? openWinkelhaken(shape, to, winkelhakenAngle, snap)
-        : shape
-  }
-}
-
-/** The shape a key makes, or undefined for a key that doesn't edit. */
-function keyed(shape: Shape, key: string, big: boolean): Shape | undefined {
-  const step = big ? BIG_STEP : 1
-  const turn = big ? BIG_TURN : 1
-  switch (key) {
-    case "ArrowLeft":
-      return moveShape(shape, -step, 0)
-    case "ArrowRight":
-      return moveShape(shape, step, 0)
-    case "ArrowUp":
-      return moveShape(shape, 0, step)
-    case "ArrowDown":
-      return moveShape(shape, 0, -step)
-    case "[":
-    case "{":
-      return turnShape(shape, turn)
-    case "]":
-    case "}":
-      return turnShape(shape, -turn)
-    case "-":
-    case "_":
-      return lengthenShape(shape, -step)
-    case "=":
-    case "+":
-      return lengthenShape(shape, step)
-    default:
-      return undefined
-  }
-}
-
 /**
- * The shape its point handle makes, which sets where it points and how long
- * it is: a wedge's tail end, or a Winkelhaken's traced leg.
+ * The head width for a new wedge: the middle one of the sign's other wedges,
+ * which are usually much alike, or a typical width if it has none.
  */
-function pointedBy(
-  shape: Shape,
-  to: Point,
-  snap: boolean,
-  winkelhakenAngle: number,
-): Shape {
-  switch (shape.kind) {
-    case "wedge":
-      return pointShape(shape, to, snap)
-    case "winkelhaken":
-      return traceLeg(shape, to, winkelhakenAngle, snap)
-  }
+function newHead(shapes: readonly Shape[]): number {
+  const heads = shapes
+    .flatMap((s) => (s.kind === "wedge" ? [s.head] : []))
+    .toSorted((a, b) => a - b)
+  return heads[Math.floor(heads.length / 2)] ?? DEFAULT_HEAD
+}
+
+function roundPoint({ x, y }: Point): Point {
+  return { x: Math.round(x), y: Math.round(y) }
 }
 
 /**

@@ -4,17 +4,18 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { testFont } from "@test/testFont"
 
-import { EditablePicture } from "./EditablePicture"
+import { EditablePicture, type EditTool } from "./EditablePicture"
 
 const style = { tailEnd: 2, taper: 2, legWidth: 0.2 }
 const shapes = ["w 10 50 0 30 12", "k 60 50 0 14"]
 
-function renderPicture(selected?: number) {
+function renderPicture(selected?: number, tool: EditTool = "select") {
   const handlers = {
     onSelect: vi.fn(),
     onEdit: vi.fn<(shapes: readonly string[], continuing: boolean) => void>(),
     onUndo: vi.fn(),
     onRedo: vi.fn(),
+    onDrawn: vi.fn(),
   }
   const { container } = render(
     <EditablePicture
@@ -23,6 +24,7 @@ function renderPicture(selected?: number) {
       font={testFont()}
       winkelhakenAngle={100}
       style={style}
+      tool={tool}
       selected={selected}
       {...handlers}
     />,
@@ -100,5 +102,50 @@ describe("EditablePicture", () => {
     )
     expect(onUndo).toHaveBeenCalledTimes(1)
     expect(onRedo).toHaveBeenCalledTimes(1)
+  })
+
+  it("draws a wedge from its head to its tail end, with the sign's head width", () => {
+    const { onEdit, onSelect, onDrawn, picture } = renderPicture(
+      undefined,
+      "wedge",
+    )
+    fireEvent.pointerDown(picture, { clientX: 100, clientY: -70 })
+    fireEvent.pointerMove(picture, { clientX: 100, clientY: -69 })
+    fireEvent.pointerMove(picture, { clientX: 101, clientY: -30 })
+    fireEvent.pointerUp(picture)
+    expect(onSelect).toHaveBeenCalledWith(2)
+    expect(onEdit.mock.calls).toEqual([
+      [[...shapes, "w 100 70 270 40 12"], false],
+    ])
+    expect(onDrawn).toHaveBeenCalled()
+  })
+
+  it("draws nothing for a wedge pressed without a drag", () => {
+    const { onEdit, onSelect, onDrawn, picture } = renderPicture(
+      undefined,
+      "wedge",
+    )
+    fireEvent.pointerDown(picture, { clientX: 100, clientY: -70 })
+    fireEvent.pointerUp(picture)
+    expect(onEdit).not.toHaveBeenCalled()
+    expect(onSelect).toHaveBeenLastCalledWith(undefined)
+    expect(onDrawn).not.toHaveBeenCalled()
+  })
+
+  it("places a small Winkelhaken opening right where it's pressed", () => {
+    const { onEdit, picture } = renderPicture(undefined, "winkelhaken")
+    fireEvent.pointerDown(picture, { clientX: 100, clientY: -70 })
+    fireEvent.pointerUp(picture)
+    expect(onEdit).toHaveBeenCalledWith([...shapes, "k 100 70 0 14"], false)
+  })
+
+  it("draws over a shape rather than selecting it", () => {
+    const { onEdit, container } = renderPicture(undefined, "winkelhaken")
+    fireEvent.pointerDown(container.querySelectorAll("path")[1]!, {
+      clientX: 20,
+      clientY: -50,
+    })
+    fireEvent.pointerUp(container.querySelector("svg")!)
+    expect(onEdit).toHaveBeenCalledWith([...shapes, "k 20 50 0 14"], false)
   })
 })
