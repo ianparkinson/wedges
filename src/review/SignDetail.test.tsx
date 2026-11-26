@@ -19,6 +19,8 @@ const sign: ReviewSign = {
 
 function renderDetail(props: Partial<Parameters<typeof SignDetail>[0]> = {}) {
   const handlers = {
+    onShowGlyphChange: vi.fn(),
+    onShowSkeletonChange: vi.fn(),
     onReviewedChange: vi.fn(),
     onPrevious: vi.fn(),
     onNext: vi.fn(),
@@ -32,6 +34,8 @@ function renderDetail(props: Partial<Parameters<typeof SignDetail>[0]> = {}) {
       style={style}
       limits={{ overlap: 0.75, shapeOutside: 0.3 }}
       isReviewed={false}
+      showGlyph
+      showSkeleton
       {...handlers}
       {...props}
     />,
@@ -54,14 +58,22 @@ describe("SignDetail", () => {
     expect(screen.getByText(/^Overlap 0\.\d+ · missed/)).toBeVisible()
   })
 
-  it("hides the glyph or the skeleton", async () => {
-    const { container } = renderDetail()
-    const paths = () => container.querySelectorAll("svg path").length
-    expect(paths()).toBe(3)
-    await userEvent.click(screen.getByRole("checkbox", { name: "Glyph" }))
-    expect(paths()).toBe(2)
-    await userEvent.click(screen.getByRole("checkbox", { name: "Skeleton" }))
-    expect(paths()).toBe(0)
+  it("hides the glyph or the skeleton", () => {
+    const paths = (props: Parameters<typeof renderDetail>[0]) =>
+      renderDetail(props).container.querySelectorAll("svg path").length
+    expect(paths({})).toBe(3)
+    expect(paths({ showGlyph: false })).toBe(2)
+    expect(paths({ showGlyph: false, showSkeleton: false })).toBe(0)
+  })
+
+  it("asks to show or hide the glyph and the skeleton", async () => {
+    const { onShowGlyphChange, onShowSkeletonChange } = renderDetail()
+    await userEvent.click(screen.getByRole("checkbox", { name: "Glyph (G)" }))
+    await userEvent.click(
+      screen.getByRole("checkbox", { name: "Skeleton (S)" }),
+    )
+    expect(onShowGlyphChange).toHaveBeenCalledWith(false)
+    expect(onShowSkeletonChange).toHaveBeenCalledWith(false)
   })
 
   it("marks the sign reviewed", async () => {
