@@ -123,6 +123,8 @@ function LoadedReview({
   const [selectedKey, setSelectedKey] = useUrlState("sign", "")
   const [compareId, setCompareId] = useUrlState("compare", "")
   const [ref, setRef] = useUrlState("ref", "")
+  const [showGlyph, setShowGlyph] = useState(true)
+  const [showSkeleton, setShowSkeleton] = useState(true)
 
   const current = useMemo(() => reviewSigns(file, font, osl), [file, font, osl])
   const {
@@ -173,10 +175,11 @@ function LoadedReview({
   useEffect(() => {
     if (!selected) return
     const onKey = (event: KeyboardEvent) => {
+      // Keys typed into a field or list are for it, but a checkbox takes no letters.
       const target = event.target
       if (
         target instanceof HTMLSelectElement ||
-        target instanceof HTMLInputElement
+        (target instanceof HTMLInputElement && target.type !== "checkbox")
       ) {
         return
       }
@@ -192,6 +195,12 @@ function LoadedReview({
             selected,
             !reviewed.isReviewed(selected.text, selected.shapes ?? []),
           )
+          break
+        case "g":
+          setShowGlyph(!showGlyph)
+          break
+        case "s":
+          setShowSkeleton(!showSkeleton)
           break
         case "Escape":
           setSelectedKey("")
@@ -285,6 +294,10 @@ function LoadedReview({
                 selected.shapes !== undefined &&
                 reviewed.isReviewed(selected.text, selected.shapes)
               }
+              showGlyph={showGlyph}
+              showSkeleton={showSkeleton}
+              onShowGlyphChange={setShowGlyph}
+              onShowSkeletonChange={setShowSkeleton}
               onReviewedChange={(value) => markReviewed(selected, value)}
               onPrevious={() => step(-1)}
               onNext={() => step(1)}

@@ -73,6 +73,22 @@ describe("ReviewPage", () => {
     expect(screen.queryByRole("region", { name: "Sign detail" })).toBeNull()
   })
 
+  it("hides and shows the glyph and the skeleton with G and S", async () => {
+    render(<ReviewPage />)
+    await userEvent.click(screen.getByRole("button", { name: /^DIŠ/ }))
+    const glyph = screen.getByRole("checkbox", { name: "Glyph (G)" })
+    const skeleton = screen.getByRole("checkbox", { name: "Skeleton (S)" })
+
+    await userEvent.keyboard("g")
+    expect(glyph).not.toBeChecked()
+    await userEvent.keyboard("s")
+    expect(skeleton).not.toBeChecked()
+    await userEvent.click(glyph)
+    await userEvent.keyboard("s")
+    expect(glyph).toBeChecked()
+    expect(skeleton).toBeChecked()
+  })
+
   it("marks a sign reviewed with R, and moves to the next", async () => {
     render(<ReviewPage />)
     await userEvent.click(screen.getByRole("button", { name: /^DIŠ/ }))

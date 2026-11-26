@@ -1,5 +1,4 @@
 import type { Font } from "opentype.js"
-import { useState } from "react"
 
 import { codePoints } from "@/core/cuneiform"
 import { Button } from "@/ui/Button/Button"
@@ -22,6 +21,10 @@ export interface SignDetailProps {
   /** The version compared with, shown below when the sign has changed. */
   comparedWith?: ComparedWith
   isReviewed: boolean
+  showGlyph: boolean
+  showSkeleton: boolean
+  onShowGlyphChange: (show: boolean) => void
+  onShowSkeletonChange: (show: boolean) => void
   onReviewedChange: (reviewed: boolean) => void
   onPrevious: () => void
   onNext: () => void
@@ -40,14 +43,16 @@ export function SignDetail({
   limits,
   comparedWith,
   isReviewed,
+  showGlyph,
+  showSkeleton,
+  onShowGlyphChange,
+  onShowSkeletonChange,
   onReviewedChange,
   onPrevious,
   onNext,
   onClose,
 }: SignDetailProps) {
   const before = comparedWith && isChanged(sign) ? sign.before : undefined
-  const [showGlyph, setShowGlyph] = useState(true)
-  const [showSkeleton, setShowSkeleton] = useState(true)
 
   return (
     <section className={styles.detail} aria-label="Sign detail">
@@ -64,17 +69,17 @@ export function SignDetail({
           <input
             type="checkbox"
             checked={showGlyph}
-            onChange={(e) => setShowGlyph(e.target.checked)}
+            onChange={(e) => onShowGlyphChange(e.target.checked)}
           />{" "}
-          Glyph
+          Glyph (G)
         </label>
         <label>
           <input
             type="checkbox"
             checked={showSkeleton}
-            onChange={(e) => setShowSkeleton(e.target.checked)}
+            onChange={(e) => onShowSkeletonChange(e.target.checked)}
           />{" "}
-          Skeleton
+          Skeleton (S)
         </label>
       </div>
 
