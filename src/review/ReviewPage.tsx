@@ -6,6 +6,7 @@ import type { OslData, SkeletonFile } from "@/core/types"
 import { useUrlState } from "@/ui/hooks/useUrlState"
 import { Link } from "@/ui/Link/Link"
 
+import { MarkShown } from "./MarkShown"
 import { skeletonFonts } from "./redraw/fonts"
 import { redrawLimits } from "./redraw/limits"
 import { skeletonFiles, useFont, useOsl } from "./reviewData"
@@ -201,6 +202,9 @@ function LoadedReview({
     return () => window.removeEventListener("keydown", onKey)
   })
 
+  const shownTraced = shown.flatMap(({ text, shapes }) =>
+    shapes ? [{ text, shapes }] : [],
+  )
   const traced = current.filter((sign) => sign.shapes)
   const counts = {
     glyphs: current.length,
@@ -245,6 +249,7 @@ function LoadedReview({
           reviewed, {counts.failing} failing the data test. Showing{" "}
           {shown.length}.{pending > 0 && ` Scoring ${pending} more…`}
         </p>
+        <MarkShown signs={shownTraced} onMark={reviewed.setAllReviewed} />
       </div>
       <div className={selected ? styles.split : undefined}>
         <ul className={styles.grid}>

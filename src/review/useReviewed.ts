@@ -11,6 +11,14 @@ export interface ReviewedMarks {
     shapes: readonly string[],
     reviewed: boolean,
   ) => void
+  /** Marks or unmarks every one of the signs, with their shapes. */
+  setAllReviewed: (signs: readonly MarkedSign[], reviewed: boolean) => void
+}
+
+/** A sign as marks record it: its characters and its skeleton's shapes. */
+export interface MarkedSign {
+  readonly text: string
+  readonly shapes: readonly string[]
 }
 
 /**
@@ -29,17 +37,22 @@ export function useReviewed(fileId: string): ReviewedMarks {
       marks.includes(mark(text, shapes)),
     [marks],
   )
-  const setReviewed = useCallback(
-    (text: string, shapes: readonly string[], reviewed: boolean) => {
-      const key = mark(text, shapes)
+  const setAllReviewed = useCallback(
+    (signs: readonly MarkedSign[], reviewed: boolean) => {
+      const keys = new Set(signs.map((sign) => mark(sign.text, sign.shapes)))
       setMarks((old) => [
-        ...old.filter((m) => m !== key),
-        ...(reviewed ? [key] : []),
+        ...old.filter((m) => !keys.has(m)),
+        ...(reviewed ? keys : []),
       ])
     },
     [setMarks],
   )
-  return { isReviewed, setReviewed }
+  const setReviewed = useCallback(
+    (text: string, shapes: readonly string[], reviewed: boolean) =>
+      setAllReviewed([{ text, shapes }], reviewed),
+    [setAllReviewed],
+  )
+  return { isReviewed, setReviewed, setAllReviewed }
 }
 
 /** A sign's characters and shapes, as one string. */
