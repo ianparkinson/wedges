@@ -99,6 +99,11 @@ function signKey(text: string, n: number): string {
   return `${text}#${n}`
 }
 
+/** Which entry for its characters a sign is, counting from 0, from its key. */
+export function signOccurrence(sign: ReviewSign): number {
+  return Number(sign.key.slice(sign.key.lastIndexOf("#") + 1))
+}
+
 /**
  * How a sign is made, judged from its OSL name: a compound's name is between
  * bars, as in |A×HA|, and a modified sign's has a modifier or variant mark,

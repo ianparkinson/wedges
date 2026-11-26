@@ -72,6 +72,28 @@ function historyUrl(ref: string, path: string): string {
 }
 
 /**
+ * Saves a sign's shapes into a skeleton file through the development server,
+ * which puts the file back in order. `occurrence` is which entry for `text`
+ * to change, counting from 0, or one more than the file has to add one. The
+ * page updates when the file changes. Throws, saying why, if the server
+ * refuses the edit. The path below the site's base is
+ * scripts/review/vitePlugin.ts's SAVE_PATH.
+ */
+export async function saveShapes(
+  file: string,
+  text: string,
+  occurrence: number,
+  shapes: readonly string[],
+): Promise<void> {
+  const response = await fetch(`${import.meta.env.BASE_URL}@review/save`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ file, text, occurrence, shapes }),
+  })
+  if (!response.ok) throw new Error(await response.text())
+}
+
+/**
  * What `read` makes of the response from `url`: undefined while it loads,
  * and null if it fails.
  */

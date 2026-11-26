@@ -10,11 +10,8 @@
  */
 import { readdirSync, readFileSync, writeFileSync } from "node:fs"
 
-import { format, resolveConfig } from "prettier"
-
-import { sortSkeletonFile } from "../src/core/skeletonOrder.ts"
 import type { SkeletonFile } from "../src/core/types"
-import { escapePrivateUse } from "./skeletons/privateUse.ts"
+import { formatSkeletonFile } from "./skeletons/format.ts"
 
 const SKELETONS = "data/skeletons"
 
@@ -29,9 +26,7 @@ const paths =
 for (const path of paths) {
   const before = readFileSync(path, "utf8")
   const file = JSON.parse(before) as SkeletonFile
-  const json = escapePrivateUse(JSON.stringify(sortSkeletonFile(file), null, 2))
-  const options = await resolveConfig(path)
-  const after = await format(json, { ...options, filepath: path })
+  const after = await formatSkeletonFile(path, file)
   if (after !== before) {
     writeFileSync(path, after)
     console.log(`Sorted ${path}`)

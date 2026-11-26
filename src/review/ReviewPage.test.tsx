@@ -6,7 +6,7 @@ import type { OslData, SkeletonFile } from "@/core/types"
 
 import { ReviewPage } from "./ReviewPage"
 
-const { file, before, osl } = vi.hoisted(() => {
+const { file, before, osl, saveShapes } = vi.hoisted(() => {
   const file: SkeletonFile = {
     version: 2,
     font: { family: "Test", version: "1", unitsPerEm: 1000, sha256: "" },
@@ -29,7 +29,8 @@ const { file, before, osl } = vi.hoisted(() => {
       { text: "A", shapes: ["w 10 25 0 50 50"] },
     ],
   }
-  return { file, before, osl }
+  const saveShapes = vi.fn(() => Promise.resolve())
+  return { file, before, osl, saveShapes }
 })
 
 vi.mock("./reviewData", async () => {
@@ -41,6 +42,7 @@ vi.mock("./reviewData", async () => {
     useSkeletonFile: (id: string, ref: string) =>
       ref === "main" ? before : id === "noto-next" ? file : null,
     useOsl: () => osl,
+    saveShapes,
   }
 })
 
@@ -203,5 +205,23 @@ describe("ReviewPage", () => {
     expect(
       screen.getByRole("link", { name: "Draw with these skeletons" }),
     ).toHaveAttribute("href", "/?skeletons=noto-next")
+  })
+
+  it("saves edited shapes into the file's entry for the sign", async () => {
+    render(<ReviewPage />)
+    await userEvent.click(screen.getByRole("button", { name: /^DIŠ/ }))
+    await userEvent.click(screen.getByRole("button", { name: "Edit shapes" }))
+    const field = screen.getByRole("textbox", { name: "Shapes, one to a line" })
+    await userEvent.type(field, "{ArrowRight}{Escape}")
+    expect(location.search).toBe(`?sign=${encodeURIComponent("𒁹#0")}`)
+
+    await userEvent.click(screen.getByRole("button", { name: "Edit shapes" }))
+    await userEvent.type(
+      screen.getByRole("textbox", { name: "Shapes, one to a line" }),
+      "{Control>}{Enter}{/Control}",
+    )
+    expect(saveShapes).toHaveBeenCalledWith("noto-next", "𒁹", 0, [
+      "w 22 70 270 70 4",
+    ])
   })
 })
