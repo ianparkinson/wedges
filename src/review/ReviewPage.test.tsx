@@ -91,6 +91,25 @@ describe("ReviewPage", () => {
     expect(skeleton).toBeChecked()
   })
 
+  it("fills the window with F, and shrinks back on Escape", async () => {
+    render(<ReviewPage />)
+    await userEvent.click(screen.getByRole("button", { name: /^DIŠ/ }))
+    const fullWindow = screen.getByRole("checkbox", { name: "Full window (F)" })
+
+    await userEvent.keyboard("f")
+    expect(fullWindow).toBeChecked()
+    await userEvent.keyboard("{ArrowRight}")
+    expect(
+      screen.getByRole("checkbox", { name: "Full window (F)" }),
+    ).toBeChecked()
+    await userEvent.keyboard("{Escape}")
+    expect(
+      screen.getByRole("checkbox", { name: "Full window (F)" }),
+    ).not.toBeChecked()
+    await userEvent.keyboard("{Escape}")
+    expect(screen.queryByRole("region", { name: "Sign detail" })).toBeNull()
+  })
+
   it("marks a sign reviewed with R, and moves to the next", async () => {
     render(<ReviewPage />)
     await userEvent.click(screen.getByRole("button", { name: /^DIŠ/ }))

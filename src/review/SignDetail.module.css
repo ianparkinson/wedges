@@ -8,6 +8,50 @@
   background: var(--color-surface);
 }
 
+/*
+ * Over the whole window, with the picture fixed on the left, as large as
+ * fits, and the rest scrolling beside it.
+ */
+.expanded {
+  --picture-size: min(
+    100dvh - 2 * var(--space-4),
+    100vw - var(--expanded-side) - 3 * var(--space-4)
+  );
+  --expanded-side: 28rem;
+
+  composes: detail;
+  position: fixed;
+  z-index: 1;
+  inset: 0;
+  overflow-y: auto;
+  padding-left: calc(var(--picture-size) + 2 * var(--space-4));
+  border: none;
+  border-radius: 0;
+}
+
+.expanded .mainPicture {
+  position: fixed;
+  top: var(--space-4);
+  left: var(--space-4);
+  width: var(--picture-size);
+  height: var(--picture-size);
+  max-height: none;
+}
+
+/* Too narrow to fit the picture beside the rest, so it fills the width. */
+@media (width < 48rem) {
+  .expanded {
+    padding-left: var(--space-4);
+  }
+
+  .expanded .mainPicture {
+    position: static;
+    flex-shrink: 0;
+    width: 100%;
+    height: calc(min(100vw, 100dvh) - 2 * var(--space-4));
+  }
+}
+
 .header {
   display: flex;
   align-items: baseline;
