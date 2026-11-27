@@ -13,7 +13,7 @@ export interface SkeletonFont {
 /** Noto Sans Cuneiform, measured from its glyphs. */
 const NOTO: SkeletonFont = {
   path: "noto/NotoSansCuneiform-Regular.ttf",
-  style: { tailEnd: 2.6, taper: 2, legWidth: 0.16 },
+  style: { tailEnd: 2.6, taper: 2, legWidth: 0.16, lineWidth: 2.1 },
 }
 
 /** The font for each skeleton file in `data/skeletons/`, by the file's name. */

@@ -12,7 +12,7 @@ import { distance, type Point, type Polygon } from "@/lib/geometry"
  * Winkelhaken narrows from the vertex to its tip.
  */
 export interface StrokeStyle {
-  /** The width of a tail's flat end, a Winkelhaken leg's tip, and a headless line. */
+  /** The width of a tail's flat end and a Winkelhaken leg's tip. */
   readonly tailEnd: number
   /**
    * How a wedge's sides curve in from the head: its width above the tail
@@ -22,6 +22,11 @@ export interface StrokeStyle {
   readonly taper: number
   /** A Winkelhaken leg's half width at the vertex, as a fraction of the leg. */
   readonly legWidth: number
+  /**
+   * The width of a headless line, for a font that draws ruled lines thinner
+   * than a tail's end. Without it, a headless line is as wide as a tail's end.
+   */
+  readonly lineWidth?: number
 }
 
 /** Points along each side of a wedge, which make its curved sides. */
@@ -39,7 +44,12 @@ export function impression(
   const [start, ...ends] = shapeKeyPoints(shape, winkelhakenAngle)
   switch (shape.kind) {
     case "wedge":
-      return wedgeOutline(start!, ends[0]!, shape.head, style)
+      return shape.head === 0 && style.lineWidth !== undefined
+        ? wedgeOutline(start!, ends[0]!, 0, {
+            ...style,
+            tailEnd: style.lineWidth,
+          })
+        : wedgeOutline(start!, ends[0]!, shape.head, style)
     case "winkelhaken":
       return winkelhakenOutline(start!, ends[0]!, ends[1]!, style)
   }
