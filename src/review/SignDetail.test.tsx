@@ -21,6 +21,7 @@ function renderDetail(props: Partial<Parameters<typeof SignDetail>[0]> = {}) {
   const handlers = {
     onShowGlyphChange: vi.fn(),
     onShowSkeletonChange: vi.fn(),
+    onExpandedChange: vi.fn(),
     onReviewedChange: vi.fn(),
     onSave: vi.fn<(shapes: readonly string[]) => Promise<void>>(() =>
       Promise.resolve(),
@@ -39,6 +40,7 @@ function renderDetail(props: Partial<Parameters<typeof SignDetail>[0]> = {}) {
       isReviewed={false}
       showGlyph
       showSkeleton
+      isExpanded={false}
       {...handlers}
       {...props}
     />,

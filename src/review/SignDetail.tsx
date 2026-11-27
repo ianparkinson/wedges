@@ -25,8 +25,11 @@ export interface SignDetailProps {
   isReviewed: boolean
   showGlyph: boolean
   showSkeleton: boolean
+  /** Whether the detail fills the window, with a larger picture. */
+  isExpanded: boolean
   onShowGlyphChange: (show: boolean) => void
   onShowSkeletonChange: (show: boolean) => void
+  onExpandedChange: (expanded: boolean) => void
   onReviewedChange: (reviewed: boolean) => void
   /** Saves new shapes for the sign. Rejects, saying why, if it can't. */
   onSave: (shapes: readonly string[]) => Promise<void>
@@ -39,7 +42,8 @@ export interface SignDetailProps {
  * One sign in detail: its skeleton redrawn over its glyph, and the same as
  * it was in the version compared with, if it has changed. Its shapes can be
  * edited, by dragging or as text. Give each sign its own `key`, so that an
- * edit doesn't carry over to the next sign.
+ * edit doesn't carry over to the next sign. Expanded, it fills the window,
+ * with the picture as large as fits beside the rest.
  */
 export function SignDetail({
   sign,
@@ -51,8 +55,10 @@ export function SignDetail({
   isReviewed,
   showGlyph,
   showSkeleton,
+  isExpanded,
   onShowGlyphChange,
   onShowSkeletonChange,
+  onExpandedChange,
   onReviewedChange,
   onSave,
   onPrevious,
@@ -61,9 +67,13 @@ export function SignDetail({
 }: SignDetailProps) {
   const before = comparedWith && isChanged(sign) ? sign.before : undefined
   const [isEditing, setEditing] = useState(false)
+  const pictureClassName = isExpanded ? styles.mainPicture : undefined
 
   return (
-    <section className={styles.detail} aria-label="Sign detail">
+    <section
+      className={isExpanded ? styles.expanded : styles.detail}
+      aria-label="Sign detail"
+    >
       <header className={styles.header}>
         <h2 className={styles.title}>
           <span className={styles.glyph}>{sign.text}</span>{" "}
@@ -89,6 +99,14 @@ export function SignDetail({
           />{" "}
           Skeleton (S)
         </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={isExpanded}
+            onChange={(e) => onExpandedChange(e.target.checked)}
+          />{" "}
+          Full window (F)
+        </label>
       </div>
 
       {isEditing ? (
@@ -102,6 +120,7 @@ export function SignDetail({
           others={before?.shapes}
           showGlyph={showGlyph}
           showSkeleton={showSkeleton}
+          pictureClassName={pictureClassName}
           onSave={onSave}
           onDone={() => setEditing(false)}
         />
@@ -118,6 +137,7 @@ export function SignDetail({
             unmatched="new"
             showGlyph={showGlyph}
             showSkeleton={showSkeleton}
+            pictureClassName={pictureClassName}
           />
           <div>
             <Button onPress={() => setEditing(true)}>

@@ -47,6 +47,7 @@ export interface EditablePictureProps {
   onRedo: () => void
   /** Called when a new shape has been drawn, which is then selected. */
   onDrawn: () => void
+  className?: string
 }
 
 /** Space around the glyph and shapes, in skeleton units, to drag into. */
@@ -99,6 +100,7 @@ export function EditablePicture({
   onUndo,
   onRedo,
   onDrawn,
+  className,
 }: EditablePictureProps) {
   const svg = useRef<SVGSVGElement>(null)
   const drag = useRef<Drag | undefined>(undefined)
@@ -220,7 +222,12 @@ export function EditablePicture({
   return (
     <svg
       ref={svg}
-      className={tool === "select" ? styles.picture : styles.drawing}
+      className={[
+        tool === "select" ? styles.picture : styles.drawing,
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       viewBox={viewBox}
       tabIndex={0}
       role="application"

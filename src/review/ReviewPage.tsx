@@ -130,6 +130,7 @@ function LoadedReview({
   const [ref, setRef] = useUrlState("ref", "")
   const [showGlyph, setShowGlyph] = useState(true)
   const [showSkeleton, setShowSkeleton] = useState(true)
+  const [isExpanded, setExpanded] = useState(false)
 
   const current = useMemo(() => reviewSigns(file, font, osl), [file, font, osl])
   const {
@@ -208,8 +209,12 @@ function LoadedReview({
         case "s":
           setShowSkeleton(!showSkeleton)
           break
+        case "f":
+          setExpanded(!isExpanded)
+          break
         case "Escape":
-          setSelectedKey("")
+          if (isExpanded) setExpanded(false)
+          else setSelectedKey("")
           break
       }
     }
@@ -303,8 +308,10 @@ function LoadedReview({
               }
               showGlyph={showGlyph}
               showSkeleton={showSkeleton}
+              isExpanded={isExpanded}
               onShowGlyphChange={setShowGlyph}
               onShowSkeletonChange={setShowSkeleton}
+              onExpandedChange={setExpanded}
               onReviewedChange={(value) => markReviewed(selected, value)}
               onSave={(shapes) =>
                 saveShapes(

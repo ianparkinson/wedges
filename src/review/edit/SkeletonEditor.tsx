@@ -30,6 +30,8 @@ export interface SkeletonEditorProps {
   onSave: (shapes: readonly string[]) => Promise<void>
   /** Ends the edit, after a save or on cancelling. */
   onDone: () => void
+  /** A class for the picture, as for {@link RedrawView}. */
+  pictureClassName?: string
 }
 
 /** How far a duplicate lies from the shape it copies, right and down. */
@@ -60,6 +62,7 @@ export function SkeletonEditor({
   showSkeleton,
   onSave,
   onDone,
+  pictureClassName,
 }: SkeletonEditorProps) {
   const draft = useShapesDraft(initial ?? [])
   const [selected, setSelected] = useState<number>()
@@ -144,6 +147,7 @@ export function SkeletonEditor({
           unmatched="new"
           showGlyph={showGlyph}
           showSkeleton={showSkeleton}
+          pictureClassName={pictureClassName}
           edit={
             canDrag
               ? {

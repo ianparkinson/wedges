@@ -32,6 +32,8 @@ export interface RedrawViewProps {
   showSkeleton?: boolean
   /** How to edit the shapes, to draw them so they can be dragged. */
   edit?: PictureEdit
+  /** A class for the picture, to size or place it. */
+  pictureClassName?: string
 }
 
 /** How {@link RedrawView} lets its shapes be edited. */
@@ -57,6 +59,7 @@ export function RedrawView({
   showGlyph,
   showSkeleton,
   edit,
+  pictureClassName,
 }: RedrawViewProps) {
   const parsed = useMemo(() => (shapes ?? []).map(parseShape), [shapes])
   const glyph = useMemo(() => readGlyph(font, text), [font, text])
@@ -85,11 +88,14 @@ export function RedrawView({
           astray={astray}
           showGlyph={showGlyph}
           showSkeleton={showSkeleton}
+          className={pictureClassName}
           {...edit}
         />
       ) : (
         <SkeletonPicture
-          className={styles.picture}
+          className={[styles.picture, pictureClassName]
+            .filter(Boolean)
+            .join(" ")}
           text={text}
           shapes={shapes}
           font={font}
