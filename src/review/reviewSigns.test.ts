@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import type { OslData, SkeletonFile } from "@/core/types"
 import { testFont } from "@test/testFont"
 
-import { reviewSigns, signGroup } from "./reviewSigns"
+import { reviewSigns, signGroup, signOccurrence } from "./reviewSigns"
 
 describe("signGroup", () => {
   it("reads how a sign is made from its OSL name", () => {
@@ -46,9 +46,8 @@ describe("reviewSigns", () => {
         { text: "𒁹", shapes: ["w 22 70 270 60 4"] },
       ],
     }
-    expect(reviewSigns(twice, testFont(), osl).map((r) => r.key)).toEqual([
-      "𒁹#0",
-      "𒁹#1",
-    ])
+    const signs = reviewSigns(twice, testFont(), osl)
+    expect(signs.map((r) => r.key)).toEqual(["𒁹#0", "𒁹#1"])
+    expect(signs.map(signOccurrence)).toEqual([0, 1])
   })
 })

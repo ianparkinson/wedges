@@ -1,23 +1,33 @@
 /**
- * Serves data files from git history to the review page, in development
- * only: `<base>@review/show?ref=main&path=data/skeletons/noto.json`.
+ * Serves the review page's requests to the development server, which only
+ * it can answer: data files from git history, read with
+ * `<base>@review/show?ref=main&path=data/skeletons/noto.json`, and edited
+ * shapes, saved by posting a `ShapesEdit` (see saveShapes.ts) to
+ * `<base>@review/save`.
  */
+import type { IncomingMessage } from "node:http"
+
 import type { Plugin } from "vite"
 
 import { gitShow, isAllowed } from "./gitShow.ts"
+import { readEdit, saveShapes } from "./saveShapes.ts"
 
 /** The path the review page fetches old files from, below the site's base. */
 export const SHOW_PATH = "@review/show"
 
-/** The Vite plugin that serves old data files to the review page. */
+/** The path the review page posts edited shapes to, below the site's base. */
+export const SAVE_PATH = "@review/save"
+
+/** The Vite plugin that answers the review page's requests. */
 export function reviewPlugin(): Plugin {
   return {
     name: "wedges-review",
     // Only the development server uses the plugin: a build leaves it out.
     apply: "serve",
     configureServer(server) {
-      const prefix = `${server.config.base}${SHOW_PATH}`
-      server.middlewares.use(prefix, (request, response) => {
+      const { base, root } = server.config
+
+      server.middlewares.use(`${base}${SHOW_PATH}`, (request, response) => {
         const query = new URL(request.url ?? "", "http://localhost")
           .searchParams
         const ref = query.get("ref") ?? ""
@@ -35,6 +45,32 @@ export function reviewPlugin(): Plugin {
           },
         )
       })
+
+      server.middlewares.use(`${base}${SAVE_PATH}`, (request, response) => {
+        if (request.method !== "POST") {
+          response.statusCode = 405
+          response.end()
+          return
+        }
+        readJson(request)
+          .then((body) => saveShapes(root, readEdit(body)))
+          .then(
+            () => {
+              response.statusCode = 204
+              response.end()
+            },
+            (error: unknown) => {
+              response.statusCode = 400
+              response.end(error instanceof Error ? error.message : "")
+            },
+          )
+      })
     },
   }
+}
+
+async function readJson(request: IncomingMessage): Promise<unknown> {
+  const chunks: Buffer[] = []
+  for await (const chunk of request) chunks.push(chunk as Buffer)
+  return JSON.parse(Buffer.concat(chunks).toString("utf8"))
 }

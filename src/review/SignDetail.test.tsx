@@ -22,6 +22,9 @@ function renderDetail(props: Partial<Parameters<typeof SignDetail>[0]> = {}) {
     onShowGlyphChange: vi.fn(),
     onShowSkeletonChange: vi.fn(),
     onReviewedChange: vi.fn(),
+    onSave: vi.fn<(shapes: readonly string[]) => Promise<void>>(() =>
+      Promise.resolve(),
+    ),
     onPrevious: vi.fn(),
     onNext: vi.fn(),
     onClose: vi.fn(),
@@ -96,5 +99,63 @@ describe("SignDetail", () => {
     renderDetail({ sign: { ...sign, shapes: undefined } })
     expect(screen.getByText("No skeleton.")).toBeVisible()
     expect(screen.queryByRole("checkbox", { name: "Reviewed (R)" })).toBeNull()
+  })
+
+  describe("editing", () => {
+    const shapesField = () =>
+      screen.getByRole("textbox", { name: "Shapes, one to a line" })
+
+    it("redraws the shapes as they're typed, and saves them", async () => {
+      const { onSave } = renderDetail()
+      await userEvent.click(screen.getByRole("button", { name: "Edit shapes" }))
+      expect(shapesField()).toHaveValue("w 22 70 270 70 4\nw 60 70 270 30 4")
+
+      await userEvent.clear(shapesField())
+      await userEvent.type(shapesField(), "w 22 70 270 60 4")
+      expect(screen.getAllByRole("row").slice(1)).toHaveLength(1)
+
+      await userEvent.click(
+        screen.getByRole("button", { name: "Save (Ctrl+Enter)" }),
+      )
+      expect(onSave).toHaveBeenCalledWith(["w 22 70 270 60 4"])
+      expect(screen.queryByRole("textbox")).toBeNull()
+    })
+
+    it("won't save a line that isn't a shape", async () => {
+      renderDetail()
+      await userEvent.click(screen.getByRole("button", { name: "Edit shapes" }))
+      await userEvent.type(shapesField(), "\nw 1 2")
+      expect(
+        screen.getByRole("list", { name: "Not shapes" }),
+      ).toHaveTextContent("Line 3: w 1 2")
+      expect(
+        screen.getByRole("button", { name: "Save (Ctrl+Enter)" }),
+      ).toBeDisabled()
+    })
+
+    it("says why a save failed, and keeps the edit", async () => {
+      renderDetail({
+        onSave: () => Promise.reject(new Error("Can't save: bad shape")),
+      })
+      await userEvent.click(screen.getByRole("button", { name: "Edit shapes" }))
+      await userEvent.type(shapesField(), "{Control>}{Enter}{/Control}")
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        "Can't save: bad shape",
+      )
+      expect(shapesField()).toBeVisible()
+    })
+
+    it("cancels the edit with Esc", async () => {
+      renderDetail()
+      await userEvent.click(screen.getByRole("button", { name: "Edit shapes" }))
+      await userEvent.type(shapesField(), "{Escape}")
+      expect(screen.queryByRole("textbox")).toBeNull()
+    })
+
+    it("adds shapes to a sign with none", async () => {
+      renderDetail({ sign: { ...sign, shapes: undefined } })
+      await userEvent.click(screen.getByRole("button", { name: "Add shapes" }))
+      expect(shapesField()).toHaveValue("")
+    })
   })
 })

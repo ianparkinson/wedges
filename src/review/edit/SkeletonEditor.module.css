@@ -1,0 +1,20 @@
+.hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.history {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.view {
+  display: contents;
+}

@@ -1,9 +1,11 @@
 import type { Font } from "opentype.js"
+import { useState } from "react"
 
 import { codePoints } from "@/core/cuneiform"
 import { Button } from "@/ui/Button/Button"
 
 import { isChanged } from "./compare"
+import { SkeletonEditor } from "./edit/SkeletonEditor"
 import type { StrokeStyle } from "./redraw/impression"
 import type { RedrawLimits } from "./redraw/limits"
 import { RedrawView } from "./RedrawView"
@@ -26,6 +28,8 @@ export interface SignDetailProps {
   onShowGlyphChange: (show: boolean) => void
   onShowSkeletonChange: (show: boolean) => void
   onReviewedChange: (reviewed: boolean) => void
+  /** Saves new shapes for the sign. Rejects, saying why, if it can't. */
+  onSave: (shapes: readonly string[]) => Promise<void>
   onPrevious: () => void
   onNext: () => void
   onClose: () => void
@@ -33,7 +37,9 @@ export interface SignDetailProps {
 
 /**
  * One sign in detail: its skeleton redrawn over its glyph, and the same as
- * it was in the version compared with, if it has changed.
+ * it was in the version compared with, if it has changed. Its shapes can be
+ * edited, by dragging or as text. Give each sign its own `key`, so that an
+ * edit doesn't carry over to the next sign.
  */
 export function SignDetail({
   sign,
@@ -48,11 +54,13 @@ export function SignDetail({
   onShowGlyphChange,
   onShowSkeletonChange,
   onReviewedChange,
+  onSave,
   onPrevious,
   onNext,
   onClose,
 }: SignDetailProps) {
   const before = comparedWith && isChanged(sign) ? sign.before : undefined
+  const [isEditing, setEditing] = useState(false)
 
   return (
     <section className={styles.detail} aria-label="Sign detail">
@@ -83,18 +91,41 @@ export function SignDetail({
         </label>
       </div>
 
-      <RedrawView
-        text={sign.text}
-        shapes={sign.shapes}
-        font={font}
-        winkelhakenAngle={winkelhakenAngle}
-        style={style}
-        limits={limits}
-        others={before?.shapes}
-        unmatched="new"
-        showGlyph={showGlyph}
-        showSkeleton={showSkeleton}
-      />
+      {isEditing ? (
+        <SkeletonEditor
+          text={sign.text}
+          shapes={sign.shapes}
+          font={font}
+          winkelhakenAngle={winkelhakenAngle}
+          style={style}
+          limits={limits}
+          others={before?.shapes}
+          showGlyph={showGlyph}
+          showSkeleton={showSkeleton}
+          onSave={onSave}
+          onDone={() => setEditing(false)}
+        />
+      ) : (
+        <>
+          <RedrawView
+            text={sign.text}
+            shapes={sign.shapes}
+            font={font}
+            winkelhakenAngle={winkelhakenAngle}
+            style={style}
+            limits={limits}
+            others={before?.shapes}
+            unmatched="new"
+            showGlyph={showGlyph}
+            showSkeleton={showSkeleton}
+          />
+          <div>
+            <Button onPress={() => setEditing(true)}>
+              {sign.shapes ? "Edit shapes" : "Add shapes"}
+            </Button>
+          </div>
+        </>
+      )}
       {sign.comments && <p>{sign.comments}</p>}
 
       {comparedWith && before && (

@@ -9,9 +9,14 @@ import { Link } from "@/ui/Link/Link"
 import { MarkShown } from "./MarkShown"
 import { skeletonFonts } from "./redraw/fonts"
 import { redrawLimits } from "./redraw/limits"
-import { skeletonFiles, useFont, useOsl } from "./reviewData"
+import { saveShapes, skeletonFiles, useFont, useOsl } from "./reviewData"
 import styles from "./ReviewPage.module.css"
-import { reviewSigns, type ReviewSign, type SignGroup } from "./reviewSigns"
+import {
+  reviewSigns,
+  signOccurrence,
+  type ReviewSign,
+  type SignGroup,
+} from "./reviewSigns"
 import { SignDetail } from "./SignDetail"
 import { hasStatus, isFailing, SORTS, sortSigns, STATUSES } from "./signFilters"
 import { SignTile } from "./SignTile"
@@ -179,6 +184,7 @@ function LoadedReview({
       const target = event.target
       if (
         target instanceof HTMLSelectElement ||
+        target instanceof HTMLTextAreaElement ||
         (target instanceof HTMLInputElement && target.type !== "checkbox")
       ) {
         return
@@ -284,6 +290,7 @@ function LoadedReview({
         {selected && (
           <div className={styles.side}>
             <SignDetail
+              key={selected.key}
               sign={selected}
               font={font}
               winkelhakenAngle={file.winkelhakenAngle}
@@ -299,6 +306,14 @@ function LoadedReview({
               onShowGlyphChange={setShowGlyph}
               onShowSkeletonChange={setShowSkeleton}
               onReviewedChange={(value) => markReviewed(selected, value)}
+              onSave={(shapes) =>
+                saveShapes(
+                  fileId,
+                  selected.text,
+                  signOccurrence(selected),
+                  shapes,
+                )
+              }
               onPrevious={() => step(-1)}
               onNext={() => step(1)}
               onClose={() => setSelectedKey("")}
