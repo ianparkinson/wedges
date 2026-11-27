@@ -1627,7 +1627,9 @@
         "w 207 21 315 45 15",
         "w 207 39 45 44 15",
         "w 207 67 315 44 15"
-      ]
+      ],
+      "partial": true,
+      "comments": "Partial: the half-oval can't be drawn, so it's a headless line along its straight edge."
     },
     {
       "text": "𒆜",

@@ -38,19 +38,20 @@ describe.each(Object.entries(limits))("data/skeletons/%s.json", (id, limit) => {
   )
   const scores = file.skeletons
     .filter((entry) => entry.shapes)
-    .map(({ text, shapes = [] }) => {
+    .map(({ text, shapes = [], partial = false }) => {
       const score = redraw(
         glyph(font, text)!,
         shapes.map(parseShape),
         file.winkelhakenAngle,
         style,
       )
-      return { text, shapes, ...score }
+      return { text, shapes, partial, ...score }
     })
 
   it("redraws each sign close to its glyph", () => {
     const poor = scores
       .filter((s) => s.overlap < limit.overlap)
+      .filter((s) => !s.partial)
       .map((s) => `${label(s.text)} ${s.overlap.toFixed(2)}`)
     expect(poor).toEqual([])
   })

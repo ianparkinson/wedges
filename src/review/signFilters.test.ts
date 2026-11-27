@@ -32,6 +32,15 @@ describe("isFailing", () => {
     expect(isFailing(sign("a", 0.9, [0.1, 0.4]), limits)).toBe(true)
   })
 
+  it("holds a partial skeleton only to the shape limit", () => {
+    const partial = (outside: number[]) => ({
+      ...sign("a", 0.4, outside),
+      partial: true,
+    })
+    expect(isFailing(partial([0.1]), limits)).toBe(false)
+    expect(isFailing(partial([0.4]), limits)).toBe(true)
+  })
+
   it("fails nothing in a file with no limits, or with no score", () => {
     expect(isFailing(sign("a", 0.1), undefined)).toBe(false)
     expect(isFailing(sign("a"), limits)).toBe(false)

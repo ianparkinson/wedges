@@ -34,6 +34,8 @@ export interface ReviewSign {
   /** The skeleton's shapes, or undefined when the file has no entry. */
   readonly shapes?: readonly string[]
   readonly comments?: string
+  /** Whether the shapes leave out strokes the format can't draw. */
+  readonly partial?: boolean
   /**
    * The redraw check's score, for an entry with shapes, once it has been
    * worked out: null if the font has no glyph to score against.
@@ -83,6 +85,7 @@ export function reviewSigns(
       ...sign(entry.text, signKey(entry.text, n)),
       shapes: entry.shapes,
       comments: entry.comments,
+      partial: entry.partial,
     }
   })
 
