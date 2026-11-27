@@ -35,6 +35,15 @@ describe("impression", () => {
     expect(bottom - top).toBeCloseTo(2)
   })
 
+  it("draws a headless line at the line width when the font has one", () => {
+    const outline = impression(parseShape("w 0 0 0 40 0"), 100, {
+      ...style,
+      lineWidth: 1.5,
+    })
+    const { top, bottom } = boundingBox(outline)
+    expect(bottom - top).toBeCloseTo(1.5)
+  })
+
   it("draws a Winkelhaken's legs out to their tips at the given angle", () => {
     const outline = impression(parseShape("k 0 0 0 20"), 90, style)
     const reach = maxOf(outline.map((p) => p.x))
