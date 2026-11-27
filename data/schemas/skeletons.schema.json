@@ -64,12 +64,17 @@
         "type": "object",
         "required": ["text"],
         "anyOf": [{ "required": ["shapes"] }, { "required": ["comments"] }],
+        "dependentRequired": { "partial": ["shapes", "comments"] },
         "additionalProperties": false,
         "properties": {
           "text": {
             "description": "The characters the font draws as this glyph: one or more code points, each cuneiform or private-use.",
             "type": "string",
             "pattern": "^[\\u{12000}-\\u{1254F}\\u{E000}-\\u{F8FF}\\u{F0000}-\\u{FFFFD}\\u{100000}-\\u{10FFFD}]+$"
+          },
+          "partial": {
+            "description": "Whether the shapes leave out strokes the format can't draw. The comments say what.",
+            "const": true
           },
           "shapes": {
             "description": "The shapes, one string each, in the order docs/skeleton-format.md defines.",

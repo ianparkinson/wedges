@@ -138,19 +138,20 @@ While a font's skeletons are being replaced, the new ones build up in a second f
 }
 ```
 
-| Field                  | Meaning                                                                                                                                |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `version`              | Always 2.                                                                                                                              |
-| `font`                 | The font the skeletons were traced over: its family name, version, units per em, and the font file's SHA-256 hash. See [Font](#font).  |
-| `credit`               | Optional. The attribution that the app must show when it uses this file, if the font's licence asks for one.                           |
-| `comments`             | Optional. Notes on the file, such as who or what made it, and when.                                                                    |
-| `wedges`               | `"headed"` or `"tapered"`.                                                                                                             |
-| `headAspect`           | A wedge head's depth divided by its size. Required in a headed font, and not allowed in a tapered one.                                 |
-| `headLean`             | The angle of a wedge head's back edge from square to its tail, in degrees, anticlockwise. Usually 0.                                   |
-| `winkelhakenAngle`     | The angle between a Winkelhaken's legs, in degrees.                                                                                    |
-| `skeletons[].text`     | The characters that the font draws as this glyph. See [Text](#text).                                                                   |
-| `skeletons[].shapes`   | Optional. The shapes, one string each. Leave it out for a sign that the file deliberately doesn't describe, and say why in `comments`. |
-| `skeletons[].comments` | Optional. Notes on this entry. Required when there are no `shapes`.                                                                    |
+| Field                  | Meaning                                                                                                                                                    |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`              | Always 2.                                                                                                                                                  |
+| `font`                 | The font the skeletons were traced over: its family name, version, units per em, and the font file's SHA-256 hash. See [Font](#font).                      |
+| `credit`               | Optional. The attribution that the app must show when it uses this file, if the font's licence asks for one.                                               |
+| `comments`             | Optional. Notes on the file, such as who or what made it, and when.                                                                                        |
+| `wedges`               | `"headed"` or `"tapered"`.                                                                                                                                 |
+| `headAspect`           | A wedge head's depth divided by its size. Required in a headed font, and not allowed in a tapered one.                                                     |
+| `headLean`             | The angle of a wedge head's back edge from square to its tail, in degrees, anticlockwise. Usually 0.                                                       |
+| `winkelhakenAngle`     | The angle between a Winkelhaken's legs, in degrees.                                                                                                        |
+| `skeletons[].text`     | The characters that the font draws as this glyph. See [Text](#text).                                                                                       |
+| `skeletons[].shapes`   | Optional. The shapes, one string each. Leave it out for a sign that the file deliberately doesn't describe, and say why in `comments`.                     |
+| `skeletons[].comments` | Optional. Notes on this entry. Required when there are no `shapes`.                                                                                        |
+| `skeletons[].partial`  | Optional. `true` when the shapes leave out strokes that the format can't draw, such as a half-oval. Needs `shapes`, and `comments` saying what's left out. |
 
 The matcher uses only `winkelhakenAngle` of the per-font values. The others are for drawing skeletons and checking them against the font. The matcher uses `winkelhakenAngle`, and any Winkelhaken's own `angle`, only to place the tips of the legs when it measures a skeleton's size: it doesn't compare the angle between a drawn Winkelhaken's legs with a skeleton's. The file doesn't record stroke thicknesses: a tool that draws skeletons over a font can keep its own.
 

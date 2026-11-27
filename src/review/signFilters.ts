@@ -61,7 +61,10 @@ export function hasStatus(
   }
 }
 
-/** Whether a sign falls outside the limits the data test holds it to. */
+/**
+ * Whether a sign falls outside the limits the data test holds it to. A partial
+ * skeleton is held only to the shape limit.
+ */
 export function isFailing(
   sign: ReviewSign,
   limits: RedrawLimits | undefined,
@@ -69,7 +72,7 @@ export function isFailing(
   const score = sign.score
   if (!limits || !score) return false
   return (
-    score.overlap < limits.overlap ||
+    (!sign.partial && score.overlap < limits.overlap) ||
     score.shapesOutside.some((outside) => outside > limits.shapeOutside)
   )
 }

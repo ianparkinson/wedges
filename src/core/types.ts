@@ -39,6 +39,11 @@ export interface SkeletonEntry {
   /** The shapes, such as "w 21 69 270 77 15". */
   readonly shapes?: readonly string[]
   readonly comments?: string
+  /**
+   * Whether the shapes leave out strokes the format can't draw, such as a
+   * half-oval, with `comments` saying what.
+   */
+  readonly partial?: boolean
 }
 
 /**
