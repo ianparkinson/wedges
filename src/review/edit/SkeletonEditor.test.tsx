@@ -20,6 +20,7 @@ function renderEditor(shapes?: readonly string[]) {
       showSkeleton
       onSave={() => Promise.resolve()}
       onDone={vi.fn()}
+      onReviewed={vi.fn()}
     />,
   )
   return {

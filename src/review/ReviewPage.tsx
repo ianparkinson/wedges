@@ -170,12 +170,19 @@ function LoadedReview({
     const next = shown[selectedIndex + by]
     if (next) setSelectedKey(next.key)
   }
-  /** Marks a sign reviewed and moves on to the next, or unmarks it. */
-  const markReviewed = (sign: ReviewSign, value: boolean) => {
-    if (!sign.shapes) return
+  /**
+   * Marks a sign reviewed and moves on to the next, or unmarks it, as it has
+   * the given shapes, by default those it has.
+   */
+  const markReviewed = (
+    sign: ReviewSign,
+    value: boolean,
+    shapes = sign.shapes,
+  ) => {
+    if (!shapes) return
     // Found before marking, since marking can filter the sign out.
     const next = shown[selectedIndex + 1]
-    reviewed.setReviewed(sign.text, sign.shapes, value)
+    reviewed.setReviewed(sign.text, shapes, value)
     if (value && next) setSelectedKey(next.key)
   }
 
@@ -305,7 +312,9 @@ function LoadedReview({
               onShowGlyphChange={setShowGlyph}
               onShowSkeletonChange={setShowSkeleton}
               onExpandedChange={setExpanded}
-              onReviewedChange={(value) => markReviewed(selected, value)}
+              onReviewedChange={(value, shapes) =>
+                markReviewed(selected, value, shapes)
+              }
               onSave={(shapes) =>
                 saveShapes(
                   fileId,

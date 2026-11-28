@@ -31,7 +31,11 @@ export interface SignDetailProps {
   onShowGlyphChange: (show: boolean) => void
   onShowSkeletonChange: (show: boolean) => void
   onExpandedChange: (expanded: boolean) => void
-  onReviewedChange: (reviewed: boolean) => void
+  /**
+   * Marks the sign reviewed or not: its shapes, or those R has just saved
+   * while editing.
+   */
+  onReviewedChange: (reviewed: boolean, shapes?: readonly string[]) => void
   /** Saves new shapes for the sign. Rejects, saying why, if it can't. */
   onSave: (shapes: readonly string[]) => Promise<void>
   onPrevious: () => void
@@ -135,6 +139,7 @@ export function SignDetail({
           pictureClassName={pictureClassName}
           onSave={onSave}
           onDone={() => setEditing(false)}
+          onReviewed={(shapes) => onReviewedChange(true, shapes)}
         />
       ) : (
         <>

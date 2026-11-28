@@ -247,4 +247,36 @@ describe("ReviewPage", () => {
       "w 22 70 270 70 4",
     ])
   })
+  it("saves an edit with R before marking it reviewed and moving on", async () => {
+    saveShapes.mockClear()
+    render(<ReviewPage />)
+    await userEvent.click(screen.getByRole("button", { name: /^DIŠ/ }))
+    await userEvent.keyboard("e")
+    await userEvent.keyboard("r")
+    expect(saveShapes).toHaveBeenCalledWith("noto-next", "𒁹", 0, [
+      "w 22 70 270 70 4",
+    ])
+    expect(location.search).toBe(`?sign=${encodeURIComponent("A#0")}`)
+    expect(
+      screen.getByRole("button", { name: /^DIŠ, .*reviewed$/ }),
+    ).toBeVisible()
+  })
+
+  it("stays on an edit that R can't save", async () => {
+    saveShapes.mockClear()
+    render(<ReviewPage />)
+    await userEvent.click(screen.getByRole("button", { name: /^DIŠ/ }))
+    await userEvent.keyboard("e")
+    await userEvent.type(
+      screen.getByRole("textbox", { name: "Shapes, one to a line" }),
+      "\nw 1 2",
+    )
+    await userEvent.click(screen.getByRole("heading", { name: /DIŠ/ }))
+    await userEvent.keyboard("r")
+    expect(saveShapes).not.toHaveBeenCalled()
+    expect(location.search).toBe(`?sign=${encodeURIComponent("𒁹#0")}`)
+    expect(
+      screen.getByRole("textbox", { name: "Shapes, one to a line" }),
+    ).toBeVisible()
+  })
 })

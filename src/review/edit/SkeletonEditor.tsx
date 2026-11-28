@@ -2,6 +2,8 @@ import type { Font } from "opentype.js"
 import { useEffect, useRef, useState, type KeyboardEvent } from "react"
 
 import { parseShape } from "@/core/skeleton"
+import { compareShapes } from "@/core/skeletonOrder"
+import { isPageKey } from "@/review/pageKeys"
 import type { StrokeStyle } from "@/review/redraw/impression"
 import type { RedrawLimits } from "@/review/redraw/limits"
 import { RedrawView } from "@/review/RedrawView"
@@ -30,12 +32,24 @@ export interface SkeletonEditorProps {
   onSave: (shapes: readonly string[]) => Promise<void>
   /** Ends the edit, after a save or on cancelling. */
   onDone: () => void
+  /** Marks the shapes reviewed, after R has saved them and ended the edit. */
+  onReviewed: (shapes: readonly string[]) => void
   /** A class for the picture, as for {@link RedrawView}. */
   pictureClassName?: string
 }
 
 /** How far a duplicate lies from the shape it copies, right and down. */
 const DUPLICATE_OFFSET = 4
+
+/**
+ * Shapes as a save writes them into the file, so that a reviewed mark made
+ * for them matches the file: spaced singly, and in the file's order.
+ */
+function asSaved(shapes: readonly string[]): readonly string[] {
+  return shapes
+    .map((shape) => shape.trim().split(/\s+/).join(" "))
+    .toSorted(compareShapes)
+}
 
 /** The drawing tools, with the keys that choose them. */
 const TOOLS: readonly { tool: EditTool; label: string; key: string }[] = [
@@ -49,7 +63,8 @@ const TOOLS: readonly { tool: EditTool; label: string; key: string }[] = [
  * and new ones drawn, and as text, scored as they change, with undo and
  * redo. The picture takes the focus to start with. With it focused, V, W
  * and K choose a tool, D duplicates the selected shape, and Delete or
- * Backspace deletes it. Ctrl+Enter or Cmd+Enter saves, wherever the focus is.
+ * Backspace deletes it. Ctrl+Enter or Cmd+Enter saves, wherever the focus is,
+ * and R saves and then marks the shapes reviewed.
  */
 export function SkeletonEditor({
   text,
@@ -63,6 +78,7 @@ export function SkeletonEditor({
   showSkeleton,
   onSave,
   onDone,
+  onReviewed,
   pictureClassName,
 }: SkeletonEditorProps) {
   const draft = useShapesDraft(initial ?? [])
@@ -76,10 +92,15 @@ export function SkeletonEditor({
     draft.problems.length === 0 && draft.text.trim() !== "" && !saving.isSaving
   const view = useRef<HTMLDivElement>(null)
 
-  const save = () => {
+  const save = (then?: (shapes: readonly string[]) => void) => {
+    const shapes = draft.shapes
     setSaving({ isSaving: true })
-    onSave(draft.shapes).then(onDone, (error: unknown) =>
-      setSaving({ isSaving: false, error: String(error) }),
+    onSave(shapes).then(
+      () => {
+        onDone()
+        then?.(asSaved(shapes))
+      },
+      (error: unknown) => setSaving({ isSaving: false, error: String(error) }),
     )
   }
 
@@ -98,6 +119,20 @@ export function SkeletonEditor({
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
+  })
+
+  // R saves before it marks the sign reviewed and moves on, or does nothing
+  // while the shapes can't be saved. Caught on the way down, so the page's
+  // own R, which would move on without saving, never sees it.
+  useEffect(() => {
+    const onKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key.toLowerCase() !== "r" || !isPageKey(event)) return
+      event.preventDefault()
+      event.stopPropagation()
+      if (canSave) save(onReviewed)
+    }
+    window.addEventListener("keydown", onKey, { capture: true })
+    return () => window.removeEventListener("keydown", onKey, { capture: true })
   })
 
   const remove = () => {
@@ -212,7 +247,7 @@ export function SkeletonEditor({
         canSave={canSave}
         error={saving.error}
         isSaving={saving.isSaving}
-        onSave={save}
+        onSave={() => save()}
         onCancel={onDone}
       />
     </>
