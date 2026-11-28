@@ -7,6 +7,7 @@ import { useUrlState } from "@/ui/hooks/useUrlState"
 import { Link } from "@/ui/Link/Link"
 
 import { MarkShown } from "./MarkShown"
+import { isPageKey } from "./pageKeys"
 import { skeletonFonts } from "./redraw/fonts"
 import { redrawLimits } from "./redraw/limits"
 import { saveShapes, skeletonFiles, useFont, useOsl } from "./reviewData"
@@ -169,27 +170,26 @@ function LoadedReview({
     const next = shown[selectedIndex + by]
     if (next) setSelectedKey(next.key)
   }
-  /** Marks a sign reviewed and moves on to the next, or unmarks it. */
-  const markReviewed = (sign: ReviewSign, value: boolean) => {
-    if (!sign.shapes) return
+  /**
+   * Marks a sign reviewed and moves on to the next, or unmarks it, as it has
+   * the given shapes, by default those it has.
+   */
+  const markReviewed = (
+    sign: ReviewSign,
+    value: boolean,
+    shapes = sign.shapes,
+  ) => {
+    if (!shapes) return
     // Found before marking, since marking can filter the sign out.
     const next = shown[selectedIndex + 1]
-    reviewed.setReviewed(sign.text, sign.shapes, value)
+    reviewed.setReviewed(sign.text, shapes, value)
     if (value && next) setSelectedKey(next.key)
   }
 
   useEffect(() => {
     if (!selected) return
     const onKey = (event: KeyboardEvent) => {
-      // Keys typed into a field or list are for it, but a checkbox takes no letters.
-      const target = event.target
-      if (
-        target instanceof HTMLSelectElement ||
-        target instanceof HTMLTextAreaElement ||
-        (target instanceof HTMLInputElement && target.type !== "checkbox")
-      ) {
-        return
-      }
+      if (!isPageKey(event)) return
       switch (event.key) {
         case "ArrowLeft":
           step(-1)
@@ -312,7 +312,9 @@ function LoadedReview({
               onShowGlyphChange={setShowGlyph}
               onShowSkeletonChange={setShowSkeleton}
               onExpandedChange={setExpanded}
-              onReviewedChange={(value) => markReviewed(selected, value)}
+              onReviewedChange={(value, shapes) =>
+                markReviewed(selected, value, shapes)
+              }
               onSave={(shapes) =>
                 saveShapes(
                   fileId,

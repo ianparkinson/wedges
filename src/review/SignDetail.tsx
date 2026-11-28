@@ -1,11 +1,12 @@
 import type { Font } from "opentype.js"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { codePoints } from "@/core/cuneiform"
 import { Button } from "@/ui/Button/Button"
 
 import { isChanged } from "./compare"
 import { SkeletonEditor } from "./edit/SkeletonEditor"
+import { isPageKey } from "./pageKeys"
 import type { StrokeStyle } from "./redraw/impression"
 import type { RedrawLimits } from "./redraw/limits"
 import { RedrawView } from "./RedrawView"
@@ -30,7 +31,11 @@ export interface SignDetailProps {
   onShowGlyphChange: (show: boolean) => void
   onShowSkeletonChange: (show: boolean) => void
   onExpandedChange: (expanded: boolean) => void
-  onReviewedChange: (reviewed: boolean) => void
+  /**
+   * Marks the sign reviewed or not: its shapes, or those R has just saved
+   * while editing.
+   */
+  onReviewedChange: (reviewed: boolean, shapes?: readonly string[]) => void
   /** Saves new shapes for the sign. Rejects, saying why, if it can't. */
   onSave: (shapes: readonly string[]) => Promise<void>
   onPrevious: () => void
@@ -43,7 +48,7 @@ export interface SignDetailProps {
  * it was in the version compared with, if it has changed. Its shapes can be
  * edited, by dragging or as text. Give each sign its own `key`, so that an
  * edit doesn't carry over to the next sign. Expanded, it fills the window,
- * with the picture as large as fits beside the rest.
+ * with the picture as large as fits beside the rest. E starts an edit.
  */
 export function SignDetail({
   sign,
@@ -68,6 +73,17 @@ export function SignDetail({
   const before = comparedWith && isChanged(sign) ? sign.before : undefined
   const [isEditing, setEditing] = useState(false)
   const pictureClassName = isExpanded ? styles.mainPicture : undefined
+
+  useEffect(() => {
+    if (isEditing) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== "e" || !isPageKey(event)) return
+      event.preventDefault()
+      setEditing(true)
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [isEditing])
 
   return (
     <section
@@ -123,6 +139,7 @@ export function SignDetail({
           pictureClassName={pictureClassName}
           onSave={onSave}
           onDone={() => setEditing(false)}
+          onReviewed={(shapes) => onReviewedChange(true, shapes)}
         />
       ) : (
         <>
@@ -141,7 +158,7 @@ export function SignDetail({
           />
           <div>
             <Button onPress={() => setEditing(true)}>
-              {sign.shapes ? "Edit shapes" : "Add shapes"}
+              {sign.shapes ? "Edit shapes (E)" : "Add shapes (E)"}
             </Button>
           </div>
         </>
