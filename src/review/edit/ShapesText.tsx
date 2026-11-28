@@ -9,6 +9,8 @@ export interface ShapesTextProps {
   onChange: (value: string) => void
   /** Messages about lines that aren't shapes, which stop the save. */
   problems: readonly string[]
+  /** Whether the shapes can be saved as they are. */
+  canSave: boolean
   /** Why the last save failed, if it did. */
   error?: string
   isSaving: boolean
@@ -18,19 +20,18 @@ export interface ShapesTextProps {
 
 /**
  * A sign's shapes as text to edit, one to a line, with Save and Cancel.
- * Ctrl+Enter or Cmd+Enter saves, and Esc cancels.
+ * Esc in the text cancels.
  */
 export function ShapesText({
   value,
   onChange,
   problems,
+  canSave,
   error,
   isSaving,
   onSave,
   onCancel,
 }: ShapesTextProps) {
-  const canSave = problems.length === 0 && value.trim() !== "" && !isSaving
-
   return (
     <div className={styles.editor}>
       <label className={styles.label}>
@@ -42,12 +43,7 @@ export function ShapesText({
           spellCheck={false}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && canSave) {
-              e.preventDefault()
-              onSave()
-            } else if (e.key === "Escape") {
-              onCancel()
-            }
+            if (e.key === "Escape") onCancel()
           }}
         />
       </label>

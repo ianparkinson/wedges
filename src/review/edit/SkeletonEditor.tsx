@@ -1,5 +1,5 @@
 import type { Font } from "opentype.js"
-import { useState, type KeyboardEvent } from "react"
+import { useEffect, useRef, useState, type KeyboardEvent } from "react"
 
 import { parseShape } from "@/core/skeleton"
 import type { StrokeStyle } from "@/review/redraw/impression"
@@ -47,8 +47,9 @@ const TOOLS: readonly { tool: EditTool; label: string; key: string }[] = [
 /**
  * A sign's shapes to edit, both over the glyph, where they can be dragged
  * and new ones drawn, and as text, scored as they change, with undo and
- * redo. With the picture focused, V, W and K choose a tool, D duplicates the
- * selected shape, and Delete or Backspace deletes it.
+ * redo. The picture takes the focus to start with. With it focused, V, W
+ * and K choose a tool, D duplicates the selected shape, and Delete or
+ * Backspace deletes it. Ctrl+Enter or Cmd+Enter saves, wherever the focus is.
  */
 export function SkeletonEditor({
   text,
@@ -71,6 +72,9 @@ export function SkeletonEditor({
     isSaving: false,
   })
   const canDrag = draft.problems.length === 0
+  const canSave =
+    draft.problems.length === 0 && draft.text.trim() !== "" && !saving.isSaving
+  const view = useRef<HTMLDivElement>(null)
 
   const save = () => {
     setSaving({ isSaving: true })
@@ -78,6 +82,23 @@ export function SkeletonEditor({
       setSaving({ isSaving: false, error: String(error) }),
     )
   }
+
+  // Focus the picture, so its keys work at once, without scrolling to it.
+  useEffect(() => {
+    view.current
+      ?.querySelector<SVGElement>("[tabindex]")
+      ?.focus({ preventScroll: true })
+  }, [])
+
+  useEffect(() => {
+    const onKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== "Enter" || !(event.ctrlKey || event.metaKey)) return
+      event.preventDefault()
+      if (canSave) save()
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  })
 
   const remove = () => {
     if (selected === undefined) return
@@ -135,7 +156,11 @@ export function SkeletonEditor({
         </div>
       )}
       {/* The keys come from the picture inside, which is focusable. */}
-      <div className={styles.view} onKeyDown={canDrag ? onKeyDown : undefined}>
+      <div
+        ref={view}
+        className={styles.view}
+        onKeyDown={canDrag ? onKeyDown : undefined}
+      >
         <RedrawView
           text={text}
           shapes={draft.shapes}
@@ -184,6 +209,7 @@ export function SkeletonEditor({
         value={draft.text}
         onChange={draft.setText}
         problems={draft.problems}
+        canSave={canSave}
         error={saving.error}
         isSaving={saving.isSaving}
         onSave={save}

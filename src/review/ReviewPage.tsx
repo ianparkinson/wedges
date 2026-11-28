@@ -7,6 +7,7 @@ import { useUrlState } from "@/ui/hooks/useUrlState"
 import { Link } from "@/ui/Link/Link"
 
 import { MarkShown } from "./MarkShown"
+import { isPageKey } from "./pageKeys"
 import { skeletonFonts } from "./redraw/fonts"
 import { redrawLimits } from "./redraw/limits"
 import { saveShapes, skeletonFiles, useFont, useOsl } from "./reviewData"
@@ -181,15 +182,7 @@ function LoadedReview({
   useEffect(() => {
     if (!selected) return
     const onKey = (event: KeyboardEvent) => {
-      // Keys typed into a field or list are for it, but a checkbox takes no letters.
-      const target = event.target
-      if (
-        target instanceof HTMLSelectElement ||
-        target instanceof HTMLTextAreaElement ||
-        (target instanceof HTMLInputElement && target.type !== "checkbox")
-      ) {
-        return
-      }
+      if (!isPageKey(event)) return
       switch (event.key) {
         case "ArrowLeft":
           step(-1)

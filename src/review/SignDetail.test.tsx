@@ -109,7 +109,9 @@ describe("SignDetail", () => {
 
     it("redraws the shapes as they're typed, and saves them", async () => {
       const { onSave } = renderDetail()
-      await userEvent.click(screen.getByRole("button", { name: "Edit shapes" }))
+      await userEvent.click(
+        screen.getByRole("button", { name: "Edit shapes (E)" }),
+      )
       expect(shapesField()).toHaveValue("w 22 70 270 70 4\nw 60 70 270 30 4")
 
       await userEvent.clear(shapesField())
@@ -125,7 +127,9 @@ describe("SignDetail", () => {
 
     it("won't save a line that isn't a shape", async () => {
       renderDetail()
-      await userEvent.click(screen.getByRole("button", { name: "Edit shapes" }))
+      await userEvent.click(
+        screen.getByRole("button", { name: "Edit shapes (E)" }),
+      )
       await userEvent.type(shapesField(), "\nw 1 2")
       expect(
         screen.getByRole("list", { name: "Not shapes" }),
@@ -139,7 +143,9 @@ describe("SignDetail", () => {
       renderDetail({
         onSave: () => Promise.reject(new Error("Can't save: bad shape")),
       })
-      await userEvent.click(screen.getByRole("button", { name: "Edit shapes" }))
+      await userEvent.click(
+        screen.getByRole("button", { name: "Edit shapes (E)" }),
+      )
       await userEvent.type(shapesField(), "{Control>}{Enter}{/Control}")
       expect(await screen.findByRole("alert")).toHaveTextContent(
         "Can't save: bad shape",
@@ -147,16 +153,59 @@ describe("SignDetail", () => {
       expect(shapesField()).toBeVisible()
     })
 
+    it("starts an edit with E, with the picture focused", async () => {
+      renderDetail()
+      await userEvent.keyboard("e")
+      expect(shapesField()).toBeVisible()
+      expect(
+        screen.getByRole("application", { name: "Skeleton editor" }),
+      ).toHaveFocus()
+    })
+
+    it("leaves E typed into a field, or held with Ctrl, to it", async () => {
+      render(<input aria-label="Elsewhere" />)
+      renderDetail()
+      await userEvent.type(
+        screen.getByRole("textbox", { name: "Elsewhere" }),
+        "e",
+      )
+      await userEvent.keyboard("{Control>}e{/Control}")
+      expect(
+        screen.queryByRole("textbox", { name: "Shapes, one to a line" }),
+      ).toBeNull()
+    })
+
+    it("saves with Ctrl+Enter after dragging, from the picture", async () => {
+      const { onSave } = renderDetail()
+      await userEvent.keyboard("e")
+      await userEvent.click(
+        screen.getByRole("cell", { name: "w 60 70 270 30 4" }),
+      )
+      screen.getByRole("application", { name: "Skeleton editor" }).focus()
+      await userEvent.keyboard("{ArrowRight}{Control>}{Enter}{/Control}")
+      expect(onSave).toHaveBeenCalledWith([
+        "w 22 70 270 70 4",
+        "w 61 70 270 30 4",
+      ])
+      expect(
+        screen.queryByRole("textbox", { name: "Shapes, one to a line" }),
+      ).toBeNull()
+    })
+
     it("cancels the edit with Esc", async () => {
       renderDetail()
-      await userEvent.click(screen.getByRole("button", { name: "Edit shapes" }))
+      await userEvent.click(
+        screen.getByRole("button", { name: "Edit shapes (E)" }),
+      )
       await userEvent.type(shapesField(), "{Escape}")
       expect(screen.queryByRole("textbox")).toBeNull()
     })
 
     it("adds shapes to a sign with none", async () => {
       renderDetail({ sign: { ...sign, shapes: undefined } })
-      await userEvent.click(screen.getByRole("button", { name: "Add shapes" }))
+      await userEvent.click(
+        screen.getByRole("button", { name: "Add shapes (E)" }),
+      )
       expect(shapesField()).toHaveValue("")
     })
   })

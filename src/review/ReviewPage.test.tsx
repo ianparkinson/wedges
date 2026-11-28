@@ -229,12 +229,16 @@ describe("ReviewPage", () => {
   it("saves edited shapes into the file's entry for the sign", async () => {
     render(<ReviewPage />)
     await userEvent.click(screen.getByRole("button", { name: /^DIŠ/ }))
-    await userEvent.click(screen.getByRole("button", { name: "Edit shapes" }))
+    await userEvent.click(
+      screen.getByRole("button", { name: "Edit shapes (E)" }),
+    )
     const field = screen.getByRole("textbox", { name: "Shapes, one to a line" })
     await userEvent.type(field, "{ArrowRight}{Escape}")
     expect(location.search).toBe(`?sign=${encodeURIComponent("𒁹#0")}`)
 
-    await userEvent.click(screen.getByRole("button", { name: "Edit shapes" }))
+    await userEvent.click(
+      screen.getByRole("button", { name: "Edit shapes (E)" }),
+    )
     await userEvent.type(
       screen.getByRole("textbox", { name: "Shapes, one to a line" }),
       "{Control>}{Enter}{/Control}",
