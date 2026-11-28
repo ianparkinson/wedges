@@ -14,6 +14,14 @@ const SCALE = 2
 /** A pixel counts as covered when it's at least half filled. */
 const COVERED = 128
 
+/**
+ * How far off the ink, in skeleton units, a shape may stray before it counts
+ * as outside: half a unit, as skeletons round their numbers to whole units.
+ * On a small stroke in a part of a compound, which the font draws only a unit
+ * or two wide, that rounding alone can put much of the shape off the ink.
+ */
+const ROUNDING = 0.5
+
 /** How well a skeleton, drawn back, covers its glyph, each from 0 to 1. */
 export interface RedrawScore {
   /** The area both cover, over the area either covers: 1 is a perfect fit. */
@@ -22,7 +30,10 @@ export interface RedrawScore {
   readonly missed: number
   /** The fraction of the drawn skeleton that lies outside the ink. */
   readonly outside: number
-  /** For each shape, the fraction of it that lies outside the ink. */
+  /**
+   * For each shape, the fraction of it that lies outside the ink, allowing
+   * for skeletons' rounding to whole units.
+   */
   readonly shapesOutside: readonly number[]
 }
 
@@ -52,6 +63,14 @@ export function redraw(
     // Six decimal places keep the outline to a millionth of a unit.
     context.fill(new Path2D(glyph.path.toPathData(6)))
   })
+  // The ink with a margin all round, for judging single shapes.
+  const nearInk = canvas.rasterize((context) => {
+    const outline = new Path2D(glyph.path.toPathData(6))
+    context.fill(outline)
+    context.lineWidth = 2 * ROUNDING
+    context.lineJoin = "round"
+    context.stroke(outline)
+  })
   const drawn = canvas.rasterize((context) => fill(context, impressions))
   const both = count(ink, drawn)
   const inkArea = count(ink)
@@ -66,7 +85,7 @@ export function redraw(
         (context) => fill(context, [polygon]),
         boundingBox(polygon),
       )
-      return 1 - count(shape, ink) / Math.max(1, count(shape))
+      return 1 - count(shape, nearInk) / Math.max(1, count(shape))
     }),
   }
 }
@@ -83,7 +102,7 @@ interface Raster {
   readonly rgba: Uint8ClampedArray
 }
 
-type Context = CanvasPath & CanvasDrawPath
+type Context = CanvasPath & CanvasDrawPath & CanvasPathDrawingStyles
 
 /** One canvas over a box in skeleton units, drawn on again and again. */
 class Canvas {
@@ -101,6 +120,7 @@ class Canvas {
       },
     )!
     this.context.fillStyle = "black"
+    this.context.strokeStyle = "black"
   }
 
   /**

@@ -62,4 +62,12 @@ describe("redraw", () => {
     expect(partly).toBeGreaterThan(0.1)
     expect(partly).toBeLessThan(0.5)
   })
+
+  it("allows a shape half a unit off the ink, as rounding puts it", () => {
+    const thin = ["w 10 10 0 20 1"]
+    const [off = 1] = score(thin, ["w 10 10.5 0 20 1"]).shapesOutside
+    const [further = 0] = score(thin, ["w 10 12 0 20 1"]).shapesOutside
+    expect(off).toBe(0)
+    expect(further).toBeGreaterThan(0.5)
+  })
 })

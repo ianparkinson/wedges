@@ -19,6 +19,8 @@ The check gives three scores for each sign, and one for each shape, all from 0 t
 | Outside  | The fraction of the drawn shapes that lies outside the ink: a stroke too long, or misplaced. |
 | By shape | The fraction of each shape that lies outside the ink, which picks out the stroke at fault.   |
 
+For the score by shape, ink within half a unit of the shape counts as ink. Skeletons round to whole units, and a small stroke in a part of a compound may be only a unit or two wide, so rounding alone could put much of it off the ink.
+
 A good skeleton doesn't reach an overlap of 1, because a font's strokes don't follow the stroke style exactly. A good Noto skeleton scores about 0.85–0.95.
 
 ### Data test
